@@ -1,0 +1,177 @@
+/*
+Copyright (c) 2011 bubbles.way@gmail.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+// For running Gradle, add GRADLE_HOME/bin to PATH, NCS_DIR has to be defined
+// Tip: Use Intellij Idea community edition to work with gradle (GradelGUI plugin)
+// run 'gradle tasks' to see available tasks
+
+version = '0.0.1'
+sourceCompatibility = '1.6'
+groupId = "org.bitbucket.novakmi"
+installDir = file('./install')
+
+apply plugin: 'groovy'
+apply plugin: 'maven' // to use maven repository
+apply plugin: 'idea' // to generate project+module files for Intellij Idea
+
+idea {
+        module {
+                downloadJavadoc = true
+        }
+}
+
+repositories {
+        mavenCentral() // standard maven repository
+        mavenRepo(name:'bubbleswayrepo', url: 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases')
+}
+
+// Define dependencies
+dependencies {
+        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.8.5'
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.1.0'
+        // dependecies for tests
+        testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.4'
+        testCompile group: 'org.testng', name: 'testng', version: '6.2.1'
+        testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.0'
+        //testCompile 'org.uncommons:reportng:1.1.1'
+        testCompile group: 'janino', name: 'janino', version: '2.5.10'
+}
+
+
+jar {
+        manifest {
+                attributes(
+                    'Implementation-Title': project.name,
+                    'Implementation-Version': version,
+                    'Specification-Vendor': 'Michal Novak (bubbles.way@gmail.com)',
+                    'Built-By': 'bubbles.way',
+                    'Specification-Title': project.name,
+                    'Extension-Name': project.name,
+                    'Specification-Version': version
+                )
+        }
+}
+
+clean << {  //add to clean task
+        installDir.deleteDir()
+}
+
+task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from "${project.projectDir}/src/main"
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+        classifier = 'groovydoc'
+        from groovydoc.destinationDir
+}
+
+test {
+        useTestNG() {
+                suiteXmlBuilder().suite(name: 'Test yang groovy builder') {
+                        test(name: 'yang'/*, annotations: 'JDK', verbose: '1'*/) {
+                                groups {
+                                        run {
+                                                include(name: "basic")
+                                        }
+                                }
+                                classes([:]) {
+                                        'class'(name: "org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest")
+                                }
+                        }
+                }
+        }
+//    options {
+        //        listeners << 'org.uncommons.reportng.HTMLReporter'
+        //        listeners << 'org.uncommons.reportng.JUnitXMLReporter'
+        //    }
+}
+
+
+task prepareInstall(type: Copy, dependsOn: [jar, sourcesJar, groovydocJar]) {
+        installDir.mkdirs()
+        //logger.quiet("externalJars {}", externalJars)
+        from configurations['compile']?.files/*?.findAll { it.absolutePath.indexOf('unspecified') < 0 }*/
+        from "${project.projectDir}/build/libs"
+        into installDir
+}
+
+// zip into build/distributions
+task zipInstall(type: Zip, dependsOn: prepareInstall) {
+        from installDir.toString()
+}
+
+artifacts { // upload also sources and groovydoc
+        archives sourcesJar
+        archives groovydocJar
+}
+
+uploadArchives { // support to upload to github emulated maven repository
+        def localMavenDir = System.getenv()['LOCAL_MAVEN_DIR']
+        if (!localMavenDir) {
+                logger.error("LOCAL_MAVEN_DIR is not defined! Artifacts will not be exported!")
+        } else {
+                repositories {
+                        mavenDeployer {
+                                repository(url: "file://localhost/${localMavenDir}/releases")
+                                pom.version = version
+                                pom.groupId = groupId
+                        }
+                }
+        }
+}
+
+// http://daniel.gredler.net/2011/08/08/gradle-keeping-libraries-up-to-date/
+// Find any 3rd party libraries which have released new versions
+// to the central Maven repo since we last upgraded.
+task checkLibVersions << {
+        def checked = [:]
+        allprojects {
+                configurations.each { configuration ->
+                        configuration.allDependencies.each { dependency ->
+                                def version = dependency.version
+                                if (version && !version.contains('SNAPSHOT') && !checked[dependency]) {
+                                        def group = dependency.group
+                                        def path = group.replace('.', '/')
+                                        def name = dependency.name
+                                        def url = "http://repo1.maven.org/maven2/$path/$name/maven-metadata.xml"
+                                        try {
+                                                def metadata = new XmlSlurper().parseText(url.toURL().text)
+                                                def versions = metadata.versioning.versions.version.collect { it.text() }
+                                                versions.removeAll { it.toLowerCase().contains('alpha') }
+                                                versions.removeAll { it.toLowerCase().contains('beta') }
+                                                versions.removeAll { it.toLowerCase().contains('rc') }
+                                                def newest = versions.max()
+                                                if (version != newest) {
+                                                        println "$group:$name $version -> $newest [$versions]"
+                                                }
+                                        } catch (FileNotFoundException e) {
+                                                logger.debug "Unable to download $url: $e.message"
+                                        } catch (org.xml.sax.SAXParseException e) {
+                                                logger.debug "Unable to parse $url: $e.message"
+                                        }
+                                        checked[dependency] = true
+                                }
+                        }
+                }
+        }
+}

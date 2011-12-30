@@ -1,0 +1,136 @@
+/*
+Copyright (c) 2011 Michal Novak (bubbles.way@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+package org.bitbucket.novakmi.yangbuilder
+
+import org.bitbucket.novakmi.nodebuilder.BuilderException
+import org.bitbucket.novakmi.nodebuilder.SimpleNode
+import org.bitbucket.novakmi.nodebuilder.TextPluginSimpleNodeBuilder
+
+class YangBuilder extends TextPluginSimpleNodeBuilder {
+
+        /**
+         * Create new YangBuilder
+         * @param indent number of spaces for indentation (default is 2)
+         */
+        public YangBuilder(indent = 2) {
+                super(indent)
+        }
+
+        /**
+         * Get needed quotes for yang string.
+         *  If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),*/
+       //*  or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
+        /* @param txt
+         * @return
+         * @see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
+         */
+        def getQuotes(txt) {
+                def retVal = ''
+                while (1) {
+                        if (txt && txt?.size() > 1) {
+                                if ((txt[0] == '"') && txt[-1] == '"') { // enclosed with "
+                                        break
+                                }
+                                if ((txt[0] == "'") && txt[-1] == "'") { // enclosed with '
+                                        break
+                                }
+                                if (
+                                    txt.contains(' ') || txt.contains('\t')
+                                        || txt.contains(';') || txt.contains('{') || txt.contains('}')
+                                        || txt.contains('//') || txt.contains('/*') || txt.contains('*/')
+                                ) {
+                                        retVal = '"'
+                                } else {
+                                        break
+                                }
+                                if (txt.contains('"')) { // already contains doubel quotes, try single quotes
+                                        if (txt.contains("'")) { // contains also single quotes, do nothing
+                                                retVal = ''
+                                                break
+                                        }
+                                        retVal = "'" // use single quotes instead
+                                }
+                        }
+                        break
+                }
+                return retVal
+        }
+
+        @Override
+        protected boolean processNode(org.bitbucket.novakmi.nodebuilder.SimpleNode node, Object opaque) throws BuilderException {
+                def retVal = true
+                def quotes = ''
+                switch (node.name) {
+                        // this node directly echoes its value with indetation or without indentation (attribute indent is set to false)
+                        case 'yngbuild':
+                                if (node.children.size()) {
+                                        throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} cannot contain child nodes!")
+                                }
+                                if ((node.attributes.indent == true)) {
+                                        opaque.printIndent()
+                                }
+                                opaque.println(node.value)
+                                break
+                        // for following keywords surround value with quotes if needed, prefer double quotes over single quotes
+                        // see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
+                        // If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),
+                        // or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
+                        case 'description':
+                        case 'presence':
+                        case 'namespace':
+                        case 'key':
+                        case 'pattern':
+                        case 'prefix':
+                        case 'organization':
+                                // TODO add other keywords as needed
+                                quotes = getQuotes(node.value)
+                        default:
+                                opaque.printIndent()
+                                opaque.print("$node.name")
+                                if (node.value) {
+                                        opaque.print(" ${quotes}${node.value}${quotes}")
+                                }
+                                if (!node?.children.size()) {
+                                        opaque.println(";") // yang statements not having children end with semicolon
+                                }
+                                break
+                }
+                return retVal
+        }
+
+        @Override
+        protected boolean processNodeBeforeChildren(SimpleNode node, Object opaque) {
+                opaque.println(" {") // block opening bracket
+                opaque.incrementIndent()
+                return true
+        }
+
+        @Override
+        protected boolean processNodeAfterChildren(SimpleNode node, Object opaque) {
+                opaque.decrementIndent()
+                opaque.printIndent()
+                opaque.println("}") // block closing bracket
+                return true
+        }
+
+}
