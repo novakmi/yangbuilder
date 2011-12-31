@@ -47,7 +47,7 @@ repositories {
 // Define dependencies
 dependencies {
         groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.8.5'
-        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.1.0'
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.2.0'
         // dependecies for tests
         testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.4'
         testCompile group: 'org.testng', name: 'testng', version: '6.2.1'
