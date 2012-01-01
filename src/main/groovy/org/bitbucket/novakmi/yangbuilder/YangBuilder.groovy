@@ -28,6 +28,7 @@ import org.bitbucket.novakmi.nodebuilder.TextPluginSimpleNodeBuilder
 
 class YangBuilder extends TextPluginSimpleNodeBuilder {
 
+        final private String YANG_ROOT = 'yangroot'
         /**
          * Create new YangBuilder
          * @param indent number of spaces for indentation (default is 2)
@@ -39,7 +40,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         /**
          * Get needed quotes for yang string.
          *  If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),*/
-       //*  or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
+        //*  or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
         /* @param txt
          * @return
          * @see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
@@ -81,7 +82,13 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                 def retVal = true
                 def quotes = ''
                 switch (node.name) {
-                        // this node directly echoes its value with indetation or without indentation (attribute indent is set to false)
+                        case YANG_ROOT:
+                                if (root == node) {
+                                        opaque.setIndentLevel(-1) //do not indent children under 'yangroot' node
+                                        break
+                                }
+                                throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} must be root node!")
+                // this node directly echoes its value with indetation or without indentation (attribute indent is set to false)
                         case 'yngbuild':
                                 if (node.children.size()) {
                                         throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} cannot contain child nodes!")
@@ -91,17 +98,47 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                                 }
                                 opaque.println(node.value)
                                 break
-                        // for following keywords surround value with quotes if needed, prefer double quotes over single quotes
-                        // see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
-                        // If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),
-                        // or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
+                // for following keywords surround value with quotes if needed, prefer double quotes over single quotes
+                // see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
+                // If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),
+                // or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
+                // in addition 'multiline' attribute is supported for following node types
+                        case 'reference':
+                        case 'contact':
                         case 'description':
                         case 'presence':
+                        case 'organization':
+                                if (node.attributes.multiline == true) {
+                                        opaque.printIndent()
+                                        opaque.println("$node.name")
+                                        quotes = getQuotes(node.value)
+                                        def lines = node?.value.split('\n')
+                                        lines.eachWithIndex {l, i ->
+                                                opaque.printIndent()
+                                                if (i == 0 && quotes != '') {
+                                                        l = quotes + l
+                                                } else {
+                                                        l = ' ' + l
+                                                }
+                                                if (i == lines.size() - 1) {
+                                                        l = l + quotes + ';'
+                                                }
+                                                //opaque.print(" ${l}")
+                                                //if (i == lines.size() - 1) {
+                                                //        opaque.print("${quotes};")
+                                                //}
+                                                opaque.println(" ${l}") // indent one space after description
+                                        }
+                                        break
+                                }
+                // for following keywords surround value with quotes if needed, prefer double quotes over single quotes
+                // see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
+                // If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),
+                // or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
                         case 'namespace':
                         case 'key':
                         case 'pattern':
                         case 'prefix':
-                        case 'organization':
                                 // TODO add other keywords as needed
                                 quotes = getQuotes(node.value)
                         default:
@@ -120,7 +157,9 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
 
         @Override
         protected boolean processNodeBeforeChildren(SimpleNode node, Object opaque) {
-                opaque.println(" {") // block opening bracket
+                if (node.name != YANG_ROOT) {
+                        opaque.println(" {") // block opening bracket
+                }
                 opaque.incrementIndent()
                 return true
         }
@@ -128,8 +167,10 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         @Override
         protected boolean processNodeAfterChildren(SimpleNode node, Object opaque) {
                 opaque.decrementIndent()
-                opaque.printIndent()
-                opaque.println("}") // block closing bracket
+                if (node.name != YANG_ROOT) {
+                        opaque.printIndent()
+                        opaque.println("}") // block closing bracket
+                }
                 return true
         }
 

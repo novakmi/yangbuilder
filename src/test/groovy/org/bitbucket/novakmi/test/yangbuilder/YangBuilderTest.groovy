@@ -47,19 +47,20 @@ class YangBuilderTest {
 
                 builder.module('acme-module') {
 
-                        namespace "http://acme.example.com/module"; // semicolon at the end can be preset (more yang style)
-                        prefix "acme" // or semicolon can be missing (more groovy style)
-                        yngbuild('') //new line
+                        namespace "http://acme.example.com/module"; // semicolon at the end can be preset (yang style)
+                        prefix "acme" // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        'import'("yang-types") {
+                        'import'("yang-types") { // Groovy keywords has to be quoted; if node has sub nodes, value has to be in brackets
                                 prefix "yang"
                         }
-                        include "acme-system"
+                        include "acme-system" // if node does not have sub nodes, brackets are optional
                         yngbuild('')
 
                         organization 'ACME Inc.'
                         contact 'joe@acme.example.com'
-                        description "The module for entities implementing the ACME products"
+                        description('''The module for entities
+implementing the ACME products.''', multiline: true) // multiline description
                         yngbuild('')
 
                         revision('2007-06-09') {
@@ -80,7 +81,9 @@ class YangBuilderTest {
 
     organization "ACME Inc.";
     contact joe@acme.example.com;
-    description "The module for entities implementing the ACME products";
+    description
+     "The module for entities
+      implementing the ACME products.";
 
     revision 2007-06-09 {
         description "Initial revision.";
