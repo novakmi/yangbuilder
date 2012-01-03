@@ -24,7 +24,7 @@ THE SOFTWARE.
 */
 
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
-//Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux script './<scriptName>.groovy')
+//Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 @GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.2.0')
@@ -68,7 +68,7 @@ builder.module(moduleName) {
         }
         yngbuild('')
 
-        makeGrouping() // this behaves same as if content of closer is written here
+        makeGrouping() // this behaves in the same way as if content of the closure is written here
 
         yngbuild('')
 

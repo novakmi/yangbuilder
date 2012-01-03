@@ -24,14 +24,14 @@ THE SOFTWARE.
 */
 
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
-//Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux script './<scriptName>.groovy')
+//Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 @GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.2.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.0.1')
 
 // This script template represents example of usage without any plugin
-def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() // create new builder, default indet of 2
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() // create new builder, default indent of 2
 
 //name of file to generate
 moduleName = "acme-module"   // do not use 'def' for script global variable
@@ -42,7 +42,7 @@ def makeModule(builder) {
                 yngbuild('// based on example from Instant YANG tutorial, section modules', indent:true) //yngbuild echoes its value + request indentation
                 namespace "http://acme.example.com/module"; // semicolon at the end can be preset (yang style)
                 prefix "acme" // or semicolon can be missing (more groovy like style)
-                yngbuild('')  //yngbuild('') means new line withiut indentation
+                yngbuild('')  //yngbuild('') means new line without indentation
 
                 'import'("yang-types") { // Groovy/Java keywords has to be quoted; if node has sub nodes, value has to be in brackets
                         prefix "yang"
@@ -70,7 +70,7 @@ implementing the ACME products.''', multiline: true) // multiple line descriptio
 builder.yangroot {
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}")
         yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */')
-        // one can continue with  module(moduleName) ... or build continue  buildeing yang in separate function
+        // one can continue with  module(moduleName) ... or build continue  building yang in separate function
         // (another option is to define closure after builder.yangroot { ...)
         makeModule(builder)
 }
