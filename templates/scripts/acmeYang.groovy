@@ -75,5 +75,6 @@ builder.yangroot {
         makeModule(builder)
 }
 
-new File("${moduleName}.yang").write(builder.getBuiltText()) // get yang text and write it to file
+builder.writeToFile("${moduleName}.yang")
+//new File("${moduleName}.yang").write(builder.getBuiltText()) // another way how to write to file
 

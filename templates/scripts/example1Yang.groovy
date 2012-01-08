@@ -78,7 +78,7 @@ builder.module(moduleName) {
         }
         yngbuild('')
 
-        ['bgp', 'ospf', 'isis', 'rip'].each {k -> // create 3 containeers in loop, not possbile in yang
+        ['bgp', 'ospf', 'isis', 'rip'].each {k -> // create 3 containers in loop, not possible in yang
                 yngbuild("/* ${k} neighbor */", indent: true)
                 container("${k}-neighbor") {
                         makeAddressPort(builder, k) // as if content of function is written here, yangbuilder reuse (not possible in yang)
@@ -87,4 +87,5 @@ builder.module(moduleName) {
         }
 }
 
-new File("${moduleName}.yang").write(builder.getBuiltText()) // get yang text and write it to file
+builder.writeToFile("${moduleName}.yang")
+//new File("${moduleName}.yang").write(builder.getBuiltText()) // another way how to write to file
