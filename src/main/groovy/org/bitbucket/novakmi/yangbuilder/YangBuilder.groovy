@@ -32,9 +32,10 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         /**
          * Create new YangBuilder
          * @param indent number of spaces for indentation (default is 2)
+         * @param plugins list of plugins to be added (no plugins by default)
          */
-        public YangBuilder(indent = 2) {
-                super(indent)
+        public YangBuilder(indent = 2, plugins = null) {
+                super(indent, plugins)
         }
 
         /**
@@ -64,7 +65,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                                 } else {
                                         break
                                 }
-                                if (txt.contains('"')) { // already contains doubel quotes, try single quotes
+                                if (txt.contains('"')) { // already contains double quotes, try single quotes
                                         if (txt.contains("'")) { // contains also single quotes, do nothing
                                                 retVal = ''
                                                 break
@@ -88,12 +89,12 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                                         break
                                 }
                                 throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} must be root node!")
-                // this node directly echoes its value with indetation or without indentation (attribute indent is set to false)
+                // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
                         case 'yngbuild':
                                 if (node.children.size()) {
                                         throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} cannot contain child nodes!")
                                 }
-                                if ((node.attributes.indent == true)) {
+                                if (node.attributes.indent) {
                                         opaque.printIndent()
                                 }
                                 opaque.println(node.value)
@@ -108,12 +109,12 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                         case 'description':
                         case 'presence':
                         case 'organization':
-                                if (node.attributes.multiline == true) {
+                                if (node.attributes.multiline) {
                                         opaque.printIndent()
                                         opaque.println("$node.name")
                                         quotes = getQuotes(node.value)
-                                        def lines = node?.value.split('\n')
-                                        lines.eachWithIndex {l, i ->
+                                        def lines = node?.value?.split('\n')
+                                        lines?.eachWithIndex {l, i ->
                                                 opaque.printIndent()
                                                 if (i == 0 && quotes != '') {
                                                         l = quotes + l
@@ -147,7 +148,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                                 if (node.value) {
                                         opaque.print(" ${quotes}${node.value}${quotes}")
                                 }
-                                if (!node?.children.size()) {
+                                if (!node?.children?.size()) {
                                         opaque.println(";") // yang statements not having children end with semicolon
                                 }
                                 break
