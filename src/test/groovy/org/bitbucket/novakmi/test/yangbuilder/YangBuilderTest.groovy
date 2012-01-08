@@ -35,7 +35,7 @@ class YangBuilderTest {
         static def assertYangFile(builder, fileName) {
                 logger.trace("==> assertYangFile")
                 logger.trace(builder.getBuiltText())
-                File f = new File("./${fileName}.yang").write(builder.getBuiltText())
+                new File("./${fileName}.yang").write(builder.getBuiltText())
                 logger.trace("<== assertYangFile")
         }
 
