@@ -79,8 +79,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         }
 
         @Override
-        protected boolean processNode(org.bitbucket.novakmi.nodebuilder.SimpleNode node, Object opaque) throws BuilderException {
-                def retVal = true
+        protected void processNode(org.bitbucket.novakmi.nodebuilder.SimpleNode node, Object opaque) throws BuilderException {
                 def quotes = ''
                 switch (node.name) {
                         case YANG_ROOT:
@@ -153,26 +152,23 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                                 }
                                 break
                 }
-                return retVal
         }
 
         @Override
-        protected boolean processNodeBeforeChildren(SimpleNode node, Object opaque) {
+        protected void processNodeBeforeChildren(SimpleNode node, Object opaque) throws BuilderException {
                 if (node.name != YANG_ROOT) {
                         opaque.println(" {") // block opening bracket
                 }
-                opaque.incrementIndent()
-                return true
+                super.processNodeBeforeChildren(node, opaque) //incrementIndent()
         }
 
         @Override
-        protected boolean processNodeAfterChildren(SimpleNode node, Object opaque) {
-                opaque.decrementIndent()
+        protected void processNodeAfterChildren(SimpleNode node, Object opaque) throws BuilderException {
+                super.processNodeAfterChildren(node, opaque)  //decrementIndent()
                 if (node.name != YANG_ROOT) {
                         opaque.printIndent()
                         opaque.println("}") // block closing bracket
                 }
-                return true
         }
 
 }
