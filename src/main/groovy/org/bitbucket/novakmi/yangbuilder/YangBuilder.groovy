@@ -23,10 +23,10 @@ THE SOFTWARE.
 package org.bitbucket.novakmi.yangbuilder
 
 import org.bitbucket.novakmi.nodebuilder.BuilderException
-import org.bitbucket.novakmi.nodebuilder.SimpleNode
-import org.bitbucket.novakmi.nodebuilder.TextPluginSimpleNodeBuilder
+import org.bitbucket.novakmi.nodebuilder.BuilderNode
+import org.bitbucket.novakmi.nodebuilder.TextPluginTreeNodeBuilder
 
-class YangBuilder extends TextPluginSimpleNodeBuilder {
+class YangBuilder extends TextPluginTreeNodeBuilder {
 
         final private String YANG_ROOT = 'yangroot'
         /**
@@ -79,7 +79,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         }
 
         @Override
-        protected void processNode(org.bitbucket.novakmi.nodebuilder.SimpleNode node, Object opaque) throws BuilderException {
+        protected void processNode(BuilderNode node, Object opaque) throws BuilderException {
                 def quotes = ''
                 switch (node.name) {
                         case YANG_ROOT:
@@ -87,11 +87,11 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
                                         opaque.setIndentLevel(-1) //do not indent children under 'yangroot' node
                                         break
                                 }
-                                throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} must be root node!")
+                                throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} must be root node!")
                 // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
                         case 'yngbuild':
                                 if (node.children.size()) {
-                                        throw new BuilderException("Node: ${SimpleNode.getNodePath(node)} cannot contain child nodes!")
+                                        throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} cannot contain child nodes!")
                                 }
                                 if (node.attributes.indent) {
                                         opaque.printIndent()
@@ -155,7 +155,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         }
 
         @Override
-        protected void processNodeBeforeChildren(SimpleNode node, Object opaque) throws BuilderException {
+        protected void processNodeBeforeChildren(BuilderNode node, Object opaque) throws BuilderException {
                 if (node.name != YANG_ROOT) {
                         opaque.println(" {") // block opening bracket
                 }
@@ -163,7 +163,7 @@ class YangBuilder extends TextPluginSimpleNodeBuilder {
         }
 
         @Override
-        protected void processNodeAfterChildren(SimpleNode node, Object opaque) throws BuilderException {
+        protected void processNodeAfterChildren(BuilderNode node, Object opaque) throws BuilderException {
                 super.processNodeAfterChildren(node, opaque)  //decrementIndent()
                 if (node.name != YANG_ROOT) {
                         opaque.printIndent()
