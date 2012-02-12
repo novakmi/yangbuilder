@@ -24,7 +24,7 @@ THE SOFTWARE.
 // Tip: Use Intellij Idea community edition to work with gradle (GradleGUI plugin)
 // run 'gradle tasks' to see available tasks
 
-version = '0.0.2'
+version = '0.1.0'
 sourceCompatibility = '1.6'
 groupId = "org.bitbucket.novakmi"
 installDir = file('./install')
@@ -46,11 +46,11 @@ repositories {
 
 // Define dependencies
 dependencies {
-        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.8.5'
-        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.2.0'
+        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.8.6'
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.3.0'
         // dependencies for tests
         testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.4'
-        testCompile group: 'org.testng', name: 'testng', version: '6.2.1'
+        testCompile group: 'org.testng', name: 'testng', version: '6.2.1' // TODO 6.3.x not supported by gradle
         testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.0'
         //testCompile 'org.uncommons:reportng:1.1.1'
         testCompile group: 'janino', name: 'janino', version: '2.5.10'
