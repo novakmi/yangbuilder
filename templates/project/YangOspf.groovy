@@ -35,7 +35,6 @@ class YangOspf {
                         container("${protocol}-neighbor") {
                                 YangCommon.buildAddressPort(builder, protocol) // as if content of function is written here, yangbuilder reuse (not possible in yang)
                         }
-                        yngbuild('')
                 }
         }
 }
