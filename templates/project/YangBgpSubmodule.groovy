@@ -43,7 +43,6 @@ class YangBgpSubmodule {
                                                 type('inet:ip-address')
                                         }
                                 }
-                                yngbuild('')
                         }
                 }
         }

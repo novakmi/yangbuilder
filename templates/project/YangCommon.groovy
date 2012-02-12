@@ -32,8 +32,8 @@ class YangCommon {
                 if (prefixName) { // do not generate prefix for and namespace for submodules
                         builder.namespace "http://bitbucket.org/bubbles.way/yangbuilder"
                         builder.prefix prefixName
+                        builder.yngbuild('')
                 }
-                builder.yngbuild('')
 
                 builder.'import'('ietf-inet-types') {
                         prefix 'inet'
