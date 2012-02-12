@@ -84,7 +84,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 switch (node.name) {
                         case YANG_ROOT:
                                 if (root == node) {
-                                        opaque.setIndentLevel(-1) //do not indent children under 'yangroot' node
+                                        opaque.setIndentLevel(-1) //do not indent 'yangroot' node
                                         break
                                 }
                                 throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} must be root node!")
@@ -168,6 +168,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 if (node.name != YANG_ROOT) {
                         opaque.printIndent()
                         opaque.println("}") // block closing bracket
+                } else {
+                        opaque.setIndentLevel(0) //reset indent
                 }
         }
 
