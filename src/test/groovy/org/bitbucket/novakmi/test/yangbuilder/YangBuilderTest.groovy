@@ -31,68 +31,113 @@ import org.slf4j.LoggerFactory
 
 class YangBuilderTest {
 
+        static def _TEST_MODULE_NAME = 'test'
+        static def WRITE_TO_FILE = true
+        static USE_PYANG = true // when true, pyang (http://code.google.com/p/pyang/) has to be in PATH
         //write yang to file
-        static def assertYangFile(builder, fileName) {
+        static def assertYangFile(YangBuilder builder, fileName) {
                 logger.trace("==> assertYangFile")
-                logger.trace(builder.getBuiltText())
-                new File("./${fileName}.yang").write(builder.getBuiltText())
+                if (WRITE_TO_FILE) {
+                        logger.trace("writing to file {}", builder.getBuiltText())
+                        builder.writeToFile("./${fileName}.yang")
+                        if (USE_PYANG) {
+                                Process process = "pyang -f tree ./${fileName}.yang".execute()
+                                process.waitFor()
+                                logger.trace("process.exitValue() {} process.text {}", process.exitValue(), process.text)
+                                logger.trace("process.err.text {}", process.err.text)
+                                Assert.assertEquals(process.exitValue(), 0)
+                        }
+                }
+                //Assert.assertNotNull(null) //for debugging
                 logger.trace("<== assertYangFile")
         }
 
-        // test based on example from Instant YANG tutorial, section modules
+        static def _buildTestYang(builder) {
+                logger.trace("==> _buildTestYang")
+                builder.module(_TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix "test" // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'test'
+                        contact 'bubbles.way@gmail.com'
+                        container('socket') {
+                                leaf('ip') {
+                                        type 'string'
+                                }
+                                leaf('port') {
+                                        type 'uint16'
+                                }
+                        }
+                }
+                logger.trace("<== _buildTestYang")
+        }
+
+        String _getTestYangString() {
+                def retVal = "module ${_TEST_MODULE_NAME} " +
+                    '''{
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization test;
+    contact bubbles.way@gmail.com;
+    container socket {
+        leaf ip {
+            type string;
+        }
+        leaf port {
+            type uint16;
+        }
+    }
+}
+'''
+                return retVal
+        }
+
+// test based on example from Instant YANG tutorial, section modules
         @Test(groups = ["basic"])
         public void yangTest() {
                 logger.trace("==> yangTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
-
-                builder.module('acme-module') {
-
-                        namespace "http://acme.example.com/module"; // semicolon at the end can be preset (yang style)
-                        prefix "acme" // or semicolon can be missing (more groovy like style)
-                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
-
-                        'import'("yang-types") { // Groovy keywords has to be quoted; if node has sub nodes, value has to be in brackets
-                                prefix "yang"
-                        }
-                        include "acme-system" // if node does not have sub nodes, brackets are optional
-                        yngbuild('')
-
-                        organization 'ACME Inc.'
-                        contact 'joe@acme.example.com'
-                        description('''The module for entities
-implementing the ACME products.''', multiline: true) // multiline description
-                        yngbuild('')
-
-                        revision('2007-06-09') {
-                                description "Initial revision."
-                        }
-
-                }
-
-                Assert.assertEquals(builder.getBuiltText(),
-                    '''module acme-module {
-    namespace "http://acme.example.com/module";
-    prefix acme;
-
-    import yang-types {
-        prefix yang;
-    }
-    include acme-system;
-
-    organization "ACME Inc.";
-    contact joe@acme.example.com;
-    description
-     "The module for entities
-      implementing the ACME products.";
-
-    revision 2007-06-09 {
-        description "Initial revision.";
-    }
-}
-''')
-                //assertYangFile(builder, 'acme-module')
+                _buildTestYang(builder)
+                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+                assertYangFile(builder, _TEST_MODULE_NAME)
                 logger.trace("<== yangTest")
         }
-        //Initialize logging
+
+        @Test(groups = ["basic"])
+        public void yangResetTest() {
+                logger.trace("==> yangResetTest")
+
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                _buildTestYang(builder)
+                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+
+                builder.reset()
+                Assert.assertEquals(builder.getBuiltText(), '')
+
+                logger.trace("<== yangResetTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void yangResetAfterYangrootTest() {
+                logger.trace("==> yangResetAfterYangrootTest")
+
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                builder.yangroot {
+                        _buildTestYang(builder)
+                }
+                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+
+                builder.reset()
+                Assert.assertEquals(builder.getBuiltText(), '')
+
+                _buildTestYang(builder)
+                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+
+                logger.trace("<== yangResetAfterYangrootTest")
+        }
+
+//Initialize logging
         private static final Logger logger = LoggerFactory.getLogger(YangBuilderTest.class);
 }
