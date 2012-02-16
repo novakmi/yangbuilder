@@ -57,7 +57,7 @@ for (y in yangs) { // one can also use yangs.each {y ->
         y.buildYang(builder)
         print("Processing ${y.getName()} ...")
         builder.writeToFile("${y.getName()}.yang")
-        //new File("${y.getName()}.yang").write(builder.getBuiltText()) //write to file
+        //new File("${y.getName()}.yang").write(builder.getText()) //write to file
         println("done")
 }
 

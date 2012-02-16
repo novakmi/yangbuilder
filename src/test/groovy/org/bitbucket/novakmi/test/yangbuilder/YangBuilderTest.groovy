@@ -38,7 +38,7 @@ class YangBuilderTest {
         static def assertYangFile(YangBuilder builder, fileName) {
                 logger.trace("==> assertYangFile")
                 if (WRITE_TO_FILE) {
-                        logger.trace("writing to file {}", builder.getBuiltText())
+                        logger.trace("writing to file {}", builder.getText())
                         builder.writeToFile("./${fileName}.yang")
                         if (USE_PYANG) {
                                 Process process = "pyang -f tree ./${fileName}.yang".execute()
@@ -100,7 +100,7 @@ class YangBuilderTest {
                 logger.trace("==> yangTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 _buildTestYang(builder)
-                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+                Assert.assertEquals(builder.getText(), _getTestYangString())
                 assertYangFile(builder, _TEST_MODULE_NAME)
                 logger.trace("<== yangTest")
         }
@@ -111,10 +111,10 @@ class YangBuilderTest {
 
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 _buildTestYang(builder)
-                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+                Assert.assertEquals(builder.getText(), _getTestYangString())
 
                 builder.reset()
-                Assert.assertEquals(builder.getBuiltText(), '')
+                Assert.assertEquals(builder.getText(), '')
 
                 logger.trace("<== yangResetTest")
         }
@@ -127,13 +127,13 @@ class YangBuilderTest {
                 builder.yangroot {
                         _buildTestYang(builder)
                 }
-                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+                Assert.assertEquals(builder.getText(), _getTestYangString())
 
                 builder.reset()
-                Assert.assertEquals(builder.getBuiltText(), '')
+                Assert.assertEquals(builder.getText(), '')
 
                 _buildTestYang(builder)
-                Assert.assertEquals(builder.getBuiltText(), _getTestYangString())
+                Assert.assertEquals(builder.getText(), _getTestYangString())
 
                 logger.trace("<== yangResetAfterYangrootTest")
         }
