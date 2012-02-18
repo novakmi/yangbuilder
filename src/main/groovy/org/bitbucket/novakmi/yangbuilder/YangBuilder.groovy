@@ -173,4 +173,22 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 }
         }
 
+        /**
+         * Search through the yang nodes and returns name of first 'module' or 'submodule'
+         * @return string representing module or submodule name or null if 'module' or 'submodule' not found
+         */
+        public String getYangName() {
+                String retVal = null
+
+                BuilderNode node = findNode('module')
+                if (node == null) {
+                        node = findNode('submodule')
+                }
+                if (node != null) {
+                        retVal = node.value
+                }
+
+                return retVal
+        }
+
 }

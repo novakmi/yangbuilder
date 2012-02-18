@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory
 class YangBuilderTest {
 
         static def _TEST_MODULE_NAME = 'test'
+        static def _TEST_SUBMODULE_NAME = "${_TEST_MODULE_NAME}_submodule"
         static def WRITE_TO_FILE = true
         static USE_PYANG = true // when true, pyang (http://code.google.com/p/pyang/) has to be in PATH
         //write yang to file
@@ -56,11 +57,12 @@ class YangBuilderTest {
                 logger.trace("==> _buildTestYang")
                 builder.module(_TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix "test" // or semicolon can be missing (more groovy like style)
+                        prefix _TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'test'
+                        organization 'bubbles'
                         contact 'bubbles.way@gmail.com'
+
                         container('socket') {
                                 leaf('ip') {
                                         type 'string'
@@ -73,13 +75,34 @@ class YangBuilderTest {
                 logger.trace("<== _buildTestYang")
         }
 
+        static def _buildTestSubmoduleYang(builder) {
+                logger.trace("==> _buildTestSubmoduleYang")
+                builder.submodule(_TEST_SUBMODULE_NAME) {
+                        prefix _TEST_SUBMODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'bubbles'
+                        contact 'bubbles.way@gmail.com'
+
+                        container('socket') {
+                                leaf('ip') {
+                                        type 'string'
+                                }
+                                leaf('port') {
+                                        type 'uint16'
+                                }
+                        }
+                }
+                logger.trace("<== _buildTestSubmoduleYang")
+        }
+
         String _getTestYangString() {
                 def retVal = "module ${_TEST_MODULE_NAME} " +
                     '''{
     namespace "http://novakmi.bitbucket.org/test";
-    prefix test;
+    prefix '''+ _TEST_MODULE_NAME + ''';
 
-    organization test;
+    organization bubbles;
     contact bubbles.way@gmail.com;
     container socket {
         leaf ip {
@@ -136,6 +159,52 @@ class YangBuilderTest {
                 Assert.assertEquals(builder.getText(), _getTestYangString())
 
                 logger.trace("<== yangResetAfterYangrootTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void yangNameModuleTest() {
+                logger.trace("==> yangNameModuleTest")
+
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                Assert.assertNull(builder.getYangName())
+                builder.yangroot {
+                        _buildTestYang(builder)
+                }
+                Assert.assertEquals(builder.getYangName(), _TEST_MODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getYangName())
+
+                _buildTestYang(builder)
+                Assert.assertEquals(builder.getYangName(), _TEST_MODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getYangName())
+
+                logger.trace("<== yangNameModuleTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void yangNameSubmoduleTest() {
+                logger.trace("==> yangNameSubmoduleTest")
+
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                Assert.assertNull(builder.getYangName())
+                builder.yangroot {
+                        _buildTestSubmoduleYang(builder)
+                }
+                Assert.assertEquals(builder.getYangName(), _TEST_SUBMODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getYangName())
+
+                _buildTestSubmoduleYang(builder)
+                Assert.assertEquals(builder.getYangName(), _TEST_SUBMODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getYangName())
+
+                logger.trace("<== yangNameSubmoduleTest")
         }
 
 //Initialize logging
