@@ -191,4 +191,26 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 return retVal
         }
 
+        /**
+         * Find prefix under module or submodule node and return its name.
+         * @return string representing prefix name or null not found
+         */
+        public String getPrefixName() {
+                String retVal = null
+
+                BuilderNode node = findNode('module')
+                if (node == null) {
+                        node = findNode('submodule')
+                }
+                if (node != null) {
+                        for (n in node.children) {
+                                if (n.name == 'prefix') {
+                                        retVal = n.value
+                                }
+                        }
+                }
+
+                return retVal
+        }
+
 }
