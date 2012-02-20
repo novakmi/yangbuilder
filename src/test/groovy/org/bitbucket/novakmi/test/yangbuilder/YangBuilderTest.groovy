@@ -77,6 +77,7 @@ class YangBuilderTest {
 
         static def _buildTestSubmoduleYang(builder) {
                 logger.trace("==> _buildTestSubmoduleYang")
+
                 builder.submodule(_TEST_SUBMODULE_NAME) {
                         prefix _TEST_SUBMODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
@@ -93,6 +94,7 @@ class YangBuilderTest {
                                 }
                         }
                 }
+
                 logger.trace("<== _buildTestSubmoduleYang")
         }
 
@@ -162,9 +164,10 @@ class YangBuilderTest {
         }
 
         @Test(groups = ["basic"])
-        public void yangNameModuleTest() {
-                logger.trace("==> yangNameModuleTest")
+        public void yangNameTest() {
+                logger.trace("==> yangNameTest")
 
+                // module
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 Assert.assertNull(builder.getYangName())
                 builder.yangroot {
@@ -181,14 +184,8 @@ class YangBuilderTest {
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
 
-                logger.trace("<== yangNameModuleTest")
-        }
-
-        @Test(groups = ["basic"])
-        public void yangNameSubmoduleTest() {
-                logger.trace("==> yangNameSubmoduleTest")
-
-                def builder = new YangBuilder(4) // new instance/use indent 4
+                // submodule
+                builder = new YangBuilder(4) // new instance/use indent 4
                 Assert.assertNull(builder.getYangName())
                 builder.yangroot {
                         _buildTestSubmoduleYang(builder)
@@ -204,8 +201,50 @@ class YangBuilderTest {
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
 
-                logger.trace("<== yangNameSubmoduleTest")
+                logger.trace("<== yangNameTest")
         }
+
+        @Test(groups = ["basic"])
+        public void prefixNameTest() {
+                logger.trace("==> prefixNameTest")
+
+                // module
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                Assert.assertNull(builder.getPrefixName())
+                builder.yangroot {
+                        _buildTestYang(builder)
+                }
+                Assert.assertEquals(builder.getPrefixName(), _TEST_MODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getPrefixName())
+
+                _buildTestYang(builder)
+                Assert.assertEquals(builder.getPrefixName(), _TEST_MODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getPrefixName())
+
+                // submodule
+                builder = new YangBuilder(4) // new instance/use indent 4
+                Assert.assertNull(builder.getPrefixName())
+                builder.yangroot {
+                        _buildTestSubmoduleYang(builder)
+                }
+                Assert.assertEquals(builder.getPrefixName(), _TEST_SUBMODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getPrefixName())
+
+                _buildTestSubmoduleYang(builder)
+                Assert.assertEquals(builder.getPrefixName(), _TEST_SUBMODULE_NAME)
+
+                builder.reset()
+                Assert.assertNull(builder.getPrefixName())
+
+                logger.trace("<== prefixNameTest")
+        }
+
 
 //Initialize logging
         private static final Logger logger = LoggerFactory.getLogger(YangBuilderTest.class);
