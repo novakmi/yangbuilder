@@ -32,7 +32,7 @@ import org.bitbucket.novakmi.nodebuilder.BuilderNode
  */
 class CompactYangPlugin extends NodeBuilderPlugin {
 
-        private comapactNodeAttr(BuilderNode node, String attrName) {
+        private compactNodeAttr(BuilderNode node, String attrName) {
                 def retVal = false
 
                 if (node.attributes[attrName]) {  // do we have the node?
@@ -53,12 +53,12 @@ class CompactYangPlugin extends NodeBuilderPlugin {
 
                 // type
                 if (node.name in ['leaf', 'leaf-list']) {
-                        processed |= comapactNodeAttr(node, 'type')
+                        processed |= compactNodeAttr(node, 'type')
                 }
 
                 // description
                 if (node.name in ['leaf', 'leaf-list', 'list', 'container']) {
-                        processed |= comapactNodeAttr(node, 'description')
+                        processed |= compactNodeAttr(node, 'description')
                 }
 
                 if (processed) {
