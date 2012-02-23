@@ -31,102 +31,14 @@ import org.slf4j.LoggerFactory
 
 class YangBuilderTest {
 
-        static def _TEST_MODULE_NAME = 'test'
-        static def _TEST_SUBMODULE_NAME = "${_TEST_MODULE_NAME}_submodule"
-        static def WRITE_TO_FILE = true
-        static USE_PYANG = true // when true, pyang (http://code.google.com/p/pyang/) has to be in PATH
-        //write yang to file
-        static def assertYangFile(YangBuilder builder, fileName) {
-                logger.trace("==> assertYangFile")
-                if (WRITE_TO_FILE) {
-                        logger.trace("writing to file {}", builder.getText())
-                        builder.writeToFile("./${fileName}.yang")
-                        if (USE_PYANG) {
-                                Process process = "pyang -f tree ./${fileName}.yang".execute()
-                                process.waitFor()
-                                logger.trace("process.exitValue() {} process.text {}", process.exitValue(), process.text)
-                                logger.trace("process.err.text {}", process.err.text)
-                                Assert.assertEquals(process.exitValue(), 0)
-                        }
-                }
-                //Assert.assertNotNull(null) //for debugging
-                logger.trace("<== assertYangFile")
-        }
-
-        static def _buildTestYang(builder) {
-                logger.trace("==> _buildTestYang")
-                builder.module(_TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix _TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
-                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
-
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
-
-                        container('socket') {
-                                leaf('ip') {
-                                        type 'string'
-                                }
-                                leaf('port') {
-                                        type 'uint16'
-                                }
-                        }
-                }
-                logger.trace("<== _buildTestYang")
-        }
-
-        static def _buildTestSubmoduleYang(builder) {
-                logger.trace("==> _buildTestSubmoduleYang")
-
-                builder.submodule(_TEST_SUBMODULE_NAME) {
-                        prefix _TEST_SUBMODULE_NAME // or semicolon can be missing (more groovy like style)
-                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
-
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
-
-                        container('socket') {
-                                leaf('ip') {
-                                        type 'string'
-                                }
-                                leaf('port') {
-                                        type 'uint16'
-                                }
-                        }
-                }
-
-                logger.trace("<== _buildTestSubmoduleYang")
-        }
-
-        String _getTestYangString() {
-                def retVal = "module ${_TEST_MODULE_NAME} " +
-                    '''{
-    namespace "http://novakmi.bitbucket.org/test";
-    prefix '''+ _TEST_MODULE_NAME + ''';
-
-    organization bubbles;
-    contact bubbles.way@gmail.com;
-    container socket {
-        leaf ip {
-            type string;
-        }
-        leaf port {
-            type uint16;
-        }
-    }
-}
-'''
-                return retVal
-        }
-
 // test based on example from Instant YANG tutorial, section modules
         @Test(groups = ["basic"])
         public void yangTest() {
                 logger.trace("==> yangTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
-                _buildTestYang(builder)
-                Assert.assertEquals(builder.getText(), _getTestYangString())
-                assertYangFile(builder, _TEST_MODULE_NAME)
+                YangBuilderTestCommon._buildTestYang(builder)
+                Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
                 logger.trace("<== yangTest")
         }
 
@@ -135,8 +47,8 @@ class YangBuilderTest {
                 logger.trace("==> yangResetTest")
 
                 def builder = new YangBuilder(4) // new instance/use indent 4
-                _buildTestYang(builder)
-                Assert.assertEquals(builder.getText(), _getTestYangString())
+                YangBuilderTestCommon._buildTestYang(builder)
+                Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
 
                 builder.reset()
                 Assert.assertEquals(builder.getText(), '')
@@ -150,15 +62,15 @@ class YangBuilderTest {
 
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.yangroot {
-                        _buildTestYang(builder)
+                        YangBuilderTestCommon._buildTestYang(builder)
                 }
-                Assert.assertEquals(builder.getText(), _getTestYangString())
+                Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
 
                 builder.reset()
                 Assert.assertEquals(builder.getText(), '')
 
-                _buildTestYang(builder)
-                Assert.assertEquals(builder.getText(), _getTestYangString())
+                YangBuilderTestCommon._buildTestYang(builder)
+                Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
 
                 logger.trace("<== yangResetAfterYangrootTest")
         }
@@ -171,15 +83,15 @@ class YangBuilderTest {
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 Assert.assertNull(builder.getYangName())
                 builder.yangroot {
-                        _buildTestYang(builder)
+                        YangBuilderTestCommon._buildTestYang(builder)
                 }
-                Assert.assertEquals(builder.getYangName(), _TEST_MODULE_NAME)
+                Assert.assertEquals(builder.getYangName(), YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
 
-                _buildTestYang(builder)
-                Assert.assertEquals(builder.getYangName(), _TEST_MODULE_NAME)
+                YangBuilderTestCommon._buildTestYang(builder)
+                Assert.assertEquals(builder.getYangName(), YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
@@ -188,15 +100,15 @@ class YangBuilderTest {
                 builder = new YangBuilder(4) // new instance/use indent 4
                 Assert.assertNull(builder.getYangName())
                 builder.yangroot {
-                        _buildTestSubmoduleYang(builder)
+                        YangBuilderTestCommon._buildTestSubmoduleYang(builder)
                 }
-                Assert.assertEquals(builder.getYangName(), _TEST_SUBMODULE_NAME)
+                Assert.assertEquals(builder.getYangName(), YangBuilderTestCommon._TEST_SUBMODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
 
-                _buildTestSubmoduleYang(builder)
-                Assert.assertEquals(builder.getYangName(), _TEST_SUBMODULE_NAME)
+                YangBuilderTestCommon._buildTestSubmoduleYang(builder)
+                Assert.assertEquals(builder.getYangName(), YangBuilderTestCommon._TEST_SUBMODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
@@ -212,15 +124,15 @@ class YangBuilderTest {
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 Assert.assertNull(builder.getPrefixName())
                 builder.yangroot {
-                        _buildTestYang(builder)
+                        YangBuilderTestCommon._buildTestYang(builder)
                 }
-                Assert.assertEquals(builder.getPrefixName(), _TEST_MODULE_NAME)
+                Assert.assertEquals(builder.getPrefixName(), YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
 
-                _buildTestYang(builder)
-                Assert.assertEquals(builder.getPrefixName(), _TEST_MODULE_NAME)
+                YangBuilderTestCommon._buildTestYang(builder)
+                Assert.assertEquals(builder.getPrefixName(), YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
@@ -229,15 +141,15 @@ class YangBuilderTest {
                 builder = new YangBuilder(4) // new instance/use indent 4
                 Assert.assertNull(builder.getPrefixName())
                 builder.yangroot {
-                        _buildTestSubmoduleYang(builder)
+                        YangBuilderTestCommon._buildTestSubmoduleYang(builder)
                 }
-                Assert.assertEquals(builder.getPrefixName(), _TEST_SUBMODULE_NAME)
+                Assert.assertEquals(builder.getPrefixName(), YangBuilderTestCommon._TEST_SUBMODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
 
-                _buildTestSubmoduleYang(builder)
-                Assert.assertEquals(builder.getPrefixName(), _TEST_SUBMODULE_NAME)
+                YangBuilderTestCommon._buildTestSubmoduleYang(builder)
+                Assert.assertEquals(builder.getPrefixName(), YangBuilderTestCommon._TEST_SUBMODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
@@ -246,6 +158,6 @@ class YangBuilderTest {
         }
 
 
-//Initialize logging
+        //Initialize logging
         private static final Logger logger = LoggerFactory.getLogger(YangBuilderTest.class);
 }
