@@ -136,6 +136,57 @@ class CompactYangPluginTest {
                 logger.trace("<== compactDescriptionTest")
         }
 
+        @Test(groups = ["basic"])
+        public void newLineTypeTest() {
+                logger.trace("==> newLineTypeTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style), no new line
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: true) // nl:true, nl:1, nl:<non false val> - make new line after node is printed
+
+                        container('socket', nl: 1) { // nl:1 is same as nl:true
+                                leaf('ip', type: 'string') //compact way to type leafs with simple types
+                                leaf('port', type: 'uint16')
+                        }
+
+                        'leaf-list'('codes', type: 'uint32', nl: false) //  nl:0 , nl: false or missing => no new line
+                        list('values', type:'type without key is ignored') {
+                                key 'value'
+                                leaf('value', type: 'string')
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                    '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    container socket {
+        leaf ip {
+            type string;
+        }
+        leaf port {
+            type uint16;
+        }
+    }
+
+    leaf-list codes {
+        type uint32;
+    }
+    list values {
+        key value;
+        leaf value {
+            type string;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                logger.trace("<== newLineTypeTest")
+        }
+
         //Initialize logging
         private static final Logger logger = LoggerFactory.getLogger(CompactYangPluginTest.class);
 }

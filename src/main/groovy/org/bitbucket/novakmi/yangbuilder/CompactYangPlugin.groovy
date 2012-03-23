@@ -68,4 +68,16 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 return retVal
         }
 
+        @Override
+        protected PluginResult processNodeAfter(BuilderNode node, Object opaque, Map pluginMap) throws BuilderException {
+                PluginResult retVal = PluginResult.NOT_ACCEPTED
+
+                if (node.attributes['nl']) {
+                        opaque.println('') // new line after processed
+                        retVal = PluginResult.PROCESSED_CONTINUE
+                }
+
+                return retVal
+        }
+
 }
