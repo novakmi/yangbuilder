@@ -1,0 +1,62 @@
+== yangbuilder
+
+Michal Novák <bubbles.way@gmail.com>
+0.0.1, 2012-03-23
+
+Document is written in AsciiDoc (http://www.methods.co.nz/asciidoc/). UML diagrams are written in +
+PlantUML (http://plantuml.sourceforge.net/) and converted to PNG pictures.
+
+== Version history
+
+[options="header"]
+|======
+| Version| Notes          | Date       | Author
+| 0.0.1  | Initial version| 2012/03/02 | Michal Novák
+|======
+
+== References
+
+[bibliography]
+* [[[yang]]] Yang modeling language
+* [[[groovy]]] Groovy language
+
+== Terminology
+
+* *Groovy builder:* builder [[groovy]]
+
+== Introduction
+
+This document represents *Decription* for yangbuilder
+
+////
+include::included.asciidoc[]
+////
+
+=== Motivation
+
+TODO
+
+== Implementation
+
+TBD
+
+=== Context diagram
+
+TBD
+
+=== Testing
+
+TBD
+
+=== Deliverables
+
+TBD
+
+=== Planing
+
+TBD
+
+==== Dependencies
+
+* Dep1
+
