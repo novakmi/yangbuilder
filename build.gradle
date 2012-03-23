@@ -140,6 +140,15 @@ uploadArchives { // support to upload to github emulated maven repository
         }
 }
 
+task documentation << {
+        File buildDirDocumentation = new File(buildDir.toString() + '/documentation')
+         buildDirDocumentation.mkdirs()
+         // asciidoc has to be installed
+         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'
+         cmd += " -o  ${buildDirDocumentation.toString()}/yangbuilder.html"
+         cmd += " documentation/yangbuilder.asciidoc"
+         cmd.execute().waitFor()
+}
 // http://daniel.gredler.net/2011/08/08/gradle-keeping-libraries-up-to-date/
 // Find any 3rd party libraries which have released new versions
 // to the central Maven repository since we last upgraded.
