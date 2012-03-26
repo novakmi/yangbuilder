@@ -1,62 +1,163 @@
-== yangbuilder
+yangbuilder
+===========
+:Author:    Michal Novák
+:Email:     bubbles.way@gmail.com
+:URL:       https://bitbucket.org/bubbles.way/yangbuilder
+:Date:      2012-03-25
+:Revision:  0.0.1
 
-Michal Novák <bubbles.way@gmail.com>
-0.0.1, 2012-03-23
-
-Document is written in AsciiDoc (http://www.methods.co.nz/asciidoc/). UML diagrams are written in +
-PlantUML (http://plantuml.sourceforge.net/) and converted to PNG pictures.
+This document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc] and converted to the desired format (html, pdf, etc.) 
 
 == Version history
 
 [options="header"]
 |======
-| Version| Notes          | Date       | Author
-| 0.0.1  | Initial version| 2012/03/02 | Michal Novák
+| Version     | Notes          | Date    | Author
+| {revision}  | Initial version| {date}  | {author}
 |======
 
 == References
 
 [bibliography]
-* [[[yang]]] Yang modeling language
-* [[[groovy]]] Groovy language
+* [[[yang]]] http://www.yang-central.org[YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)]
+* [[[RFC6200]]] RFC for http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html[YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)]
+* [[[groovy]]] http://groovy.codehaus.org/[Groovy - dynamic language for JAVA platform]
+* [[[nodebuilder]]] https://bitbucket.org/bubbles.way/nodebuilder[Library for creation of groovy builders with plugin support]
 
 == Terminology
 
-* *Groovy builder:* builder [[groovy]]
+* *Yang:*  A Data Modeling Language for the Network Configuration Protocol (NETCONF), see <<RFC6200>>
+* *Groovy builder:*  builder http://en.wikipedia.org/wiki/Design_Patterns[design pattern] implemented in <<groovy>>, with support for DSL,
+  see http://groovy.codehaus.org/Builders[groovy builders]
 
 == Introduction
 
-This document represents *Decription* for yangbuilder
+The [[[yang]]] modeling language is used to describe data model of the configuration. In this way it can be compared to the *xsd*, however the syntax is
+rather different (resembles *JSON*). 
+
+Syntax of the data model written in the <<yang>> resembles syntax used in a Groovy builders. Groovy builders can be used to create
+parent-child oriented data documents like *XML* and also <<yang>>.
+
+Compare 
+
+.Yang example from http://www.yang-central.org/twiki/bin/view/Main/YangTutorials[Yang tutorial] (shortened)
+----
+container timeout {                                             <1>
+    leaf access-timeout {                                       <2>
+        description "Maximum time without server response";
+        type uint32;
+    }
+    leaf retry-timer {                                          <2>
+        description "Period to retry operation";
+        type uint32;
+    }
+}
+----
+<1> structure parent element
+<2> structure member - child element with attributes (e.g. +type+)
+
+to 
+
+.Groovy MarkupBuilder example from  http://groovy.codehaus.org/Creating+XML+using+Groovy%27s+MarkupBuilder[Creating XML] chapter
+----
+car(name:'HSV Maloo', make:'Holden', year:2006) {               <1>
+    country('Australia')                                        <2>
+    record(type:'speed', ' Truck with speed of 271kph')         <2>
+}
+----
+<1> structure parent element
+<2> structure member - child element with attributes (e.g. +type+, +value+)
+
+NOTE: We are comparing similarity of the syntax. The <<yang>> example represents data model,
+      the <<groovy>> example represents data (XML with values).
+
+NOTE: Because of the syntax similarity, in some Java IDEs (http://netbeans.org/index.html[NetBeans], http://www.jetbrains.com/idea/[Intellij IDEA], http://www.eclipse.org/[Eclipse]) 
+     it is possible to use groovy mode to get limited editor support for the <<yang>> files.
+
+Groovy yangbuilder allows to create <<yang>> data models with similar syntax as <<yang>>. 
+
+.Yang example from http://www.yang-central.org/twiki/bin/view/Main/YangTutorials[Yang tutorial] (shortened) written in <<groovy>> yangbuilder
+----
+container('timeout') {                                             <1>
+    leaf('access-timeout') {                                       <2>
+        description "Maximum time without server response";
+        type uint32;
+    }
+    leaf('retry-timer') {                                          <2>
+        description "Period to retry operation";
+        type uint32;
+    }
+}
+----
+<1> structure parent element
+<2> structure member - child element with attributes (e.g. +type+)
+
+With yangbuilder one can use groovy script to generate <<yang>> file. This approach has following pros and cons:
+
+*Pros:*
+
+* use of programming language
+* similar syntax to yang
+* support in IDE
+* plugins
+
+*Cons:*
+
+* additional step - yang file has to be generated
+* yangbuilder does not support yang validation
+
+== History
+
+TBD footnoteref:[future,This part of documentation will be updated in future version of the document.]
 
 ////
 include::included.asciidoc[]
 ////
 
-=== Motivation
+=== Dependencies
 
-TODO
+* <<groovy>> 1.8.0 and newer has to be installed on the system (preferably with +GROOVY_HOME+ set and +$GROOVY_HOME/bin+ in system +PATH+)
+* +nodebuilder+ jar file, see <<nodebuilder>>
+* +yangbuilder+ jar file
 
+
+
+== Installation
+
+In most cases, there is no need for installation. If you have installed <<groovy>> of version 1.8.0 or newer and Internet connection, the script generating <<yang>> file 
+downloads all required dependencies with use of <<groovy>> http://groovy.codehaus.org/Grape[Grape] feature. See +templates/scripts+ directory for example script.
+Usually, first run of the script takes some time (downloading dependencies). During second run no dependencies are downloade and Internet connection is not 
+needed anymore.
+
+It is also possible to run script or application in regular <<groovy>> way by supplying +classpath+ to the dependent +jar+ files.
+
+TBD footnoteref:[future]
+
+== Using yangbuilder
+
+See +templates/scripts+ directory to see how write yangbuilder scripts and generate yang files.
+See +templates/project+ directory for sample project that generates several (related) yang files.
+
+TBD footnoteref:[future]
+
+== Plugins
+
+Plugins can extend +yangbuilder+ with additional functionality. See +CompactYangPlugin.groovy+ (plugin allowing shorter syntax) for example of plugin implementation and 
++CompactYangPluginTest.groovy+ for plugin usage example.
+
+TBD footnoteref:[future]
+
+////
 == Implementation
 
+=== Builder 
 TBD
 
-=== Context diagram
-
-TBD
-
-=== Testing
+=== Plugins
 
 TBD
 
-=== Deliverables
+=== Tests
 
 TBD
-
-=== Planing
-
-TBD
-
-==== Dependencies
-
-* Dep1
-
+////
