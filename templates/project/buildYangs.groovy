@@ -27,8 +27,8 @@ the software.
 //run as ordinary groovy script with command 'groovy <scriptname>.groovy' (or as linux executable script './<scriptname>.groovy')
 //update nodebuilder, yangbuilder version numbers as needed
 @GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.3.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.4.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
 
 //due to @Grab limitation in script, we have to have def ... after Grab, in our case we can just create builder
 // see http://groovy.codehaus.org/Grapes+and+grab()
