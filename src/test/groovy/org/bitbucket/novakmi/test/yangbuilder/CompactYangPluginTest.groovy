@@ -46,7 +46,7 @@ class CompactYangPluginTest {
                                 leaf('port', type: 'uint16')
                         }
                         'leaf-list'('codes', type: 'uint32')
-                        list('values', type:'type without key is ignored') {
+                        list('values', type: 'type without key is ignored') {
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -96,7 +96,7 @@ class CompactYangPluginTest {
                                 leaf('port', type: 'uint16', description: 'port vlaue')
                         }
                         'leaf-list'('codes', type: 'uint32', description: 'list of codes')
-                        list('values', description: 'values', type:'type without key is ignored') {
+                        list('values', description: 'values', type: 'type without key is ignored') {
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -151,7 +151,7 @@ class CompactYangPluginTest {
                         }
 
                         'leaf-list'('codes', type: 'uint32', nl: false) //  nl:0 , nl: false or missing => no new line
-                        list('values', type:'type without key is ignored') {
+                        list('values', type: 'type without key is ignored') {
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -185,6 +185,71 @@ class CompactYangPluginTest {
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 logger.trace("<== newLineTypeTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void compactImportPrefixTest() {
+                logger.trace("==> compactImportPrefixTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl:1) // or semicolon can be missing (more groovy like style)
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+                        leaf('port', type: 'uint16', description: 'port vlaue')
+                }
+
+                Assert.assertEquals(builder.getText(),
+                    '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    leaf port {
+        description "port vlaue";
+        type uint16;
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                logger.trace("<== compactImportPrefixTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void compactListKeyTest() {
+                logger.trace("==> compactListKeyTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl:1) // or semicolon can be missing (more groovy like style)
+
+                        list('values', key:'value', description: 'values', type: 'type without key is ignored') {
+                                leaf('value', type: 'string')
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                    '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    list values {
+        description values;
+        key value;
+        leaf value {
+            type string;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                logger.trace("<== compactListKeyTest")
         }
 
         //Initialize logging
