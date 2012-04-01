@@ -51,12 +51,22 @@ class CompactYangPlugin extends NodeBuilderPlugin {
 
                 def processed = false
 
-                // type
+                // prefix under 'import'
+                if (node.name in ['import']) {
+                        processed |= compactNodeAttr(node, 'prefix')
+                }
+
+                // type  under 'leaf', 'leaf-list'
                 if (node.name in ['leaf', 'leaf-list']) {
                         processed |= compactNodeAttr(node, 'type')
                 }
 
-                // description
+                // key under 'list'
+                if (node.name in ['list']) {
+                        processed |= compactNodeAttr(node, 'key')
+                }
+
+                // description  under 'leaf', 'leaf-list', 'list', 'container'
                 if (node.name in ['leaf', 'leaf-list', 'list', 'container']) {
                         processed |= compactNodeAttr(node, 'description')
                 }
