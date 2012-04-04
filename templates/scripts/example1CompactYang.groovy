@@ -48,7 +48,7 @@ def makeAddressPort(builder, kind = null) { //this is example how function can b
         builder.leaf("${kind ? kind + '-' : ''}port", type: 'uint16', description: "IP port")  //with compact plugin 'type' can be declared as param. of leaf. 'description' as param of element
 }
 
-builder.module(moduleName, namespace:'http://bitbucket.org/bubbles.way/yangbuilder', prefix_nl: 'example1') { //module's prefix and namespace as attributes '_nl' means new line
+builder.module(moduleName, pnl_namespace:'http://bitbucket.org/bubbles.way/yangbuilder', prefix_nl: 'example1') { //module's prefix and namespace as attributes '_nl' means new line
         def makeGrouping = { // this is example how closure can be called be used by the builder
                 grouping('addressPort') {
                         makeAddressPort(builder)
@@ -64,7 +64,7 @@ builder.module(moduleName, namespace:'http://bitbucket.org/bubbles.way/yangbuild
         yngbuild('')
 
         yngbuild("/* neighbor */", indent: true)
-        container('neighbor', nl: 1) {
+        container('neighbor', pnl: 1, nl: 1) { // pnl - prefix new line - new line before nod processing
                 uses 'addressPort'  // yang grouping reuse
         }
 

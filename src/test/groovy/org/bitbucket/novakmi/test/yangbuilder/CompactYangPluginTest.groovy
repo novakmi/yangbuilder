@@ -151,7 +151,7 @@ class CompactYangPluginTest {
                         }
 
                         'leaf-list'('codes', type: 'uint32', nl: false) //  nl:0 , nl: false or missing => no new line
-                        list('values', type: 'type without key is ignored') {
+                        list('values', type: 'type without key is ignored', pnl: true) { //pnl:true - new line before node is processed
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -174,6 +174,7 @@ class CompactYangPluginTest {
     leaf-list codes {
         type uint32;
     }
+
     list values {
         key value;
         leaf value {
@@ -188,18 +189,19 @@ class CompactYangPluginTest {
         }
 
         @Test(groups = ["basic"])
-        public void compactImportPrefixNamespaceTest() {
-                logger.trace("==> compactImportPrefixNamespaceTest")
+        public void compactImportPrefixNamespacePnlTest() {
+                logger.trace("==> compactImportPrefixNamespacePnlTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
-                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
                         'import'('ietf-inet-types', prefix: 'inet', nl: 1)
 
-                        leaf('port', type: 'uint16', description: 'port value')
+                        leaf('port', pnl_type_nl: 'uint16', description: 'port value')
                 }
 
                 Assert.assertEquals(builder.getText(),
                     '''module test {
+
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
@@ -209,13 +211,15 @@ class CompactYangPluginTest {
 
     leaf port {
         description "port value";
+
         type uint16;
+
     }
 }
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactImportPrefixNamespaceTest")
+                logger.trace("<== compactImportPrefixNamespacePnlTest")
         }
 
 

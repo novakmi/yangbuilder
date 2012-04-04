@@ -35,10 +35,16 @@ class CompactYangPlugin extends NodeBuilderPlugin {
         private compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
                 def retVal = false
                 // if attribute ends with _'nl', add new line to new node, unless forbidden by 'nlAllow'
-                def nlVariant = nlAllow && node.attributes[attrName+'_nl']
-                if (node.attributes[attrName] || nlVariant) {  // do we have the attribute or nl attribute variant?
-                        BuilderNode typeNode = new BuilderNode(name: attrName, value: node.attributes[nlVariant ? attrName + '_nl' : attrName])
+                def pnlVariant = nlAllow && (node.attributes['pnl_'+ attrName] || node.attributes['pnl_'+ attrName + '_nl'])
+                def nlVariant = nlAllow && (node.attributes[attrName + '_nl'] ||  node.attributes['pnl_'+ attrName + '_nl'])
+                if (node.attributes[attrName] || nlVariant || pnlVariant) {  // do we have the attribute or nl attribute variant?
+
+                        BuilderNode typeNode =
+                                new BuilderNode(name: attrName, value: node.attributes[(pnlVariant ? 'pnl_' : '') + attrName + (nlVariant ? '_nl' : '')])
                         typeNode.setParent(node)
+                        if (pnlVariant) {
+                                typeNode.attributes['pnl'] = true
+                        }
                         if (nlVariant) {
                                 typeNode.attributes['nl'] = true
                         }
@@ -53,6 +59,11 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 PluginResult retVal = PluginResult.NOT_ACCEPTED
 
                 def processed = false
+
+                if (node.attributes['pnl']) {
+                        opaque.println('') // new line before processed
+                        processed |= true
+                }
 
                 // prefix under 'import', 'belongs-to', 'module'
                 if (node.name in ['import', 'belongs-to', 'module']) {
