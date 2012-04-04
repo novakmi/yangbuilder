@@ -48,7 +48,7 @@ def makeAddressPort(builder, kind = null) { //this is example how function can b
         builder.leaf("${kind ? kind + '-' : ''}port", type: 'uint16', description: "IP port")  //with compact plugin 'type' can be declared as param. of leaf. 'description' as param of element
 }
 
-builder.module(moduleName) {
+builder.module(moduleName, namespace:'http://bitbucket.org/bubbles.way/yangbuilder', prefix_nl: 'example1') { //module's prefix and namespace as attributes '_nl' means new line
         def makeGrouping = { // this is example how closure can be called be used by the builder
                 grouping('addressPort') {
                         makeAddressPort(builder)
@@ -57,9 +57,6 @@ builder.module(moduleName) {
 
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}", indent: true)
         yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */', indent: true, nl: true)  // 'nl:true adds new line (you can also use nl:1, etc.)
-
-        namespace "http://bitbucket.org/bubbles.way/yangbuilder"
-        prefix("example1", nl: 1) // add new line
 
         'import'('ietf-inet-types', prefix: 'inet', nl: 1) //with compact yang 'prefix' can be added as attribute of import, add new line after ending '}' of import
 
@@ -73,7 +70,7 @@ builder.module(moduleName) {
 
         ['bgp', 'ospf', 'isis', 'rip'].each {k -> // create 3 containers in loop, not possible in yang
                 yngbuild("/* ${k} neighbor */", indent: true)
-                container("${k}-neighbor", nl: 1) {
+                container("${k}-neighbor", description: "${k}-neighbor container", nl: 1) {
                         makeAddressPort(builder, k) // as if content of function is written here, yangbuilder reuse (not possible in yang)
                 }
         }

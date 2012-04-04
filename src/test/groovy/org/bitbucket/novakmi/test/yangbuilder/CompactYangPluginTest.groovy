@@ -188,15 +188,14 @@ class CompactYangPluginTest {
         }
 
         @Test(groups = ["basic"])
-        public void compactImportPrefixTest() {
-                logger.trace("==> compactImportPrefixTest")
+        public void compactImportPrefixNamespaceTest() {
+                logger.trace("==> compactImportPrefixNamespaceTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
-                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl:1) // or semicolon can be missing (more groovy like style)
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
                         'import'('ietf-inet-types', prefix: 'inet', nl: 1)
-                        leaf('port', type: 'uint16', description: 'port vlaue')
+
+                        leaf('port', type: 'uint16', description: 'port value')
                 }
 
                 Assert.assertEquals(builder.getText(),
@@ -209,14 +208,51 @@ class CompactYangPluginTest {
     }
 
     leaf port {
-        description "port vlaue";
+        description "port value";
         type uint16;
     }
 }
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactImportPrefixTest")
+                logger.trace("<== compactImportPrefixNamespaceTest")
+        }
+
+
+        @Test(groups = ["basic"])
+        public void compactImportPrefixBelongsToTest() {
+                logger.trace("==> compactImportPrefixBelongsToTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.submodule(YangBuilderTestCommon._TEST_SUBMODULE_NAME) {
+
+                        'belongs-to'(YangBuilderTestCommon._TEST_SUBMODULE_NAME, prefix: 'test_submodule_prefix', nl:1 )
+
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+
+
+                        leaf('port', type: 'uint16', description: 'port value')
+                }
+
+                Assert.assertEquals(builder.getText(),
+                    '''submodule test_submodule {
+    belongs-to test_submodule {
+        prefix test_submodule_prefix;
+    }
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    leaf port {
+        description "port value";
+        type uint16;
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                logger.trace("<== compactImportPrefixBelongsToTest")
         }
 
         @Test(groups = ["basic"])
