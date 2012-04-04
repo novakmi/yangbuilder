@@ -81,5 +81,5 @@ builder.module(moduleName, pnl_namespace:'http://bitbucket.org/bubbles.way/yangb
         }
 }
 
-builder.writeToFile("${moduleName}.yang")
+builder.writeToFile("${builder.getYangName()}.yang")
 //new File("${moduleName}.yang").write(builder.getText()) // another way how to write to file
