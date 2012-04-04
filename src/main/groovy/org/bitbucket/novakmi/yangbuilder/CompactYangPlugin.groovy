@@ -32,16 +32,19 @@ import org.bitbucket.novakmi.nodebuilder.BuilderNode
  */
 class CompactYangPlugin extends NodeBuilderPlugin {
 
-        private compactNodeAttr(BuilderNode node, String attrName) {
+        private compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
                 def retVal = false
-
-                if (node.attributes[attrName]) {  // do we have the node?
-                        BuilderNode typeNode = new BuilderNode(name: attrName, value: node.attributes[attrName])
+                // if attribute ends with _'nl', add new line to new node, unless forbidden by 'nlAllow'
+                def nlVariant = nlAllow && node.attributes[attrName+'_nl']
+                if (node.attributes[attrName] || nlVariant) {  // do we have the attribute or nl attribute variant?
+                        BuilderNode typeNode = new BuilderNode(name: attrName, value: node.attributes[nlVariant ? attrName + '_nl' : attrName])
                         typeNode.setParent(node)
+                        if (nlVariant) {
+                                typeNode.attributes['nl'] = true
+                        }
                         node.children = [typeNode] + node.children // prepend to list
                         retVal = true
                 }
-
                 return retVal
         }
 
@@ -51,11 +54,14 @@ class CompactYangPlugin extends NodeBuilderPlugin {
 
                 def processed = false
 
-                // prefix under 'import'
-                if (node.name in ['import']) {
+                // prefix under 'import', 'belongs-to', 'module'
+                if (node.name in ['import', 'belongs-to', 'module']) {
                         processed |= compactNodeAttr(node, 'prefix')
                 }
 
+                if (node.name in ['module'])  {
+                        processed |= compactNodeAttr(node, 'namespace')
+                }
                 // type  under 'leaf', 'leaf-list'
                 if (node.name in ['leaf', 'leaf-list']) {
                         processed |= compactNodeAttr(node, 'type')
