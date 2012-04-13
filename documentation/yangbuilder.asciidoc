@@ -3,7 +3,7 @@ yangbuilder
 :Author:    Michal Novák
 :Email:     bubbles.way@gmail.com
 :URL:       https://bitbucket.org/bubbles.way/yangbuilder
-:Date:      2012-03-25
+:Date:      2012-04-13
 :Revision:  0.0.1
 
 This document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc] and converted to the desired format (html, pdf, etc.) 
@@ -23,20 +23,22 @@ This document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc] and con
 * [[[RFC6200]]] RFC for http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html[YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)]
 * [[[groovy]]] http://groovy.codehaus.org/[Groovy - dynamic language for JAVA platform]
 * [[[nodebuilder]]] https://bitbucket.org/bubbles.way/nodebuilder[Library for creation of groovy builders with plugin support]
+* [[[yangbuilder]]] https://bitbucket.org/bubbles.way/yangbuilder[Groovy builder for YANG] - this document describes <<yangbuilder>>
+* [[[pyang]]] http://code.google.com/p/pyang/
 
 == Terminology
 
-* *Yang:*  A Data Modeling Language for the Network Configuration Protocol (NETCONF), see <<RFC6200>>
-* *Groovy builder:*  builder http://en.wikipedia.org/wiki/Design_Patterns[design pattern] implemented in <<groovy>>, with support for DSL,
+* *Yang:*  a Data Modeling Language for the Network Configuration Protocol (NETCONF), see <<RFC6200>>
+* *Groovy builder:*  http://en.wikipedia.org/wiki/Design_Patterns[builder design pattern] implemented in <<groovy>>, with support for DSL,
   see http://groovy.codehaus.org/Builders[groovy builders]
 
 == Introduction
 
-The [[[yang]]] modeling language is used to describe data model of the configuration. In this way it can be compared to the *xsd*, however the syntax is
-rather different (resembles *JSON*). 
+The [[[yang]]] modeling language is used to describe data model of the configuration. In this way it can be compared to the *XSD*, however the syntax is
+rather different (more similar *JSON*). 
 
 Syntax of the data model written in the <<yang>> resembles syntax used in a Groovy builders. Groovy builders can be used to create
-parent-child oriented data documents like *XML* and also <<yang>>.
+parent-child oriented data documents like *XML* and thus also <<yang>>.
 
 Compare 
 
@@ -68,13 +70,14 @@ car(name:'HSV Maloo', make:'Holden', year:2006) {               <1>
 <1> structure parent element
 <2> structure member - child element with attributes (e.g. +type+, +value+)
 
-NOTE: We are comparing similarity of the syntax. The <<yang>> example represents data model,
-      the <<groovy>> example represents data (XML with values).
+NOTE: Here we are comparing similarity of the syntax, not the meaning. The <<yang>> example represents data model,
+      the <<groovy>> example represents data model instance (XML with values). With <<groovy>> one can also build *XSD*
+      in a same way like *XML*. With *XSD* the meaning would be the same.
 
 NOTE: Because of the syntax similarity, in some Java IDEs (http://netbeans.org/index.html[NetBeans], http://www.jetbrains.com/idea/[Intellij IDEA], http://www.eclipse.org/[Eclipse]) 
-     it is possible to use groovy mode to get limited editor support for the <<yang>> files.
+      it is possible to use groovy mode to get limited editor support for the <<yang>> files (e.g syntax highlighting) out of the box.
 
-Groovy yangbuilder allows to create <<yang>> data models with similar syntax as <<yang>>. 
+Groovy <<yangbuilder>> allows to create <<yang>> data models with similar syntax as <<yang>>. 
 
 .Yang example from http://www.yang-central.org/twiki/bin/view/Main/YangTutorials[Yang tutorial] (shortened) written in <<groovy>> yangbuilder
 ----
@@ -92,34 +95,43 @@ container('timeout') {                                             <1>
 <1> structure parent element
 <2> structure member - child element with attributes (e.g. +type+)
 
+As you can see, there is only little syntax difference between <<groovy>> and <<yang>>.
+NOTE: <<groovy>> syntax in example above was written to be much similar to <<yang>> as possible. The only difference is brackets around element 
+      names containing child elements and apostrophes (or quotation marks). In <<groovy>> you can also omit semicolon. 
+
 With yangbuilder one can use groovy script to generate <<yang>> file. This approach has following pros and cons:
 
 *Pros:*
 
+* more advance reuse (functions, closures, parametrization)
 * use of programming language
 * similar syntax to yang
-* support in IDE
+* (groovy) support in IDE (navigation, syntax highlighting, formatting)
 * plugins
 
 *Cons:*
 
 * additional step - yang file has to be generated
-* yangbuilder does not support yang validation
+* yangbuilder does not support yang validation (use <<pyang>>)
+* advanced reuse can lead to bigger yang files (e.g. generate similar parts several times instead of using yang's +grouping+)
 
 == History
 
-TBD footnoteref:[future,This part of documentation will be updated in future version of the document.]
+There already existed a <<groovy>> as a part o one project I have worked for in my job (owned by customer).
 
-////
-include::included.asciidoc[]
-////
+When I was implementing <<groovy>> builder for http://plantuml.sourceforge.net/[PlantUML] called https://bitbucket.org/bubbles.way/plantumlbuilder[plantumlbuilder],
+I have decided to create common builder library <<nodebuilder>> with common support for <<groovy>> builders using
+parent-child processing. Than it was relatively easy to base new <<yangbuilder>> on this common library. New <<yangbuilder>> implementation is
+completely new, free and supports plugins (provided by <<nodebuilder>>).
+
 
 === Dependencies
 
 * <<groovy>> 1.8.0 and newer has to be installed on the system (preferably with +GROOVY_HOME+ set and +$GROOVY_HOME/bin+ in system +PATH+)
-* +nodebuilder+ jar file, see <<nodebuilder>>
+* +nodebuilder+ jar file,
 * +yangbuilder+ jar file
 
+Note: <<nodebuilder>> and <<yangbuilder>> does not need to be downloaded, if  if <<groovy>> +@Grab+ can be used (PC is connected to Internet)
 
 
 == Installation
@@ -131,7 +143,7 @@ needed anymore.
 
 It is also possible to run script or application in regular <<groovy>> way by supplying +classpath+ to the dependent +jar+ files.
 
-TBD footnoteref:[future]
+TBD footnoteref:[future, This section will be updated in the future to provide more information.]
 
 == Using yangbuilder
 
