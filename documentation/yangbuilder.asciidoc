@@ -147,9 +147,114 @@ TBD footnoteref:[future, This section will be updated in the future to provide m
 
 == Using yangbuilder
 
-See +templates/scripts+ directory to see how write yangbuilder scripts and generate yang files.
+See +templates/scripts+ directory to see how write <<yangbuilder>> scripts and generate yang files.
 See +templates/project+ directory for sample project that generates several (related) yang files.
 
+=== Example 1
+
+////
+Syntax highlighting requires source-highlight package (Ubuntu).
+java is used as it is close to groovy syntax
+////
+.Example groovy script to generate <<Yang>> file based on example from Instant YANG tutorial, section modules
+[source,java]
+-----------
+#!/usr/bin/env groovy                                                                                 //<1>
+//Update nodebuilder, yangbuilder version numbers as needed
+@GrabResolver(name = 'bubbleswayrepo', 
+            root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases',
+            m2compatible = true)                                                                      //<2>
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.4.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
+
+// This script template represents example of usage without any plugin
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() // create new builder, default indent of 2
+
+//name of file to generate
+moduleName = "acme-module"   // do not use 'def' for script global variable
+
+def makeModule(builder) {                                                                              //<3> 
+        builder.module(moduleName) {
+                //'yngbuild' echoes its value + request indentation
+                yngbuild('// based on example from Instant YANG tutorial, section modules', indent:true) 
+                namespace "http://acme.example.com/module"; // semicolon at the end present (yang style)
+                prefix "acme" // or semicolon can be missing (more groovy like style)
+                yngbuild('')  //yngbuild('') means new line without indentation
+
+                // Groovy/Java keywords has to be quoted; if node has sub nodes, value has to be in brackets
+                'import'("yang-types") { 
+                        prefix "yang"
+                }
+                include "acme-system" // if node does not have sub nodes, brackets are optional
+                yngbuild('')
+
+                organization 'ACME Inc.'
+                contact 'joe@acme.example.com'
+                description('''The module for entities
+implementing the ACME products.''', multiline: true) // multiple line description
+                yngbuild('')
+
+                revision('2007-06-09') {
+                        description "Initial revision."
+                }
+                yngbuild('')
+        }
+}
+
+/* if 'yangroot' is used as root node, its value is not echoed;
+   use 'yangroot' e.g. if you need to add comments before 'module' or 'submodule'
+   Otherwise use directly builder.module or builder.submodule
+*/
+builder.yangroot {                                                                                    //<4>
+        yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}")
+        yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */')
+        // one can continue with  module(moduleName) ... or build  yang in separate function
+        // (another option is to define closure after builder.yangroot { ...)
+        makeModule(builder)
+}
+
+builder.writeToFile("${builder.getYangName()}.yang")                                                  //<5>
+-----------
+
+<1> On Unix (Linux) you can run script to generate <<yang>> file as any other executable script +./<scriptName>.groovy+, 
+provided <<groovy>> is installed and exec attribute is set. Alternatively (or on Windows) you can run it as +groovy <scriptname>.groovy>+.
+<2> With Internet connection, use groovy <<Groovy>> +Grab+ to get dependencies automatically (may take some time for the first time to download jars)
+Without Internet connection you need to specify <<nodebuilder>> and <<yangbuilder>. jars on classpath.
+E.g. +groovy -cp ./nodebuilder-0.4.0.jar:yangbuilder-0.2.0.jar <scriptname>.groovy>+.  
+<3>  function that makes main <<yang>> module
+<4> script entry point, normally we would start with +builder.module(moduleName)+, but since we want to add some comments before module, we start
+with +yangroot+ ant then continue with +ynngbuild+ (echoing commands)
+<5> with function +getYangName+ builder returns name of +module+ or +submodule+ node, which we can use to get <<yang>> file name (we could also used
++uilder.writeToFile("${moduleName}.yang")+ or builder.writeToFile("acme-module.yang"), but this is general for all scripts. 
+
+
+[source,java]
+.Resulting <<yang>> file
+-----------
+/* This yang file was generated with groovy YangBuilder on Wed Apr 04 22:53:44 CEST 2012
+   see http://bitbucket.org/bubbles.way/yangbuilder */
+module acme-module {
+  // based on example from Instant YANG tutorial, section modules
+  namespace "http://acme.example.com/module";
+  prefix acme;
+
+  import yang-types {
+    prefix yang;
+  }
+  include acme-system;
+
+  organization "ACME Inc.";
+  contact joe@acme.example.com;
+  description
+   "The module for entities
+    implementing the ACME products.";
+
+  revision 2007-06-09 {
+    description "Initial revision.";
+  }
+
+}
+-----------
 TBD footnoteref:[future]
 
 == Plugins
