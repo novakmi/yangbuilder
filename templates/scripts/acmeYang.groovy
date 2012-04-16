@@ -40,7 +40,7 @@ def makeModule(builder) {
         builder.module(moduleName) {
 
                 yngbuild('// based on example from Instant YANG tutorial, section modules', indent:true) //yngbuild echoes its value + request indentation
-                namespace "http://acme.example.com/module"; // semicolon at the end can be preset (yang style)
+                namespace "http://acme.example.com/module"; // semicolon at the end can be present (yang style)
                 prefix "acme" // or semicolon can be missing (more groovy like style)
                 yngbuild('')  //yngbuild('') means new line without indentation
 
