@@ -27,11 +27,12 @@ THE SOFTWARE.
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 @GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.4.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.5.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
 
 // This script template represents example of usage without any plugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(4) // create new builder, indent 4 (default is 2)
+builder.declareAlias('import_', 'import')
 
 //name of file to generate
 moduleName = "example1-module"   // do not use 'def' for script global variable
@@ -63,7 +64,7 @@ builder.module(moduleName) {
         prefix "example1"
         yngbuild('')
 
-        'import'('ietf-inet-types') {
+        import_('ietf-inet-types') { // 'import' alias is declared, it can be used instead of 'import' - workaround for clashing keyword
                 prefix 'inet'
         }
         yngbuild('')
