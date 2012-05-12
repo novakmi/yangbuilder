@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-
 /*
 Copyright (c) 2012 Michal Novak (bubbles.way@gmail.com)
 http://bitbucket.org/bubbles.way/yangbuilder
@@ -26,25 +25,29 @@ THE SOFTWARE.
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
-@GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
+//adoc1-begin
+@GrabResolver(name = 'bubbleswayrepo',
+root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)        //<2>
+
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.5.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
 
-// This script template represents example of usage without any plugin
-def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() // create new builder, default indent of 2
+//This script template represents example of usage without any plugin
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
 
 //name of file to generate
 moduleName = "acme-module"   // do not use 'def' for script global variable
 
 def makeModule(builder) {
-        builder.module(moduleName) {
-
-                yngbuild('// based on example from Instant YANG tutorial, section modules', indent:true) //yngbuild echoes its value + request indentation
-                namespace "http://acme.example.com/module"; // semicolon at the end can be present (yang style)
-                prefix "acme" // or semicolon can be missing (more groovy like style)
+        builder.module(moduleName) {                                                                   //<3>
+                //yngbuild echoes its value, indent:true forces indentation of echooed line
+                yngbuild('// based on example from Instant YANG tutorial, section modules', indent: true)
+                namespace "http://acme.example.com/module"; //semicolon at the end can present (yang style)
+                prefix "acme" //or semicolon can be missing (more groovy like style)
                 yngbuild('')  //yngbuild('') means new line without indentation
 
-                'import'("yang-types") { // Groovy/Java keywords has to be quoted; if node has sub nodes, value has to be in brackets
+                //Groovy/Java keywords has to be quoted; if node has sub nodes, value has to be in brackets
+                'import'("yang-types") {
                         prefix "yang"
                 }
                 include "acme-system" // if node does not have sub nodes, brackets are optional
@@ -67,14 +70,22 @@ implementing the ACME products.''', multiline: true) // multiple line descriptio
    use 'yangroot' e.g. if you need to add comments before 'module' or 'submodule'
    Otherwise use directly builder.module or builder.submodule
 */
-builder.yangroot {
+builder.yangroot {                                                                                     //<4>
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}")
         yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */')
-        // one can continue with  module(moduleName) ... or build continue  building yang in separate function
-        // (another option is to define closure after builder.yangroot { ...)
+        // one can continue with  module(moduleName) ... or build continue building yang in
+        // separate function (another option is to define closure after builder.yangroot { ...)
         makeModule(builder)
 }
 
-builder.writeToFile("${builder.getYangName()}.yang")
-//new File("${moduleName}.yang").write(builder.getText()) // another way how to write to file
+builder.writeToFile("${builder.getYangName()}.yang")                                                   //<5>
+/* adoc1-callout
+<2> With Internet connection, use groovy <<Groovy>> +Grab+ to get dependencies automatically (may take some time for the first time to download jars)
+Without Internet connection you need to specify <<nodebuilder>> and <<yangbuilder>> jars on the classpath.
+E.g. +groovy -cp ./nodebuilder-0.4.0.jar:./yangbuilder-0.2.0.jar <scriptname>.groovy>+. In this way one can also use different version of the jar files than
+<3>  function that makes main <<yang>> module
+<4> script entry point, normally we would start with +builder.module(moduleName)+, but since we want to add some comments before module, we start
+with +yangroot+ ant then continue with +ynngbuild+ (echoing commands)
+<5> with function +getYangName+ builder returns name of the +module+ or the +submodule+ node, which we can use to get <<yang>> file name.
+adoc1-end */
 
