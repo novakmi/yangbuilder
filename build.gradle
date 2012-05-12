@@ -41,7 +41,7 @@ idea {
 
 repositories {
         mavenCentral() // standard maven repository
-        mavenRepo(name:'bubbleswayrepo', url: 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases')
+        mavenRepo(name: 'bubbleswayrepo', url: 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases')
 }
 
 // Define dependencies
@@ -60,13 +60,13 @@ dependencies {
 jar {
         manifest {
                 attributes(
-                    'Implementation-Title': project.name,
-                    'Implementation-Version': version,
-                    'Specification-Vendor': 'Michal Novak (bubbles.way@gmail.com)',
-                    'Built-By': 'bubbles.way',
-                    'Specification-Title': project.name,
-                    'Extension-Name': project.name,
-                    'Specification-Version': version
+                        'Implementation-Title': project.name,
+                        'Implementation-Version': version,
+                        'Specification-Vendor': 'Michal Novak (bubbles.way@gmail.com)',
+                        'Built-By': 'bubbles.way',
+                        'Specification-Title': project.name,
+                        'Extension-Name': project.name,
+                        'Specification-Version': version
                 )
         }
 }
@@ -140,9 +140,32 @@ uploadArchives { // support to upload to github emulated maven repository
         }
 }
 
+def linesBetween(inFile, outFile, line1, line2) {
+        def exec = "/usr/bin/awk /${line2}/{flag=0}flag;/${line1}/{flag=1} ${inFile}"
+        logger.debug("exec {}", exec)
+        def proc = exec.execute()
+        proc.waitFor()
+        def out = proc.in.text
+        if (proc.exitValue()) {
+                logger.error "return code: ${ proc.exitValue()}"
+                logger.error "stderr: ${proc.err.text}"
+                logger.error "stdout: ${out}" // *out* from the external program is *in*
+        } else {
+                logger.debug(out)
+                new File(outFile).write(out)
+        }
+}
+
 task documentation << {
         File buildDirDocumentation = new File(buildDir.toString() + '/documentation')
         buildDirDocumentation.mkdirs()
+
+        // prepare include files
+        def templatesDir = "${project.projectDir}/templates"
+        def docDir = "${project.projectDir}/documentation"
+        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/example1.tmp", "adoc1-begin", "adoc1-callout")
+        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/example1-callout.tmp", "adoc1-callout", "adoc1-end")
+
         // asciidoc has to be installed
         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'
         cmd += " -o  ${buildDirDocumentation.toString()}/yangbuilder.html"
