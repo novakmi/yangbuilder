@@ -27,7 +27,8 @@ THE SOFTWARE.
 version = '0.2.0'
 sourceCompatibility = '1.6'
 groupId = "org.bitbucket.novakmi"
-installDir = file('./install')
+installDir = file("${project.projectDir}/install")
+documentationDir = file("${project.projectDir}/documentation")
 
 apply plugin: 'groovy'
 apply plugin: 'maven' // to use maven repository
@@ -140,7 +141,8 @@ uploadArchives { // support to upload to github emulated maven repository
         }
 }
 
-def linesBetween(inFile, outFile, line1, line2) {
+def linesBetween(inFile, outFile, line1, line2, skipList = ['#$#'],
+                 replaceMap = ['*<*':'<', '*>*':'>']) {
         def exec = "/usr/bin/awk /${line2}/{flag=0}flag;/${line1}/{flag=1} ${inFile}"
         logger.debug("exec {}", exec)
         def proc = exec.execute()
@@ -151,26 +153,61 @@ def linesBetween(inFile, outFile, line1, line2) {
                 logger.error "stderr: ${proc.err.text}"
                 logger.error "stdout: ${out}" // *out* from the external program is *in*
         } else {
+                def finalOut = ''
+                out.eachLine {line ->
+                        def skipped = false
+                        if (skipList) {
+                                for(skip in skipList) {
+                                        if (line.contains(skip)) {
+                                                skipped = true
+                                                break
+                                        }
+                                }
+                        }
+                        if (!skipped) {
+                                if (replaceMap) {
+                                        replaceMap.each { k, v ->
+                                                line = line.replace(k,v)
+                                        }
+                                }
+                                finalOut += line + '\n'
+                        }
+                }
                 logger.debug(out)
-                new File(outFile).write(out)
+                new File(outFile).write(finalOut)
         }
 }
 
 task documentation << {
         File buildDirDocumentation = new File(buildDir.toString() + '/documentation')
+        def templatesDir = "${project.projectDir}/templates"
+        def docDir = "${documentationDir.toString()}"
+
         buildDirDocumentation.mkdirs()
 
+        //run script files
+        Binding binding = new Binding();
+        GroovyScriptEngine gse = new GroovyScriptEngine("${templatesDir}/scripts");
+        logger.debug("Evaluating scripts")
+        Object value = gse.run("acmeYang.groovy", binding);
+        logger.debug("Evaluating scripts doe, value {}", value)
+        "mv ${project.projectDir}/acme-module.yang ${docDir}/acme-module_.tmp".execute().waitFor()
+
         // prepare include files
-        def templatesDir = "${project.projectDir}/templates"
-        def docDir = "${project.projectDir}/documentation"
-        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/example1.tmp", "adoc1-begin", "adoc1-callout")
-        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/example1-callout.tmp", "adoc1-callout", "adoc1-end")
+        linesBetween("${project.projectDir}/LICENSE", "${docDir}/LICENSE.tmp", "-----", "-----")
+        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang.tmp", "adoc1-begin", "adoc1-callout")
+        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang-callout.tmp", "adoc1-callout", "adoc1-end")
+        linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module.tmp", "adoc2-begin", "adoc2-callout")
+        linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module-callout.tmp", "adoc2-callout", "adoc2-end")
 
         // asciidoc has to be installed
         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'
         cmd += " -o  ${buildDirDocumentation.toString()}/yangbuilder.html"
-        cmd += " documentation/yangbuilder.asciidoc"
+        cmd += " ${docDir}/yangbuilder.asciidoc"
         cmd.execute().waitFor()
+
+        // delete generated files
+        delete(fileTree(documentationDir.toString()).include('**/*.tmp'))
 }
 // http://daniel.gredler.net/2011/08/08/gradle-keeping-libraries-up-to-date/
 // Find any 3rd party libraries which have released new versions
