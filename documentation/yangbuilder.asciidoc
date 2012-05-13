@@ -37,25 +37,7 @@ This document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc] and con
 The <<yangbuilder>> is free software licensed under http://en.wikipedia.org/wiki/MIT_License[MIT Licnense].
 
 ------------------
-Copyright (c) 2012 Michal Novak (bubbles.way@gmail.com)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+include::LICENSE.tmp[]
 ------------------
 
 == Introduction
@@ -185,41 +167,19 @@ java is used as it is close to groovy syntax
 .Example groovy script to generate <<Yang>> file based on example from Instant YANG tutorial, section modules
 [source,java]
 -----------
-#!/usr/bin/env groovy                                                                                   //<1>
-include::example1.tmp[]
+#!/usr/bin/env groovy                                                                                  //<1>
+include::acmeYang.tmp[]
 -----------
 <1> On Unix (Linux) you can run script to generate <<yang>> file as any other executable script +./<scriptName>.groovy+, 
 provided <<groovy>> is installed and exec attribute is set. Alternatively (or on Windows) you can run it as +groovy <scriptname>.groovy+.
-include::example1-callout.tmp[]
+include::acmeYang-callout.tmp[]
 
 [source,java]
 .Resulting <<yang>> file
 -----------
-/* This yang file was generated with groovy YangBuilder on Wed Apr 04 22:53:44 CEST 2012 <1>
-   see http://bitbucket.org/bubbles.way/yangbuilder */
-module acme-module {
-  // based on example from Instant YANG tutorial, section modules
-  namespace "http://acme.example.com/module";
-  prefix acme;
-
-  import yang-types {
-    prefix yang;
-  }
-  include acme-system;
-
-  organization "ACME Inc.";
-  contact joe@acme.example.com;
-  description
-   "The module for entities
-    implementing the ACME products.";
-
-  revision 2007-06-09 {
-    description "Initial revision.";
-  }
-
-}
+include::acme-module.tmp[]
 -----------
-<1> default indent is 2 unless overwritten (see below)
+include::acme-module-callout.tmp[]
 TBD footnoteref:[future]
 
 === Example 2

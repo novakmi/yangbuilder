@@ -25,7 +25,7 @@ THE SOFTWARE.
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
-//adoc1-begin
+//adoc1-begin - documentation purpose comment
 @GrabResolver(name = 'bubbleswayrepo',
 root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)        //<2>
 
@@ -40,7 +40,7 @@ moduleName = "acme-module"   // do not use 'def' for script global variable
 
 def makeModule(builder) {
         builder.module(moduleName) {                                                                   //<3>
-                //yngbuild echoes its value, indent:true forces indentation of echooed line
+                //yngbuild echoes its value, indent:true forces indentation of echoed line
                 yngbuild('// based on example from Instant YANG tutorial, section modules', indent: true)
                 namespace "http://acme.example.com/module"; //semicolon at the end can present (yang style)
                 prefix "acme" //or semicolon can be missing (more groovy like style)
@@ -71,15 +71,20 @@ implementing the ACME products.''', multiline: true) // multiple line descriptio
    Otherwise use directly builder.module or builder.submodule
 */
 builder.yangroot {                                                                                     //<4>
+        yngbuild('//adoc2-begin - documentation purpose comment') //#$# for asciidoc
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}")
         yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */')
+        yngbuild('//                                                                           *<*1*>*') //#$# for asciidoc
         // one can continue with  module(moduleName) ... or build continue building yang in
         // separate function (another option is to define closure after builder.yangroot { ...)
         makeModule(builder)
+        yngbuild('/* adoc2-callout - documentation purpose comment') //#$# for asciidoc
+        yngbuild('*<*1*>* default indent is 2 unless overwritten') //#$# for asciidoc
+        yngbuild('   adoc2-end - documentation purpose comment */') //#$# for asciidoc
 }
 
-builder.writeToFile("${builder.getYangName()}.yang")                                                   //<5>
-/* adoc1-callout
+builder.writeToFile("${builder.getYangName()}.yang")                                                  //<5>
+/* adoc1-callout - documentation purpose comment
 <2> With Internet connection, use groovy <<Groovy>> +Grab+ to get dependencies automatically (may take some time for the first time to download jars)
 Without Internet connection you need to specify <<nodebuilder>> and <<yangbuilder>> jars on the classpath.
 E.g. +groovy -cp ./nodebuilder-0.4.0.jar:./yangbuilder-0.2.0.jar <scriptname>.groovy>+. In this way one can also use different version of the jar files than
@@ -87,5 +92,5 @@ E.g. +groovy -cp ./nodebuilder-0.4.0.jar:./yangbuilder-0.2.0.jar <scriptname>.gr
 <4> script entry point, normally we would start with +builder.module(moduleName)+, but since we want to add some comments before module, we start
 with +yangroot+ ant then continue with +ynngbuild+ (echoing commands)
 <5> with function +getYangName+ builder returns name of the +module+ or the +submodule+ node, which we can use to get <<yang>> file name.
-adoc1-end */
+   adoc1-end - documentation purpose comment*/
 
