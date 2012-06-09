@@ -182,6 +182,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 BuilderNode node = findNode('module')
                 if (node == null) {
                         node = findNode('submodule')
+                        if (node) {
+                                node = findNode('belongs-to')
+                        }
                 }
                 if (node != null) {
                         for (n in node.children) {

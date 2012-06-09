@@ -59,7 +59,10 @@ class YangBuilderTestCommon {
                 org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("==> _buildTestSubmoduleYang")
 
                 builder.submodule(_TEST_SUBMODULE_NAME) {
-                        prefix _TEST_SUBMODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+                        'belongs-to'() {
+                                prefix _TEST_SUBMODULE_NAME // or semicolon can be missing (more groovy like style)
+                        }
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         organization 'bubbles'
