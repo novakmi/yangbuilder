@@ -170,16 +170,24 @@ task documentation << {
         Binding binding = new Binding();
         GroovyScriptEngine gse = new GroovyScriptEngine("${templatesDir}/scripts");
         logger.debug("Evaluating scripts")
-        Object value = gse.run("acmeYang.groovy", binding);
-        logger.debug("Evaluating scripts doe, value {}", value)
+        gse.run("acmeYang.groovy", binding);
+        gse.run("example1Yang.groovy", binding);
+        logger.debug("Evaluating scripts done")
         "mv ${project.projectDir}/acme-module.yang ${docDir}/acme-module_.tmp".execute().waitFor()
+        "mv ${project.projectDir}/example1-module.yang ${docDir}/example1-module_.tmp".execute().waitFor()
 
-        // prepare include files
+        // prepare include files from groovy source files
         linesBetween("${project.projectDir}/LICENSE", "${docDir}/LICENSE.tmp", "-----", "-----")
-        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang.tmp", "adoc1-begin", "adoc1-callout")
-        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang-callout.tmp", "adoc1-callout", "adoc1-end")
-        linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module.tmp", "adoc2-begin", "adoc2-callout")
-        linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module-callout.tmp", "adoc2-callout", "adoc2-end")
+        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang.tmp", "adoc-begin", "adoc-callout")
+        linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang-callout.tmp", "adoc-callout", "adoc-end")
+        linesBetween("${templatesDir}/scripts/example1Yang.groovy", "${docDir}/example1Yang.tmp", "adoc-begin", "adoc-callout")
+        linesBetween("${templatesDir}/scripts/example1Yang.groovy", "${docDir}/example1Yang-callout.tmp", "adoc-callout", "adoc-end")
+
+        // prepare inlcude files from generated yang files
+        linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module.tmp", "adocy-begin", "adocy-callout")
+        linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module-callout.tmp", "adocy-callout", "adocy-end")
+        linesBetween("${docDir}/example1-module_.tmp", "${docDir}/example1-module.tmp", "adocy-begin", "adocy-callout")
+        linesBetween("${docDir}/example1-module_.tmp", "${docDir}/example1-module-callout.tmp", "adocy-callout", "adocy-end")
 
         // asciidoc has to be installed
         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'
@@ -188,7 +196,7 @@ task documentation << {
         cmd.execute().waitFor()
 
         // delete generated files
-        delete(fileTree(documentationDir.toString()).include('**/*.tmp'))
+        //delete(fileTree(documentationDir.toString()).include('**/*.tmp'))
 }
 // http://daniel.gredler.net/2011/08/08/gradle-keeping-libraries-up-to-date/
 // Find any 3rd party libraries which have released new versions
