@@ -10,6 +10,10 @@ import org.bitbucket.novakmi.nodebuilder.TextPluginTreeNodeBuilder
 class YangBuilder extends TextPluginTreeNodeBuilder {
 
         final private String YANG_ROOT = 'yangroot'
+
+        // list of keywords with special quote handling
+        private quoteKeywords = []
+
         /**
          * Create new YangBuilder
          * @param indent number of spaces for indentation (default is 2)
@@ -17,6 +21,17 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          */
         public YangBuilder(indent = 2, plugins = null) {
                 super(indent, plugins)
+                quoteKeywords += [
+                        'reference',
+                        'contact',
+                        'description',
+                        'presence',
+                        'organization',
+                        'namespace',
+                        'key',
+                        'pattern',
+                        'prefix',
+                ]
         }
 
         /**
@@ -27,6 +42,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          * @return
          * @see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
          */
+
         def getQuotes(txt) {
                 def retVal = ''
                 while (1) {
@@ -38,9 +54,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         break
                                 }
                                 if (
-                                    txt.contains(' ') || txt.contains('\t')
-                                        || txt.contains(';') || txt.contains('{') || txt.contains('}')
-                                        || txt.contains('//') || txt.contains('/*') || txt.contains('*/')
+                                        txt.contains(' ') || txt.contains('\t')
+                                                || txt.contains(';') || txt.contains('{') || txt.contains('}')
+                                                || txt.contains('//') || txt.contains('/*') || txt.contains('*/')
                                 ) {
                                         retVal = '"'
                                 } else {
@@ -69,7 +85,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         break
                                 }
                                 throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} must be root node!")
-                // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
+                        // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
                         case 'yngbuild':
                                 if (node.children.size()) {
                                         throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} cannot contain child nodes!")
@@ -79,50 +95,30 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 }
                                 opaque.println(node.value)
                                 break
-                // for following keywords surround value with quotes if needed, prefer double quotes over single quotes
-                // see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
-                // If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),
-                // or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
-                // in addition 'multiline' attribute is supported for following node types
-                        case 'reference':
-                        case 'contact':
-                        case 'description':
-                        case 'presence':
-                        case 'organization':
-                                if (node.attributes.multiline) {
-                                        opaque.printIndent()
-                                        opaque.println("$node.name")
-                                        quotes = getQuotes(node.value)
-                                        def lines = node?.value?.split('\n')
-                                        lines?.eachWithIndex {l, i ->
-                                                opaque.printIndent()
-                                                if (i == 0 && quotes != '') {
-                                                        l = quotes + l
-                                                } else {
-                                                        l = ' ' + l
-                                                }
-                                                if (i == lines.size() - 1) {
-                                                        l = l + quotes + ';'
-                                                }
-                                                //opaque.print(" ${l}")
-                                                //if (i == lines.size() - 1) {
-                                                //        opaque.print("${quotes};")
-                                                //}
-                                                opaque.println(" ${l}") // indent one space after description
-                                        }
-                                        break
-                                }
-                // for following keywords surround value with quotes if needed, prefer double quotes over single quotes
-                // see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
-                // If a string contains any space or tab characters, a semicolon (";"), braces ("{" or "}"),
-                // or comment sequences ("//", "/*", or "*/"), then it MUST be enclosed within double or single quotes.
-                        case 'namespace':
-                        case 'key':
-                        case 'pattern':
-                        case 'prefix':
-                                // TODO add other keywords as needed
-                                quotes = getQuotes(node.value)
                         default:
+                                if (node.name in quoteKeywords && !node.attributes.noQuotes) { //if quote Keyword and quotes not disabled
+                                        quotes = getQuotes(node.value)
+                                        if (node.attributes.multiline) {
+                                                opaque.printIndent()
+                                                opaque.println("$node.name")
+                                                quotes = getQuotes(node.value)
+                                                def quotesFill = ' ' * quotes.size()
+                                                def lines = node?.value?.split('\n')
+                                                lines?.eachWithIndex {l, i ->
+                                                        opaque.printIndent()
+                                                        if (i == 0 ) {
+                                                                l = quotes + l
+                                                        } else {
+                                                                l = quotesFill + l
+                                                        }
+                                                        if (i == lines.size() - 1) {
+                                                                l = l + quotes + ';'
+                                                        }
+                                                        opaque.println(" ${l}") // indent one space after description
+                                                }
+                                                break
+                                        }
+                                }
                                 opaque.printIndent()
                                 opaque.print("$node.name")
                                 if (node.value) {
@@ -195,6 +191,10 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 }
 
                 return retVal
+        }
+
+        public void addQuoteKeywords(keywordList) {
+                quoteKeywords += addQuoteKeywords()
         }
 
 }
