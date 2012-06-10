@@ -307,11 +307,36 @@ description''',
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
+                        cmt('This is comment')
+                        cmt('This is inline comment', inline: true)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        cmt('This is indented comment', indent: true)
+                        cmt('This is inline indented comment', inline: true, indent: true)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        cmt('''This is
+multiline comment.''')
+                        cmt('''This is inline
+multiline comment''', inline: true)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        cmt('''This is indented
+multiline comment.''', indent: true)
+                        cmt('''This is indented inline
+multiline comment''', inline: true, indent: true)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+
                         organization 'bubbles'
                         contact 'bubbles.way@gmail.com'
                         description 'test quotes'
 
                         container('socket', cmt: "Inline comment for socket container") {
+                                cmt('This is indented comment in container', indent: true)
+                                yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+                                cmt('This is inline indented comment in container', inline: true, indent: true)
+                                yngbuild('') //yngbuild echoes value, yngbuild('') means new line
                                 presence 'yes'
                                 leaf('ipnum') {
                                         type('string') {
@@ -319,6 +344,13 @@ description''',
                                         }
                                 }
                                 list('ports') {
+                                        cmt('''This is indented
+multiline comment in list.''', indent: true)
+                                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+                                        cmt('''This is indented inline
+multiline comment in list''', inline: true, indent: true)
+                                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
                                         key 'port'
                                         leaf('port') {
                                                 type 'uint16'
@@ -330,10 +362,40 @@ description''',
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
+/*
+This is comment
+*/
+// This is inline comment
+
+    /*
+    This is indented comment
+    */
+    // This is inline indented comment
+
+/*
+This is
+multiline comment.
+*/
+// This is inline
+// multiline comment
+
+    /*
+    This is indented
+    multiline comment.
+    */
+    // This is indented inline
+    // multiline comment
+
     organization bubbles;
     contact bubbles.way@gmail.com;
     description "test quotes";
     container socket { //Inline comment for socket container
+        /*
+        This is indented comment in container
+        */
+
+        // This is inline indented comment in container
+
         presence yes;
         leaf ipnum {
             type string {
@@ -341,6 +403,14 @@ description''',
             }
         }
         list ports {
+            /*
+            This is indented
+            multiline comment in list.
+            */
+
+            // This is indented inline
+            // multiline comment in list
+
             key port;
             leaf port {
                 type uint16;
