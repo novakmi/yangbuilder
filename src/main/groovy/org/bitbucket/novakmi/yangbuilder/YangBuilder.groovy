@@ -132,16 +132,25 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         opaque.print(" ${quotes}${node.value}${quotes}")
                                 }
                                 if (!node?.children?.size()) {
-                                        opaque.println(";") // yang statements not having children end with semicolon
+                                        opaque.print(";") // yang statements not having children end with semicolon
+                                        processInlindeComment(node, opaque)
                                 }
                                 break
                 }
         }
 
+        private void processInlindeComment(BuilderNode node, opaque) {
+                if (node.attributes.cmt) { // print inline comment
+                        opaque.print(" //${node.attributes.cmt}")
+                }
+                opaque.println()
+        }
+
         @Override
         protected void processNodeBeforeChildren(BuilderNode node, Object opaque) throws BuilderException {
                 if (node.name != YANG_ROOT) {
-                        opaque.println(" {") // block opening bracket
+                        opaque.print(" {") // block opening bracket
+                        processInlindeComment(node, opaque)
                 }
                 super.processNodeBeforeChildren(node, opaque) //incrementIndent()
         }
