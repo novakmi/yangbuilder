@@ -1,6 +1,6 @@
 #Yangbuilder change log
 
-* 0.3.1 2012-06-10
+* 0.3.2, 0.3.1 2012-06-10
     * fixed error in addQuoteKeyword (infinite loop)
 
 * 0.3.0 2012-06-10
