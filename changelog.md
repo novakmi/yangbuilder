@@ -1,6 +1,9 @@
 #Yangbuilder change log
 
-* 0.3.0 2012-06-10 TODO
+* 0.3.1 2012-06-10
+    * fixed error in addQuoteKeyword (infinite loop)
+
+* 0.3.0 2012-06-10
      * `README.md`, `changelog.md` and `LICENSE` added
      * Updated `CompactYangPlugin`
         * `prefix` attribute in `belongs-to`
