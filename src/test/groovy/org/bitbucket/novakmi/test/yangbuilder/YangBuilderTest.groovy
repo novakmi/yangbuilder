@@ -30,6 +30,7 @@ class YangBuilderTest {
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 YangBuilderTestCommon._buildTestYang(builder)
                 Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertEquals(builder.getText(), '')
@@ -46,12 +47,14 @@ class YangBuilderTest {
                         YangBuilderTestCommon._buildTestYang(builder)
                 }
                 Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertEquals(builder.getText(), '')
 
                 YangBuilderTestCommon._buildTestYang(builder)
                 Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 logger.trace("<== yangResetAfterYangrootTest")
         }
@@ -67,12 +70,14 @@ class YangBuilderTest {
                         YangBuilderTestCommon._buildTestYang(builder)
                 }
                 Assert.assertEquals(builder.getYangName(), YangBuilderTestCommon._TEST_MODULE_NAME)
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
 
                 YangBuilderTestCommon._buildTestYang(builder)
                 Assert.assertEquals(builder.getYangName(), YangBuilderTestCommon._TEST_MODULE_NAME)
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
@@ -108,12 +113,14 @@ class YangBuilderTest {
                         YangBuilderTestCommon._buildTestYang(builder)
                 }
                 Assert.assertEquals(builder.getPrefixName(), YangBuilderTestCommon._TEST_MODULE_NAME)
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
 
                 YangBuilderTestCommon._buildTestYang(builder)
                 Assert.assertEquals(builder.getPrefixName(), YangBuilderTestCommon._TEST_MODULE_NAME)
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
@@ -138,6 +145,149 @@ class YangBuilderTest {
                 logger.trace("<== prefixNameTest")
         }
 
+        @Test(groups = ["basic"])
+        public void quoteTest() {
+                logger.trace("==> quoteTest")
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'bubbles'
+                        contact 'bubbles.way@gmail.com'
+                        description 'test quotes'
+
+                        container('socket') {
+                                presence 'yes'
+                                leaf('ip') {
+                                        type('string') {
+                                                pattern('*.')
+                                        }
+                                }
+                                list('ports') {
+                                        key 'port'
+                                        leaf('port') {
+                                                type 'uint16'
+                                        }
+                                }
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization bubbles;
+    contact bubbles.way@gmail.com;
+    description "test quotes";
+    container socket {
+        presence yes;
+        leaf ip {
+            type string {
+                pattern *.;
+            }
+        }
+        list ports {
+            key port;
+            leaf port {
+                type uint16;
+            }
+        }
+    }
+}
+''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        list('ports') {
+                                key('port', quotes: '"') // force quotes
+                                leaf('port') {
+                                        type 'uint16'
+                                }
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    list ports {
+        key "port";
+        leaf port {
+            type uint16;
+        }
+    }
+}
+''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'bubbles'
+                        contact 'bubbles.way@gmail.com'
+                        description('test quotes', noAutoQuotes: true) // force no quotes = invalid yang
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization bubbles;
+    contact bubbles.way@gmail.com;
+    description test quotes;
+}
+''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'bubbles'
+                        contact('bubbles.way@gmail.com', quotes: '"')
+                        description('test quotes') // force no quotes = invalid yang
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization bubbles;
+    contact "bubbles.way@gmail.com";
+    description "test quotes";
+}
+''')
+
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'bubbles'
+                        contact('bubbles.way@gmail.com', quotes: '"')
+                        description(
+                                '''test quotes
+in multiline
+description''',
+                                multiline: true) // force no quotes = invalid yang
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization bubbles;
+    contact "bubbles.way@gmail.com";
+    description
+        "test quotes
+         in multiline
+         description";
+}
+''')
+                logger.trace("<== quoteTest")
+        }
 
         //Initialize logging
         private static final Logger logger = LoggerFactory.getLogger(YangBuilderTest.class);
