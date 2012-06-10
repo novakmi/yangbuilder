@@ -85,18 +85,40 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         break
                                 }
                                 throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} must be root node!")
-                        // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
+                // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
                         case 'yngbuild':
+                        case 'cmt':
                                 if (node.children.size()) {
                                         throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} cannot contain child nodes!")
                                 }
-                                if (node.attributes.indent) {
-                                        opaque.printIndent()
+
+                                if (node.name == 'yngbuild') {
+                                        indentIfNeeded(node, opaque)
+                                        opaque.println(node.value)
+                                } else {
+                                        assert (node.name == 'cmt')
+                                        if (!node.attributes.inline) {
+                                                indentIfNeeded(node, opaque)
+                                                opaque.println('/*')
+                                        }
+                                        // process comment line by line
+                                        def lines = node?.value?.split('\n')
+                                        lines.each {l ->
+                                                indentIfNeeded(node, opaque)
+                                                if (node.attributes.inline) {
+                                                        opaque.print('// ')
+                                                }
+                                                opaque.println(l)
+                                        }
+                                        if (!node.attributes.inline) {
+                                                indentIfNeeded(node, opaque)
+                                                opaque.println('*/')
+                                        }
                                 }
-                                opaque.println(node.value)
                                 break
                         default:
                                 //qoute handling attributes
+                                //*************************
                                 //quotes - force quotes
                                 //noAutoQuotes - no quotes handling
                                 //always - even if not needed
@@ -111,7 +133,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                 def quotesFill = ' ' * quotes.size()
                                                 def lines = node?.value?.split('\n')
                                                 lines?.eachWithIndex {l, i ->
-                                                        if (i == 0 ) {
+                                                        if (i == 0) {
                                                                 l = quotes + l
                                                         } else {
                                                                 l = quotesFill + l
@@ -136,6 +158,12 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         processInlindeComment(node, opaque)
                                 }
                                 break
+                }
+        }
+
+        private void indentIfNeeded(BuilderNode node, opaque) {
+                if (node.attributes.indent) {
+                        opaque.printIndent()
                 }
         }
 
