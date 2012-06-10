@@ -77,7 +77,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
 
         @Override
         protected void processNode(BuilderNode node, Object opaque) throws BuilderException {
-                def quotes = ''
+                def quotes = node.attributes.quotes ?: ''
                 switch (node.name) {
                         case YANG_ROOT:
                                 if (root == node) {
@@ -96,16 +96,21 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 opaque.println(node.value)
                                 break
                         default:
-                                if (node.name in quoteKeywords && !node.attributes.noQuotes) { //if quote Keyword and quotes not disabled
-                                        quotes = getQuotes(node.value)
+                                //qoute handling attributes
+                                //quotes - force quotes
+                                //noAutoQuotes - no quotes handling
+                                //always - even if not needed
+                                //multiline - handle multiline string
+                                if (quotes == '' && node.name in quoteKeywords) { //if quote Keyword and quotes not disabled
+                                        if (!node.attributes.noAutoQuotes) {
+                                                quotes = getQuotes(node.value)
+                                        }
                                         if (node.attributes.multiline) {
                                                 opaque.printIndent()
                                                 opaque.println("$node.name")
-                                                quotes = getQuotes(node.value)
                                                 def quotesFill = ' ' * quotes.size()
                                                 def lines = node?.value?.split('\n')
                                                 lines?.eachWithIndex {l, i ->
-                                                        opaque.printIndent()
                                                         if (i == 0 ) {
                                                                 l = quotes + l
                                                         } else {
@@ -114,7 +119,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                         if (i == lines.size() - 1) {
                                                                 l = l + quotes + ';'
                                                         }
-                                                        opaque.println(" ${l}") // indent one space after description
+                                                        opaque.printIndent()
+                                                        opaque.printIndent()
+                                                        opaque.println("${l}") //print just
                                                 }
                                                 break
                                         }
