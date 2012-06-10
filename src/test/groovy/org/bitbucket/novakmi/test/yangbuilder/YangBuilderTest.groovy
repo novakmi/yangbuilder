@@ -160,9 +160,9 @@ class YangBuilderTest {
 
                         container('socket') {
                                 presence 'yes'
-                                leaf('ip') {
+                                leaf('ipnum') {
                                         type('string') {
-                                                pattern('*.')
+                                                pattern('[0-9a-fA-F]*')
                                         }
                                 }
                                 list('ports') {
@@ -182,9 +182,9 @@ class YangBuilderTest {
     description "test quotes";
     container socket {
         presence yes;
-        leaf ip {
+        leaf ipnum {
             type string {
-                pattern *.;
+                pattern [0-9a-fA-F]*;
             }
         }
         list ports {
@@ -196,6 +196,8 @@ class YangBuilderTest {
     }
 }
 ''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
@@ -221,6 +223,8 @@ class YangBuilderTest {
     }
 }
 ''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
@@ -240,6 +244,8 @@ class YangBuilderTest {
     description test quotes;
 }
 ''')
+                //YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME) - yang not valid
+
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
@@ -259,6 +265,7 @@ class YangBuilderTest {
     description "test quotes";
 }
 ''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -286,7 +293,64 @@ description''',
          description";
 }
 ''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
                 logger.trace("<== quoteTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void commentTest() {
+                logger.trace("==> commentTest")
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'bubbles'
+                        contact 'bubbles.way@gmail.com'
+                        description 'test quotes'
+
+                        container('socket', cmt: "Inline comment for socket container") {
+                                presence 'yes'
+                                leaf('ipnum') {
+                                        type('string') {
+                                                pattern('[0-9a-fA-F]*', cmt: "Inline comment for pattern")
+                                        }
+                                }
+                                list('ports') {
+                                        key 'port'
+                                        leaf('port') {
+                                                type 'uint16'
+                                        }
+                                }
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization bubbles;
+    contact bubbles.way@gmail.com;
+    description "test quotes";
+    container socket { //Inline comment for socket container
+        presence yes;
+        leaf ipnum {
+            type string {
+                pattern [0-9a-fA-F]*; //Inline comment for pattern
+            }
+        }
+        list ports {
+            key port;
+            leaf port {
+                type uint16;
+            }
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+                logger.trace("<== commentTest")
         }
 
         //Initialize logging
