@@ -1,5 +1,8 @@
 #Yangbuilder change log
 
+* 0.3.3 2012-06-12
+    * fixed indent in multiline quoted keywords
+
 * 0.3.2, 0.3.1 2012-06-10
     * fixed error in addQuoteKeyword (infinite loop)
 
