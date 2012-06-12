@@ -141,8 +141,11 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                         if (i == lines.size() - 1) {
                                                                 l = l + quotes + ';'
                                                         }
-                                                        opaque.printIndent()
-                                                        opaque.printIndent()
+                                                        indentIfNeeded(node, opaque)
+                                                        def level = opaque.getIndentLevel() // indent only
+                                                        opaque.setIndentLevel(1)            // one indent level
+                                                        indentIfNeeded(node, opaque)
+                                                        opaque.setIndentLevel(level)        //restore indent
                                                         opaque.println("${l}") //print just
                                                 }
                                                 break

@@ -279,7 +279,7 @@ class YangBuilderTest {
                                 '''test quotes
 in multiline
 description''',
-                                multiline: true) // force no quotes = invalid yang
+                                multiline: true, indent: true) // multiline and indent
                 }
                 Assert.assertEquals(builder.getText(), '''module test {
     namespace "http://novakmi.bitbucket.org/test";
