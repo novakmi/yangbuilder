@@ -1,5 +1,8 @@
 #Yangbuilder change log
 
+* 0.4.0 working
+    * dependencies updated to groovy 2.0.0
+
 * 0.3.3 2012-06-12
     * fixed indent in multiline quoted keywords
 
