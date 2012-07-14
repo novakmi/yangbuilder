@@ -10,8 +10,8 @@
 @GrabResolver(name = 'bubbleswayrepo',
 root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)        //<2>
 
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.5.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.6.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.4.0')
 
 //This script template represents example of usage without any plugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2

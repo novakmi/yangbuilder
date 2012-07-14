@@ -1,7 +1,9 @@
 #Yangbuilder change log
 
-* 0.4.0 working
-    * dependencies updated to groovy 2.0.0
+* 0.4.0
+    * dependencies updated to groovy 2.0.0, nodebuilder 0.6.0
+    * CompactYangPlugin now supports description attribute for revision
+    * 'cmt' keyword is now inline and indented by default
 
 * 0.3.3 2012-06-12
     * fixed indent in multiline quoted keywords

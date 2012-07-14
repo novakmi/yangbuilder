@@ -9,8 +9,8 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 @GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.5.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.6.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.4.0')
 
 // This script template represents example of usage with Compact yang plugin (syntax is more different from yang, but more compact)
 // create new builder, pass plugin or list of plugins as constructor parameter,
