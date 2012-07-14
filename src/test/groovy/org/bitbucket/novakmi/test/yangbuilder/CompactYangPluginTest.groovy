@@ -72,6 +72,10 @@ class CompactYangPluginTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
+                        revision('2012-06-29', description: "initial revision")
+
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
                         container('socket', description: 'socket ip address and port') {
                                 leaf('ip', type: 'string', description: 'ip address ')
                                 leaf('port', type: 'uint16', description: 'port vlaue')
@@ -87,6 +91,10 @@ class CompactYangPluginTest {
                     '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
+
+    revision 2012-06-29 {
+        description "initial revision";
+    }
 
     container socket {
         description "socket ip address and port";
