@@ -93,11 +93,14 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 }
 
                                 if (node.name == 'yngbuild') {
-                                        indentIfNeeded(node, opaque)
+                                        if (node.attributes.indent) {
+                                                opaque.printIndent()
+                                        }
                                         opaque.println(node.value)
                                 } else {
                                         assert (node.name == 'cmt')
-                                        if (!node.attributes.inline) {
+                                        def isInline = node.attributes.inline == null || node.attributes.inline
+                                        if (!isInline) {
                                                 indentIfNeeded(node, opaque)
                                                 opaque.println('/*')
                                         }
@@ -105,12 +108,12 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         def lines = node?.value?.split('\n')
                                         lines.each {l ->
                                                 indentIfNeeded(node, opaque)
-                                                if (node.attributes.inline) {
+                                                if (isInline) {
                                                         opaque.print('// ')
                                                 }
                                                 opaque.println(l)
                                         }
-                                        if (!node.attributes.inline) {
+                                        if (!isInline) {
                                                 indentIfNeeded(node, opaque)
                                                 opaque.println('*/')
                                         }
@@ -165,7 +168,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         }
 
         private void indentIfNeeded(BuilderNode node, opaque) {
-                if (node.attributes.indent) {
+                def isIndent = node.attributes.indent == null || node.attributes.indent
+                if (isIndent) {
                         opaque.printIndent()
                 }
         }
