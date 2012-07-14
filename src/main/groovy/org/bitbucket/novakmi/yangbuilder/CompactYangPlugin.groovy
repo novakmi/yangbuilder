@@ -65,8 +65,8 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         processed |= compactNodeAttr(node, 'key')
                 }
 
-                // description  under 'leaf', 'leaf-list', 'list', 'container'
-                if (node.name in ['leaf', 'leaf-list', 'list', 'container']) {
+                // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision'
+                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'revision']) {
                         processed |= compactNodeAttr(node, 'description')
                 }
 
