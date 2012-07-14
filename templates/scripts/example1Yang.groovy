@@ -9,8 +9,8 @@
 //adoc-begin - documentation purpose comment
 @GrabResolver(name = 'bubbleswayrepo',
 root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.5.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.2.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.6.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.4.0')
 
 // This script template represents example of usage without any plugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(4) // create new builder, indent 4 (default is 2)
