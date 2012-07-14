@@ -307,24 +307,24 @@ description''',
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        cmt('This is comment')
-                        cmt('This is inline comment', inline: true)
+                        cmt('This is comment', indent: false, inline: false)
+                        cmt('This is inline comment', indent: false)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        cmt('This is indented comment', indent: true)
-                        cmt('This is inline indented comment', inline: true, indent: true)
+                        cmt('This is indented comment', inline: false)
+                        cmt('This is inline indented comment')
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         cmt('''This is
-multiline comment.''')
+multiline comment.''', indent: false, inline: false)
                         cmt('''This is inline
-multiline comment''', inline: true)
+multiline comment''', indent: false)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         cmt('''This is indented
-multiline comment.''', indent: true)
+multiline comment.''', inline: false)
                         cmt('''This is indented inline
-multiline comment''', inline: true, indent: true)
+multiline comment''')
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
 
@@ -333,9 +333,9 @@ multiline comment''', inline: true, indent: true)
                         description 'test quotes'
 
                         container('socket', cmt: "Inline comment for socket container") {
-                                cmt('This is indented comment in container', indent: true)
+                                cmt('This is indented comment in container', inline: false)
                                 yngbuild('') //yngbuild echoes value, yngbuild('') means new line
-                                cmt('This is inline indented comment in container', inline: true, indent: true)
+                                cmt('This is inline indented comment in container')
                                 yngbuild('') //yngbuild echoes value, yngbuild('') means new line
                                 presence 'yes'
                                 leaf('ipnum') {
@@ -345,10 +345,10 @@ multiline comment''', inline: true, indent: true)
                                 }
                                 list('ports') {
                                         cmt('''This is indented
-multiline comment in list.''', indent: true)
+multiline comment in list.''', inline: false)
                                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
                                         cmt('''This is indented inline
-multiline comment in list''', inline: true, indent: true)
+multiline comment in list''')
                                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                                         key 'port'
