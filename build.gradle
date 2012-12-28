@@ -9,7 +9,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven' // to use maven repository
 apply plugin: 'idea' // to generate project+module files for Intellij Idea
 
-version = '0.4.0'
+version = '0.5.0working'
 sourceCompatibility = '1.6'
 def groupId = "org.bitbucket.novakmi"
 def installDir = file("${project.projectDir}/install")
@@ -28,12 +28,12 @@ repositories {
 
 // Define dependencies
 dependencies {
-        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.0'
+        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.6'
         compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.6.0'
         // dependencies for tests
-        testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.4'
-        testCompile group: 'org.testng', name: 'testng', version: '6.4'
-        testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.1'
+        testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
+        testCompile group: 'org.testng', name: 'testng', version: '6.8'
+        testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
         //testCompile 'org.uncommons:reportng:1.1.1'
         testCompile group: 'janino', name: 'janino', version: '2.5.10'
 }
@@ -206,8 +206,8 @@ task checkLibVersions << {
         allprojects {
                 configurations.each { configuration ->
                         configuration.allDependencies.each { dependency ->
-                                def version = dependency.version
-                                if (version && !version.contains('SNAPSHOT') && !checked[dependency]) {
+                                def ver = dependency.version
+                                if (ver && !ver.contains('SNAPSHOT') && !checked[dependency]) {
                                         def group = dependency.group
                                         def path = group.replace('.', '/')
                                         def name = dependency.name
@@ -219,8 +219,8 @@ task checkLibVersions << {
                                                 versions.removeAll { it.toLowerCase().contains('beta') }
                                                 versions.removeAll { it.toLowerCase().contains('rc') }
                                                 def newest = versions.max()
-                                                if (version != newest) {
-                                                        println "$group:$name $version -> $newest [$versions]"
+                                                if (ver != newest) {
+                                                        println "$group:$name $ver -> $newest [$versions]"
                                                 }
                                         } catch (FileNotFoundException e) {
                                                 logger.debug "Unable to download $url: $e.message"
