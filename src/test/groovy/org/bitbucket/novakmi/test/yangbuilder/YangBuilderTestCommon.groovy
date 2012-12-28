@@ -22,10 +22,13 @@ class YangBuilderTestCommon {
                         org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("writing to file {}", builder.getText())
                         builder.writeToFile("./${fileName}.yang")
                         if (USE_PYANG) {
+                                def sout = new StringBuffer()
+                                def serr = new StringBuffer()
                                 Process process = "pyang -f tree ./${fileName}.yang".execute()
+                                process.consumeProcessOutput(sout, serr)
                                 process.waitFor()
-                                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("process.exitValue() {} process.text {}", process.exitValue(), process.text)
-                                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("process.err.text {}", process.err.text)
+                                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("process.exitValue() {} sout {}", process.exitValue(), sout)
+                                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("serr {}", serr)
                                 Assert.assertEquals(process.exitValue(), 0)
                         }
                 }
