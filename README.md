@@ -9,6 +9,17 @@ Use [gradle][gradle_id] to build, test and package project.
 
 See `changelog.txt`.
 
+TODO:
+
+* support for `mandatory` in CompactYangPlugin (`container`, `leaf`)
+* support for `presence` in CompactYangPlugin (`container`)
+* support for `enumeration` in CompactYangPlugin (`type(enumeration, enums: [....]`)
+* support for `children` in CompactYangPlugin (container, list, leaf, eg. `leaf(my_leaf, childern ['my:annotation'(), 'other:annotation'()])`)
+
+DONE:
+
+* support for `type` and `description` in CompactYangPlugin (`typedef(type 'string', description:'my type')`)
+
 Michal Novak (<bubbles.way@gmail.com>)
 
 [gradle_id]: http://www.gradle.org/  "Gradle"

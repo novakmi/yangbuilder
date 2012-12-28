@@ -56,7 +56,7 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         processed |= compactNodeAttr(node, 'namespace')
                 }
                 // type  under 'leaf', 'leaf-list'
-                if (node.name in ['leaf', 'leaf-list']) {
+                if (node.name in ['leaf', 'leaf-list', 'typedef']) {
                         processed |= compactNodeAttr(node, 'type')
                 }
 
@@ -66,7 +66,7 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 }
 
                 // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision'
-                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'revision']) {
+                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef']) {
                         processed |= compactNodeAttr(node, 'description')
                 }
 
