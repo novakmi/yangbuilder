@@ -22,6 +22,8 @@ class CompactYangPluginTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
+                        typedef('my-string', type:'string', description: 'compact typedef')
+
                         container('socket') {
                                 leaf('ip', type: 'string') //compact way to type leafs with simple types
                                 leaf('port', type: 'uint16')
@@ -38,6 +40,10 @@ class CompactYangPluginTest {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
+    typedef my-string {
+        description "compact typedef";
+        type string;
+    }
     container socket {
         leaf ip {
             type string;
@@ -75,7 +81,8 @@ class CompactYangPluginTest {
                         revision('2012-06-29', description: "initial revision")
 
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
-
+                        typedef('my-string1', type:'string', description: 'compact typedef')
+                        typedef('my-string2', type:'string', description: 'compact_typedef')
                         container('socket', description: 'socket ip address and port') {
                                 leaf('ip', type: 'string', description: 'ip address ')
                                 leaf('port', type: 'uint16', description: 'port vlaue')
@@ -96,6 +103,14 @@ class CompactYangPluginTest {
         description "initial revision";
     }
 
+    typedef my-string1 {
+        description "compact typedef";
+        type string;
+    }
+    typedef my-string2 {
+        description compact_typedef;
+        type string;
+    }
     container socket {
         description "socket ip address and port";
         leaf ip {
