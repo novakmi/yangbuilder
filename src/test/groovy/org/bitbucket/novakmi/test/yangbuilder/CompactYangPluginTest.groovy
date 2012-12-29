@@ -15,7 +15,7 @@ class CompactYangPluginTest {
 
         @Test(groups = ["basic"])
         public void compactTypeTest() {
-                logger.trace("==> compactTypeTest")
+                log.trace("==> compactTypeTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -66,12 +66,12 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactTypeTest")
+                log.trace("<== compactTypeTest")
         }
 
         @Test(groups = ["basic"])
         public void compactDescriptionTest() {
-                logger.trace("==> compactDescriptionTest")
+                log.trace("==> compactDescriptionTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -151,12 +151,12 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactDescriptionTest")
+                log.trace("<== compactDescriptionTest")
         }
 
         @Test(groups = ["basic"])
         public void newLineTypeTest() {
-                logger.trace("==> newLineTypeTest")
+                log.trace("==> newLineTypeTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -203,12 +203,12 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== newLineTypeTest")
+                log.trace("<== newLineTypeTest")
         }
 
         @Test(groups = ["basic"])
         public void compactImportPrefixNamespacePnlTest() {
-                logger.trace("==> compactImportPrefixNamespacePnlTest")
+                log.trace("==> compactImportPrefixNamespacePnlTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -237,13 +237,13 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactImportPrefixNamespacePnlTest")
+                log.trace("<== compactImportPrefixNamespacePnlTest")
         }
 
 
         @Test(groups = ["basic"])
         public void compactImportPrefixBelongsToTest() {
-                logger.trace("==> compactImportPrefixBelongsToTest")
+                log.trace("==> compactImportPrefixBelongsToTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.submodule(YangBuilderTestCommon._TEST_SUBMODULE_NAME) {
@@ -274,12 +274,12 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactImportPrefixBelongsToTest")
+                log.trace("<== compactImportPrefixBelongsToTest")
         }
 
         @Test(groups = ["basic"])
         public void compactListKeyTest() {
-                logger.trace("==> compactListKeyTest")
+                log.trace("==> compactListKeyTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -307,12 +307,12 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactListKeyTest")
+                log.trace("<== compactListKeyTest")
         }
 
         @Test(groups = ["basic"])
         public void compactMandatoryTest() {
-                logger.trace("==> compactMandatoryTest")
+                log.trace("==> compactMandatoryTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -395,12 +395,12 @@ class CompactYangPluginTest {
                         // do nothing
                 }
 
-                logger.trace("<== compactMandatoryTest")
+                log.trace("<== compactMandatoryTest")
         }
 
         @Test(groups = ["basic"])
         public void compactPresenceTest() {
-                logger.trace("==> compactPresenceTest")
+                log.trace("==> compactPresenceTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -456,12 +456,12 @@ class CompactYangPluginTest {
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== compactPresenceTest")
+                log.trace("<== compactPresenceTest")
         }
 
         @Test(groups = ["basic"])
         public void compactTypeEnumerationTest() {
-                logger.trace("==> compactTypeEnumerationTest")
+                log.trace("==> compactTypeEnumerationTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -533,9 +533,9 @@ class CompactYangPluginTest {
                         // do nothing
                 }
 
-                logger.trace("<== compactTypeEnumerationTest")
+                log.trace("<== compactTypeEnumerationTest")
         }
 
         //Initialize logging
-        private static final Logger logger = LoggerFactory.getLogger(CompactYangPluginTest.class);
+        private static final Logger log = LoggerFactory.getLogger(CompactYangPluginTest.class);
 }
