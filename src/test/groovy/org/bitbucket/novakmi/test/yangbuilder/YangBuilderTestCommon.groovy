@@ -17,9 +17,9 @@ class YangBuilderTestCommon {
         static USE_PYANG = true
 
         public static def assertYangFile(YangBuilder builder, fileName) {
-                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("==> assertYangFile")
+                logger.trace("==> assertYangFile")
                 if (WRITE_TO_FILE) {
-                        org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("writing to file {}", builder.getText())
+                        logger.trace("writing to file {}", builder.getText())
                         builder.writeToFile("./${fileName}.yang")
                         if (USE_PYANG) {
                                 def sout = new StringBuffer()
@@ -27,17 +27,17 @@ class YangBuilderTestCommon {
                                 Process process = "pyang -f tree ./${fileName}.yang".execute()
                                 process.consumeProcessOutput(sout, serr)
                                 process.waitFor()
-                                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("process.exitValue() {} sout {}", process.exitValue(), sout)
-                                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("serr {}", serr)
+                                logger.trace("process.exitValue() {} sout {}", process.exitValue(), sout)
+                                logger.trace("serr {}", serr)
                                 Assert.assertEquals(process.exitValue(), 0)
                         }
                 }
                 //Assert.assertNotNull(null) //for debugging
-                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("<== assertYangFile")
+                logger.trace("<== assertYangFile")
         }
 
         static def _buildTestYang(builder) {
-                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("==> _buildTestYang")
+                logger.trace("==> _buildTestYang")
                 builder.module(_TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
                         prefix _TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
@@ -55,11 +55,11 @@ class YangBuilderTestCommon {
                                 }
                         }
                 }
-                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("<== _buildTestYang")
+                logger.trace("<== _buildTestYang")
         }
 
         static def _buildTestSubmoduleYang(builder) {
-                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("==> _buildTestSubmoduleYang")
+                logger.trace("==> _buildTestSubmoduleYang")
 
                 builder.submodule(_TEST_SUBMODULE_NAME) {
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
@@ -81,7 +81,7 @@ class YangBuilderTestCommon {
                         }
                 }
 
-                org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest.logger.trace("<== _buildTestSubmoduleYang")
+                logger.trace("<== _buildTestSubmoduleYang")
         }
 
         static String _getTestYangString() {
