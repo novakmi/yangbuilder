@@ -86,6 +86,20 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         }
                 }
 
+                // enumerations in type
+                if (node.name  == 'type' && node.value == 'enumeration') {
+                        def enums = node.attributes['enums']
+                        if (!(enums instanceof List)) {
+                                throw new BuilderException("'enums' attribute of 'type enumeration' has to be List")
+                        }
+                        enums.each { e->
+                                if (!(e instanceof String)) {
+                                        throw new BuilderException("enum value ${e} is not String type!")
+                                }
+                                node.children += new BuilderNode(name: 'enum', value: e)
+                        }
+                }
+
                 if (processed) {
                         retVal = PluginResult.PROCESSED_CONTINUE
                 }

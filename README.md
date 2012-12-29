@@ -11,7 +11,6 @@ See `changelog.txt`.
 
 TODO:
 
-* support for `enumeration` in CompactYangPlugin (`type(enumeration, enums: [....]`)
 * support for `children` in CompactYangPlugin (container, list, leaf, eg. `leaf(my_leaf, childern ['my:annotation'(), 'other:annotation'()])`)
 
 DONE:
@@ -19,6 +18,7 @@ DONE:
 * support for `presence` in CompactYangPlugin (`container`)
 * support for `type` and `description` in CompactYangPlugin (`typedef(type 'string', description:'my type')`)
 * support for `mandatory` in CompactYangPlugin (`choice`, `leaf`)
+* support for `enumeration` in CompactYangPlugin (`type(enumeration, enums: [....]`)
 
 Michal Novak (<bubbles.way@gmail.com>)
 
