@@ -15,17 +15,17 @@ class YangBuilderTest {
 // test based on example from Instant YANG tutorial, section modules
         @Test(groups = ["basic"])
         public void yangTest() {
-                logger.trace("==> yangTest")
+                log.trace("==> yangTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 YangBuilderTestCommon._buildTestYang(builder)
                 Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
-                logger.trace("<== yangTest")
+                log.trace("<== yangTest")
         }
 
         @Test(groups = ["basic"])
         public void yangResetTest() {
-                logger.trace("==> yangResetTest")
+                log.trace("==> yangResetTest")
 
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 YangBuilderTestCommon._buildTestYang(builder)
@@ -35,12 +35,12 @@ class YangBuilderTest {
                 builder.reset()
                 Assert.assertEquals(builder.getText(), '')
 
-                logger.trace("<== yangResetTest")
+                log.trace("<== yangResetTest")
         }
 
         @Test(groups = ["basic"])
         public void yangResetAfterYangrootTest() {
-                logger.trace("==> yangResetAfterYangrootTest")
+                log.trace("==> yangResetAfterYangrootTest")
 
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.yangroot {
@@ -56,12 +56,12 @@ class YangBuilderTest {
                 Assert.assertEquals(builder.getText(), YangBuilderTestCommon._getTestYangString())
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== yangResetAfterYangrootTest")
+                log.trace("<== yangResetAfterYangrootTest")
         }
 
         @Test(groups = ["basic"])
         public void yangNameTest() {
-                logger.trace("==> yangNameTest")
+                log.trace("==> yangNameTest")
 
                 // module
                 def builder = new YangBuilder(4) // new instance/use indent 4
@@ -99,12 +99,12 @@ class YangBuilderTest {
                 builder.reset()
                 Assert.assertNull(builder.getYangName())
 
-                logger.trace("<== yangNameTest")
+                log.trace("<== yangNameTest")
         }
 
         @Test(groups = ["basic"])
         public void prefixNameTest() {
-                logger.trace("==> prefixNameTest")
+                log.trace("==> prefixNameTest")
 
                 // module
                 def builder = new YangBuilder(4) // new instance/use indent 4
@@ -142,12 +142,12 @@ class YangBuilderTest {
                 builder.reset()
                 Assert.assertNull(builder.getPrefixName())
 
-                logger.trace("<== prefixNameTest")
+                log.trace("<== prefixNameTest")
         }
 
         @Test(groups = ["basic"])
         public void quoteTest() {
-                logger.trace("==> quoteTest")
+                log.trace("==> quoteTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
@@ -295,12 +295,12 @@ description''',
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
-                logger.trace("<== quoteTest")
+                log.trace("<== quoteTest")
         }
 
         @Test(groups = ["basic"])
         public void commentTest() {
-                logger.trace("==> commentTest")
+                log.trace("==> commentTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
@@ -420,9 +420,9 @@ multiline comment.
 }
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
-                logger.trace("<== commentTest")
+                log.trace("<== commentTest")
         }
 
         //Initialize logging
-        private static final Logger logger = LoggerFactory.getLogger(YangBuilderTest.class);
+        private static final Logger log = LoggerFactory.getLogger(YangBuilderTest.class);
 }

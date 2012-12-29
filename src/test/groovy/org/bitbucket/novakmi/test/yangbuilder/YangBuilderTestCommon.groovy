@@ -17,9 +17,9 @@ class YangBuilderTestCommon {
         static USE_PYANG = true
 
         public static def assertYangFile(YangBuilder builder, fileName) {
-                logger.trace("==> assertYangFile")
+                log.trace("==> assertYangFile")
                 if (WRITE_TO_FILE) {
-                        logger.trace("writing to file {}", builder.getText())
+                        log.trace("writing to file {}", builder.getText())
                         builder.writeToFile("./${fileName}.yang")
                         if (USE_PYANG) {
                                 def sout = new StringBuffer()
@@ -27,17 +27,17 @@ class YangBuilderTestCommon {
                                 Process process = "pyang -f tree ./${fileName}.yang".execute()
                                 process.consumeProcessOutput(sout, serr)
                                 process.waitFor()
-                                logger.trace("process.exitValue() {} sout {}", process.exitValue(), sout)
-                                logger.trace("serr {}", serr)
+                                log.trace("process.exitValue() {} sout {}", process.exitValue(), sout)
+                                log.trace("serr {}", serr)
                                 Assert.assertEquals(process.exitValue(), 0)
                         }
                 }
                 //Assert.assertNotNull(null) //for debugging
-                logger.trace("<== assertYangFile")
+                log.trace("<== assertYangFile")
         }
 
         static def _buildTestYang(builder) {
-                logger.trace("==> _buildTestYang")
+                log.trace("==> _buildTestYang")
                 builder.module(_TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
                         prefix _TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
@@ -55,11 +55,11 @@ class YangBuilderTestCommon {
                                 }
                         }
                 }
-                logger.trace("<== _buildTestYang")
+                log.trace("<== _buildTestYang")
         }
 
         static def _buildTestSubmoduleYang(builder) {
-                logger.trace("==> _buildTestSubmoduleYang")
+                log.trace("==> _buildTestSubmoduleYang")
 
                 builder.submodule(_TEST_SUBMODULE_NAME) {
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
@@ -81,7 +81,7 @@ class YangBuilderTestCommon {
                         }
                 }
 
-                logger.trace("<== _buildTestSubmoduleYang")
+                log.trace("<== _buildTestSubmoduleYang")
         }
 
         static String _getTestYangString() {
@@ -107,5 +107,5 @@ class YangBuilderTestCommon {
 
 
         //Initialize logging
-        private static final Logger logger = LoggerFactory.getLogger(YangBuilderTestCommon.class);
+        private static final Logger log = LoggerFactory.getLogger(YangBuilderTestCommon.class);
 }
