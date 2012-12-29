@@ -527,7 +527,7 @@ class CompactYangPluginTest {
                 }
 
                 try {
-                        def txt = builder.getText()
+                        builder.getText()
                         Assert.fail()
                 } catch (BuilderException expected) {
                         // do nothing
