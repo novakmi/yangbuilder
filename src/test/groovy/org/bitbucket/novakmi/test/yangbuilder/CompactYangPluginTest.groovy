@@ -23,7 +23,7 @@ class CompactYangPluginTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        typedef('my-string', type:'string', description: 'compact typedef')
+                        typedef('my-string', type: 'string', description: 'compact typedef')
 
                         container('socket') {
                                 leaf('ip', type: 'string') //compact way to type leafs with simple types
@@ -37,7 +37,7 @@ class CompactYangPluginTest {
                 }
 
                 Assert.assertEquals(builder.getText(),
-                    '''module test {
+                        '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
@@ -82,8 +82,8 @@ class CompactYangPluginTest {
                         revision('2012-06-29', description: "initial revision")
 
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
-                        typedef('my-string1', type:'string', description: 'compact typedef')
-                        typedef('my-string2', type:'string', description: 'compact_typedef')
+                        typedef('my-string1', type: 'string', description: 'compact typedef')
+                        typedef('my-string2', type: 'string', description: 'compact_typedef')
                         container('socket', description: 'socket ip address and port') {
                                 leaf('ip', type: 'string', description: 'ip address ')
                                 leaf('port', type: 'uint16', description: 'port vlaue')
@@ -100,7 +100,7 @@ class CompactYangPluginTest {
                 }
 
                 Assert.assertEquals(builder.getText(),
-                    '''module test {
+                        '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
@@ -176,7 +176,7 @@ class CompactYangPluginTest {
                 }
 
                 Assert.assertEquals(builder.getText(),
-                    '''module test {
+                        '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
@@ -218,7 +218,7 @@ class CompactYangPluginTest {
                 }
 
                 Assert.assertEquals(builder.getText(),
-                    '''module test {
+                        '''module test {
 
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
@@ -248,7 +248,7 @@ class CompactYangPluginTest {
 
                 builder.submodule(YangBuilderTestCommon._TEST_SUBMODULE_NAME) {
 
-                        'belongs-to'(YangBuilderTestCommon._TEST_SUBMODULE_NAME, prefix: 'test_submodule_prefix', nl:1 )
+                        'belongs-to'(YangBuilderTestCommon._TEST_SUBMODULE_NAME, prefix: 'test_submodule_prefix', nl: 1)
 
                         'import'('ietf-inet-types', prefix: 'inet', nl: 1)
 
@@ -257,7 +257,7 @@ class CompactYangPluginTest {
                 }
 
                 Assert.assertEquals(builder.getText(),
-                    '''submodule test_submodule {
+                        '''submodule test_submodule {
     belongs-to test_submodule {
         prefix test_submodule_prefix;
     }
@@ -284,15 +284,15 @@ class CompactYangPluginTest {
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl:1) // or semicolon can be missing (more groovy like style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
 
-                        list('values', key:'value', description: 'values', type: 'type without key is ignored') {
+                        list('values', key: 'value', description: 'values', type: 'type without key is ignored') {
                                 leaf('value', type: 'string')
                         }
                 }
 
                 Assert.assertEquals(builder.getText(),
-                    '''module test {
+                        '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
@@ -391,7 +391,7 @@ class CompactYangPluginTest {
                 try {
                         builder.getText()
                         Assert.fail()
-                } catch(BuilderException expected) {
+                } catch (BuilderException expected) {
                         // do nothing
                 }
 
@@ -405,7 +405,7 @@ class CompactYangPluginTest {
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl:1) // or semicolon can be missing (more groovy like style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
 
                         container('value-c1', presence: true) {
                                 leaf('value', type: 'string')
@@ -457,6 +457,83 @@ class CompactYangPluginTest {
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 logger.trace("<== compactPresenceTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void compactTypeEnumerationTest() {
+                logger.trace("==> compactTypeEnumerationTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+
+                        typedef('my-type') {
+                                type('enumeration', enums: ['one', 'two', 'three'])
+                        }
+                        leaf('enum-leaf') {
+                                type('enumeration', enums: ['one', 'two', 'three'])
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    typedef my-type {
+        type enumeration {
+            enum one;
+            enum two;
+            enum three;
+        }
+    }
+    leaf enum-leaf {
+        type enumeration {
+            enum one;
+            enum two;
+            enum three;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                        typedef('my-type-non-list') {
+                                type('enumeration', enums: 'one') // enums must be list
+                        }
+                }
+
+                try {
+                        builder.getText()
+                        Assert.fail()
+                } catch (BuilderException expected) {
+                        // do nothing
+                }
+
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                        typedef('my-type-non-list') {
+                                type('enumeration', enums: [1, 2, 3]) // enums must be Strings
+                        }
+                }
+
+                try {
+                        def txt = builder.getText()
+                        Assert.fail()
+                } catch (BuilderException expected) {
+                        // do nothing
+                }
+
+                logger.trace("<== compactTypeEnumerationTest")
         }
 
         //Initialize logging
