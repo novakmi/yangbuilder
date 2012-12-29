@@ -78,6 +78,7 @@ test {
                                 }
                                 classes([:]) {
                                         'class'(name: "org.bitbucket.novakmi.test.yangbuilder.YangBuilderTest")
+                                        'class'(name: "org.bitbucket.novakmi.test.yangbuilder.CompactYangPluginTest")
                                 }
                         }
                 }
