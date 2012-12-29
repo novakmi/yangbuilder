@@ -3,6 +3,7 @@
 
 package org.bitbucket.novakmi.test.yangbuilder
 
+import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testng.Assert
@@ -92,6 +93,10 @@ class CompactYangPluginTest {
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
+                        choice('porta-portb') {
+                                leaf('porta', type: 'uint16')
+                                leaf('portb', type: 'uint16', description: 'port value')
+                        }
                 }
 
                 Assert.assertEquals(builder.getText(),
@@ -131,6 +136,15 @@ class CompactYangPluginTest {
         key value;
         leaf value {
             type string;
+        }
+    }
+    choice porta-portb {
+        leaf porta {
+            type uint16;
+        }
+        leaf portb {
+            description "port value";
+            type uint16;
         }
     }
 }
@@ -294,6 +308,155 @@ class CompactYangPluginTest {
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
                 logger.trace("<== compactListKeyTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void compactMandatoryTest() {
+                logger.trace("==> compactMandatoryTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+
+                        leaf('port1', type: 'uint16', description: 'port value', mandatory: true, nl: true)
+                        leaf('port2', type: 'uint16', description: 'port value', mandatory: false, nl: true)
+                        leaf('port3', type: 'uint16', description: 'port value', nl: true)
+
+                        container('port-c', mandatory: true, nl: true) {  // mandatory has no effect under contianer
+                                leaf('port4', type: 'uint16', description: 'port value', mandatory: true)
+                        }
+
+                        choice('porta-portb', mandatory: true, nl: true) {
+                                leaf('porta', type: 'uint16', description: 'port value')
+                                leaf('portb', type: 'uint16', description: 'port value')
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    leaf port1 {
+        description "port value";
+        mandatory true;
+        type uint16;
+    }
+
+    leaf port2 {
+        description "port value";
+        mandatory false;
+        type uint16;
+    }
+
+    leaf port3 {
+        description "port value";
+        type uint16;
+    }
+
+    container port-c {
+        leaf port4 {
+            description "port value";
+            mandatory true;
+            type uint16;
+        }
+    }
+
+    choice porta-portb {
+        mandatory true;
+        leaf porta {
+            description "port value";
+            type uint16;
+        }
+        leaf portb {
+            description "port value";
+            type uint16;
+        }
+    }
+
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+                        leaf('port1', type: 'uint16', description: 'port value', mandatory: 'true', nl: true) // mandatory cannot be string
+                }
+                try {
+                        builder.getText()
+                        Assert.fail()
+                } catch(BuilderException expected) {
+                        // do nothing
+                }
+
+                logger.trace("<== compactMandatoryTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void compactPresenceTest() {
+                logger.trace("==> compactPresenceTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl:1) // or semicolon can be missing (more groovy like style)
+
+                        container('value-c1', presence: true) {
+                                leaf('value', type: 'string')
+                        }
+
+                        container('value-c2', presence: 'value-c2') {
+                                leaf('value', type: 'string')
+                        }
+
+                        container('value-c3', presence: "value c3") {
+                                leaf('value', type: 'string')
+                        }
+
+                        container('value-c4') {
+                                leaf('value', type: 'string')
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    container value-c1 {
+        presence true;
+        leaf value {
+            type string;
+        }
+    }
+    container value-c2 {
+        presence value-c2;
+        leaf value {
+            type string;
+        }
+    }
+    container value-c3 {
+        presence "value c3";
+        leaf value {
+            type string;
+        }
+    }
+    container value-c4 {
+        leaf value {
+            type string;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                logger.trace("<== compactPresenceTest")
         }
 
         //Initialize logging

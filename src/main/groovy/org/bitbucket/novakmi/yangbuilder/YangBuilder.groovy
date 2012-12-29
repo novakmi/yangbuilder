@@ -46,7 +46,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         def getQuotes(txt) {
                 def retVal = ''
                 while (1) {
-                        if (txt && txt?.size() > 1) {
+                        if (txt instanceof String && txt?.size() > 1) {
                                 if ((txt[0] == '"') && txt[-1] == '"') { // enclosed with "
                                         break
                                 }
@@ -156,7 +156,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 }
                                 opaque.printIndent()
                                 opaque.print("$node.name")
-                                if (node.value) {
+                                if (node.value != null) {
                                         opaque.print(" ${quotes}${node.value}${quotes}")
                                 }
                                 if (!node?.children?.size()) {
