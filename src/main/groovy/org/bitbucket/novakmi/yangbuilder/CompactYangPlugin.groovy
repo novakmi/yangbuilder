@@ -17,9 +17,9 @@ class CompactYangPlugin extends NodeBuilderPlugin {
         private compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
                 def retVal = false
                 // if attribute ends with _'nl', add new line to new node, unless forbidden by 'nlAllow'
-                def pnlVariant = nlAllow && (node.attributes['pnl_'+ attrName] || node.attributes['pnl_'+ attrName + '_nl'])
-                def nlVariant = nlAllow && (node.attributes[attrName + '_nl'] ||  node.attributes['pnl_'+ attrName + '_nl'])
-                if (node.attributes[attrName] || nlVariant || pnlVariant) {  // do we have the attribute or nl attribute variant?
+                def pnlVariant = nlAllow && (node.attributes['pnl_'+ attrName] != null || node.attributes['pnl_'+ attrName + '_nl'] != null)
+                def nlVariant = nlAllow && (node.attributes[attrName + '_nl'] != null ||  node.attributes['pnl_'+ attrName + '_nl'] != null)
+                if (node.attributes[attrName] != null || nlVariant || pnlVariant) {  // do we have the attribute or nl attribute variant?
 
                         BuilderNode typeNode =
                                 new BuilderNode(name: attrName, value: node.attributes[(pnlVariant ? 'pnl_' : '') + attrName + (nlVariant ? '_nl' : '')])
@@ -55,7 +55,8 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 if (node.name in ['module'])  {
                         processed |= compactNodeAttr(node, 'namespace')
                 }
-                // type  under 'leaf', 'leaf-list'
+
+                // type  under 'leaf', 'leaf-list'. 'typedef'
                 if (node.name in ['leaf', 'leaf-list', 'typedef']) {
                         processed |= compactNodeAttr(node, 'type')
                 }
@@ -65,9 +66,24 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         processed |= compactNodeAttr(node, 'key')
                 }
 
-                // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision'
-                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef']) {
+                // mandatory under 'leaf', 'choice'
+                if (node.name in ['leaf', 'choice']) {
+                        def man = node.attributes['mandatory']
+                        if (man != null) {
+                                if (man instanceof Boolean) {
+                                        processed |= compactNodeAttr(node, 'mandatory')
+                                } else {
+                                        throw new BuilderException("'mandatory' attribute of '${node.name} ${node.value}' has to be 'boolean' ('true', 'false')");
+                                }
+                        }
+                }
+
+                // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef'
+                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'choice', 'revision', 'typedef']) {
                         processed |= compactNodeAttr(node, 'description')
+                        if (node.name in ['container']) {
+                                processed |= compactNodeAttr(node, 'presence')
+                        }
                 }
 
                 if (processed) {
