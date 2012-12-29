@@ -3,14 +3,14 @@
 
 package org.bitbucket.novakmi.test.yangbuilder
 
+import groovy.util.logging.Slf4j
 import org.bitbucket.novakmi.nodebuilder.BuilderException
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.testng.Assert
 import org.testng.annotations.Test
 import org.bitbucket.novakmi.yangbuilder.YangBuilder
 import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 
+@Slf4j //Initialize logging
 class CompactYangPluginTest {
 
         @Test(groups = ["basic"])
@@ -535,7 +535,4 @@ class CompactYangPluginTest {
 
                 log.trace("<== compactTypeEnumerationTest")
         }
-
-        //Initialize logging
-        private static final Logger log = LoggerFactory.getLogger(CompactYangPluginTest.class);
 }

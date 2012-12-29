@@ -3,11 +3,11 @@
 
 package org.bitbucket.novakmi.test.yangbuilder
 
+import groovy.util.logging.Slf4j
 import org.bitbucket.novakmi.yangbuilder.YangBuilder
 import org.testng.Assert
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
+@Slf4j //Initialize logging
 class YangBuilderTestCommon {
         static def _TEST_MODULE_NAME = 'test'
         static def _TEST_SUBMODULE_NAME = "${_TEST_MODULE_NAME}_submodule"
@@ -104,8 +104,4 @@ class YangBuilderTestCommon {
 '''
                 return retVal
         }
-
-
-        //Initialize logging
-        private static final Logger log = LoggerFactory.getLogger(YangBuilderTestCommon.class);
 }

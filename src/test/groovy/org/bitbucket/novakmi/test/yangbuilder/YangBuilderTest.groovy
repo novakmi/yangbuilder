@@ -3,13 +3,12 @@
 
 package org.bitbucket.novakmi.test.yangbuilder
 
+import groovy.util.logging.Slf4j
 import org.testng.annotations.Test
 import org.testng.Assert
 import org.bitbucket.novakmi.yangbuilder.YangBuilder
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
-
+@Slf4j //Initialize logging
 class YangBuilderTest {
 
 // test based on example from Instant YANG tutorial, section modules
@@ -422,7 +421,4 @@ multiline comment.
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
                 log.trace("<== commentTest")
         }
-
-        //Initialize logging
-        private static final Logger log = LoggerFactory.getLogger(YangBuilderTest.class);
 }
