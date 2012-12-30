@@ -1,7 +1,7 @@
 //This is free software licensed under MIT License, see LICENSE file
 //(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
 
-// For running Gradle, add GRADLE_HOME/bin to PATH, NCS_DIR has to be defined
+// For running Gradle, add GRADLE_HOME/bin to PATH
 // Tip: Use Intellij Idea community edition to work with gradle (GradleGUI plugin)
 // run 'gradle tasks' to see available tasks
 
