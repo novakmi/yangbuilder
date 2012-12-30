@@ -135,7 +135,7 @@ completely new, free and supports plugins (provided by <<nodebuilder>>).
 
 === Dependencies
 
-* <<groovy>> 1.8.0 and newer has to be installed on the system (preferably with +GROOVY_HOME+ set and +$GROOVY_HOME/bin+ in system +PATH+)
+* <<groovy>> 2.0.0 and newer has to be installed on the system (preferably with +GROOVY_HOME+ set and +$GROOVY_HOME/bin+ in system +PATH+)
 * +nodebuilder+ jar file,
 * +yangbuilder+ jar file
 
