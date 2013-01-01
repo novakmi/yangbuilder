@@ -468,12 +468,20 @@ class CompactYangPluginTest {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
                         prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
 
-                        typedef('my-type') {
+                        typedef('my-type1') {
+                                type('enumeration') {
+                                        'enum'('one')
+                                        'enum'('two')
+                                        'enum'('three')
+                                }
+                        }
+                        typedef('my-type2') {
                                 type('enumeration', enums: ['one', 'two', 'three'])
                         }
                         leaf('enum-leaf') {
                                 type('enumeration', enums: ['one', 'two', 'three'])
                         }
+
                 }
 
                 Assert.assertEquals(builder.getText(),
@@ -481,7 +489,14 @@ class CompactYangPluginTest {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
-    typedef my-type {
+    typedef my-type1 {
+        type enumeration {
+            enum one;
+            enum two;
+            enum three;
+        }
+    }
+    typedef my-type2 {
         type enumeration {
             enum one;
             enum two;
