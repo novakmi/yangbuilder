@@ -46,7 +46,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         def getQuotes(txt) {
                 def retVal = ''
                 while (1) {
-                        if (txt instanceof String && txt?.size() > 1) {
+                        if (((txt instanceof String) || (txt instanceof GString)) && txt?.size() > 1) {
                                 if ((txt[0] == '"') && txt[-1] == '"') { // enclosed with "
                                         break
                                 }
