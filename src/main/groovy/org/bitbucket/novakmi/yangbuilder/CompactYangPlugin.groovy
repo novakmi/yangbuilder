@@ -73,7 +73,7 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                                 if (man instanceof Boolean) {
                                         processed |= compactNodeAttr(node, 'mandatory')
                                 } else {
-                                        throw new BuilderException("'mandatory' attribute of '${node.name} ${node.value}' has to be 'boolean' ('true', 'false')");
+                                        throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; 'mandatory' attribute has to be 'boolean' ('true', 'false')");
                                 }
                         }
                 }
