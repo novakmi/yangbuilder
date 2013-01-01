@@ -1,6 +1,17 @@
 #Yangbuilder change log
 
-* 0.4.0
+* 0.5.0 2013-0.-01
+    * updated dependencies to groovy 2.0.6, nodebuilder-0.7.0 (testng 6.8, logback 1.0.9, slf4j 1.7.2)
+    * tests - updated reading of sout, serr for pyang process
+    * CompactYangPlugin now supports  'type' and 'description' attributes for 'typedef'
+    * CompactYangPlugin now supports  'presence' attribute for 'container'
+    * CompactYangPlugin now supports  'mandatory' (true or false) attribute for 'leaf', 'choice'
+    * CompactYangPlugin now supports  'description' attribute for 'choice'
+    * tests - used Slf4j groovy annotation used for logging
+    * yangbuilder dependency in documentation and examples updated to 0.5.0
+
+
+* 0.4.0 2012-07-14
     * dependencies updated to groovy 2.0.0, nodebuilder 0.6.0
     * CompactYangPlugin now supports description attribute for revision
     * 'cmt' keyword is now inline and indented by default
