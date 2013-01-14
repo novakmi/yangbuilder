@@ -248,4 +248,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 quoteKeywords += keywordList
         }
 
+        public BuilderNode getRootNode() {
+                return root
+        }
+
 }
