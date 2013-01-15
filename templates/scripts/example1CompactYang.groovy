@@ -8,7 +8,7 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
-@GrabResolver(name = 'bubbleswayrepo', root = 'https://github.com/bubblesway/bubbleswayrepo/raw/master/releases', m2compatible = true)
+@GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2compatible = true)
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.7.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.5.0')
 
