@@ -247,9 +247,4 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public void addQuoteKeywords(keywordList) {
                 quoteKeywords += keywordList
         }
-
-        public BuilderNode getRootNode() {
-                return root
-        }
-
 }
