@@ -21,7 +21,7 @@ DONE:
 * support for `enumeration` in CompactYangPlugin (`type(enumeration, enums: [....]`)
 * support for `children` in CompactYangPlugin (container, list, leaf, eg. `leaf(my_leaf, childern ['my:annotation'(), 'other:annotation'()])`) - supported by nodebuilder SubnodesAttrPlugin
 
-Michal Novak (<bubbles.way@gmail.com>)
+Michal Novak (<it.novakmi@gmail.com>)
 
 [gradle_id]: http://www.gradle.org/  "Gradle"
 [groovy_id]: http://groovy.codehaus.org/  "Groovy"

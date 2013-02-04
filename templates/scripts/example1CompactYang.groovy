@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 
@@ -28,7 +28,7 @@ def makeAddressPort(builder, kind = null) { //this is example how function can b
         builder.leaf("${kind ? kind + '-' : ''}port", type: 'uint16', description: "IP port")  //with compact plugin 'type' can be declared as param. of leaf. 'description' as param of element
 }
 
-builder.module(moduleName, pnl_namespace:'http://bitbucket.org/bubbles.way/yangbuilder', prefix_nl: 'example1') { //module's prefix and namespace as attributes '_nl' means new line
+builder.module(moduleName, pnl_namespace:'http://bitbucket.org/novakmi/yangbuilder', prefix_nl: 'example1') { //module's prefix and namespace as attributes '_nl' means new line
         def makeGrouping = { // this is example how closure can be called be used by the builder
                 grouping('addressPort') {
                         makeAddressPort(builder)
@@ -36,7 +36,7 @@ builder.module(moduleName, pnl_namespace:'http://bitbucket.org/bubbles.way/yangb
         }
 
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}", indent: true)
-        yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */', indent: true, nl: true)  // 'nl:true adds new line (you can also use nl:1, etc.)
+        yngbuild('   see http://bitbucket.org/novakmi/yangbuilder */', indent: true, nl: true)  // 'nl:true adds new line (you can also use nl:1, etc.)
 
         'import'('ietf-inet-types', prefix: 'inet', nl: 1) //with compact yang 'prefix' can be added as attribute of import, add new line after ending '}' of import
 

@@ -1,5 +1,5 @@
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 package org.bitbucket.novakmi.test.yangbuilder
 
@@ -153,8 +153,8 @@ class YangBuilderTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
+                        organization 'novakmi'
+                        contact 'it.novakmi@gmail.com'
                         description 'test quotes'
 
                         container('socket') {
@@ -176,8 +176,8 @@ class YangBuilderTest {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
-    organization bubbles;
-    contact bubbles.way@gmail.com;
+    organization novakmi;
+    contact it.novakmi@gmail.com;
     description "test quotes";
     container socket {
         presence yes;
@@ -230,16 +230,16 @@ class YangBuilderTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
+                        organization 'novakmi'
+                        contact 'it.novakmi@gmail.com'
                         description('test quotes', noAutoQuotes: true) // force no quotes = invalid yang
                 }
                 Assert.assertEquals(builder.getText(), '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
-    organization bubbles;
-    contact bubbles.way@gmail.com;
+    organization novakmi;
+    contact it.novakmi@gmail.com;
     description test quotes;
 }
 ''')
@@ -251,16 +251,16 @@ class YangBuilderTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'bubbles'
-                        contact('bubbles.way@gmail.com', quotes: '"')
+                        organization 'novakmi'
+                        contact('it.novakmi@gmail.com', quotes: '"')
                         description('test quotes') // force no quotes = invalid yang
                 }
                 Assert.assertEquals(builder.getText(), '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
-    organization bubbles;
-    contact "bubbles.way@gmail.com";
+    organization novakmi;
+    contact "it.novakmi@gmail.com";
     description "test quotes";
 }
 ''')
@@ -272,8 +272,8 @@ class YangBuilderTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'bubbles'
-                        contact('bubbles.way@gmail.com', quotes: '"')
+                        organization 'novakmi'
+                        contact('it.novakmi@gmail.com', quotes: '"')
                         description(
                                 '''test quotes
 in multiline
@@ -284,8 +284,8 @@ description''',
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
-    organization bubbles;
-    contact "bubbles.way@gmail.com";
+    organization novakmi;
+    contact "it.novakmi@gmail.com";
     description
         "test quotes
          in multiline
@@ -327,8 +327,8 @@ multiline comment''')
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
 
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
+                        organization 'novakmi'
+                        contact 'it.novakmi@gmail.com'
                         description 'test quotes'
 
                         container('socket', cmt: "Inline comment for socket container") {
@@ -385,8 +385,8 @@ multiline comment.
     // This is indented inline
     // multiline comment
 
-    organization bubbles;
-    contact bubbles.way@gmail.com;
+    organization novakmi;
+    contact it.novakmi@gmail.com;
     description "test quotes";
     container socket { //Inline comment for socket container
         /*

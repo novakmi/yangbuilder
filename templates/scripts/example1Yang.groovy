@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
@@ -44,10 +44,10 @@ builder.yangroot {                                                              
 
                 yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}",
                         indent: true)
-                yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */', indent: true)                    //<5>
+                yngbuild('   see http://bitbucket.org/novakmi/yangbuilder */', indent: true)                    //<5>
                 yngbuild('') // new line
 
-                namespace "http://bitbucket.org/bubbles.way/yangbuilder"
+                namespace "http://bitbucket.org/novakmi/yangbuilder"
                 prefix "example1"
                 yngbuild('')
 

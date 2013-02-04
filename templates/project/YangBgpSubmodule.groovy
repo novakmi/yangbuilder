@@ -1,5 +1,5 @@
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 // This class is related to bgp-submodule.yang file
 class YangBgpSubmodule {

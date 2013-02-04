@@ -1,16 +1,16 @@
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 // This class contains reusable parts, it is not related to specific yang file
 class YangCommon {
 
         static def buildHeader(builder, prefixName = null) {
                 builder.yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}", indent: true)
-                builder.yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */', indent: true)
+                builder.yngbuild('   see http://bitbucket.org/novakmi/yangbuilder */', indent: true)
                 builder.yngbuild('') // new line
 
                 if (prefixName) { // do not generate prefix for and namespace for submodules
-                        builder.namespace "http://bitbucket.org/bubbles.way/yangbuilder"
+                        builder.namespace "http://bitbucket.org/novakmi/yangbuilder"
                         builder.prefix prefixName
                         builder.yngbuild('')
                 }

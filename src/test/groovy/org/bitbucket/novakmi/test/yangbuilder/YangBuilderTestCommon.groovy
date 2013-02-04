@@ -1,5 +1,5 @@
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 package org.bitbucket.novakmi.test.yangbuilder
 
@@ -43,8 +43,8 @@ class YangBuilderTestCommon {
                         prefix _TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
+                        organization 'novakmi'
+                        contact 'it.novakmi@gmail.com'
 
                         container('socket') {
                                 leaf('ip') {
@@ -68,8 +68,8 @@ class YangBuilderTestCommon {
                         }
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'bubbles'
-                        contact 'bubbles.way@gmail.com'
+                        organization 'novakmi'
+                        contact 'it.novakmi@gmail.com'
 
                         container('socket') {
                                 leaf('ip') {
@@ -90,8 +90,8 @@ class YangBuilderTestCommon {
     namespace "http://novakmi.bitbucket.org/test";
     prefix '''+ YangBuilderTestCommon._TEST_MODULE_NAME + ''';
 
-    organization bubbles;
-    contact bubbles.way@gmail.com;
+    organization novakmi;
+    contact it.novakmi@gmail.com;
     container socket {
         leaf ip {
             type string;

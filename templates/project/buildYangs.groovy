@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 //if you have internet connection, use groovy grab to get dependencies (may take some time for the first time to download jars)
 //run as ordinary groovy script with command 'groovy <scriptname>.groovy' (or as linux executable script './<scriptname>.groovy')

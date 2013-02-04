@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
@@ -54,7 +54,7 @@ implementing the ACME products.''', multiline: true) // multiple line descriptio
 builder.yangroot {                                                                                     //<4>
         yngbuild('//adocy-begin - documentation purpose comment') //#$# for asciidoc
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}")
-        yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */')
+        yngbuild('   see http://bitbucket.org/novakmi/yangbuilder */')
         yngbuild('//                                                                           *<*1*>*') //#$# for asciidoc
         // one can continue with  module(moduleName) ... or build continue building yang in
         // separate function (another option is to define closure after builder.yangroot { ...)

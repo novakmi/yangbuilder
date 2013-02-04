@@ -1,8 +1,8 @@
 yangbuilder
 ===========
 :Author:    Michal Novák
-:Email:     bubbles.way@gmail.com
-:URL:       https://bitbucket.org/bubbles.way/yangbuilder
+:Email:     it.novakmi@gmail.com
+:URL:       https://bitbucket.org/novakmi/yangbuilder
 :Date:      2012-04-14
 :Revision:  0.0.1
 
@@ -22,8 +22,8 @@ This document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc] and con
 * [[[yang]]] http://www.yang-central.org[YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)]
 * [[[RFC6200]]] RFC for http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html[YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)]
 * [[[groovy]]] http://groovy.codehaus.org/[Groovy - dynamic language for JAVA platform]
-* [[[nodebuilder]]] https://bitbucket.org/bubbles.way/nodebuilder[Library for creation of groovy builders with plugin support]
-* [[[yangbuilder]]] https://bitbucket.org/bubbles.way/yangbuilder[Groovy builder for YANG] - this document describes <<yangbuilder>>
+* [[[nodebuilder]]] https://bitbucket.org/novakmi/nodebuilder[Library for creation of groovy builders with plugin support]
+* [[[yangbuilder]]] https://bitbucket.org/novakmi/yangbuilder[Groovy builder for YANG] - this document describes <<yangbuilder>>
 * [[[pyang]]] http://code.google.com/p/pyang/
 
 == Terminology
@@ -127,7 +127,7 @@ With yangbuilder one can use groovy script to generate <<yang>> file. This appro
 
 There already existed a <<groovy>> as a part o one project I have worked for in my job (owned by customer).
 
-When I was implementing <<groovy>> builder for http://plantuml.sourceforge.net/[PlantUML] called https://bitbucket.org/bubbles.way/plantumlbuilder[plantumlbuilder],
+When I was implementing <<groovy>> builder for http://plantuml.sourceforge.net/[PlantUML] called https://bitbucket.org/novakmi/plantumlbuilder[plantumlbuilder],
 I have decided to create common builder library <<nodebuilder>> with common support for <<groovy>> builders using
 parent-child processing. Than it was relatively easy to base new <<yangbuilder>> on this common library. New <<yangbuilder>> implementation is
 completely new, free and supports plugins (provided by <<nodebuilder>>).
@@ -196,9 +196,9 @@ include::example1Yang-callout.tmp[]
 -----------
 module example1-module {                                                                        //<1>
     /* This yang file was generated with groovy YangBuilder on Wed Apr 04 22:53:11 CEST 2012
-       see http://bitbucket.org/bubbles.way/yangbuilder */
+       see http://bitbucket.org/novakmi/yangbuilder */
 
-    namespace "http://bitbucket.org/bubbles.way/yangbuilder";
+    namespace "http://bitbucket.org/novakmi/yangbuilder";
     prefix example1;
 
     import ietf-inet-types {
@@ -405,7 +405,7 @@ def makeAddressPort(builder, kind = null) {
 }
 
 //module's prefix and namespace as attributes '_nl' means new line
-builder.module(moduleName, pnl_namespace:'http://bitbucket.org/bubbles.way/yangbuilder', 
+builder.module(moduleName, pnl_namespace:'http://bitbucket.org/novakmi/yangbuilder',
                prefix_nl: 'example1') {                                                               // <3>  
         def makeGrouping = { // this is example how closure can be called be used by the builder
                 grouping('addressPort') {
@@ -416,7 +416,7 @@ builder.module(moduleName, pnl_namespace:'http://bitbucket.org/bubbles.way/yangb
         yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}", 
                   indent: true)
         // 'nl:true adds new line (you can also use nl:1, etc.)                                       // <4> 
-        yngbuild('   see http://bitbucket.org/bubbles.way/yangbuilder */', indent: true, nl: true)  
+        yngbuild('   see http://bitbucket.org/novakmi/yangbuilder */', indent: true, nl: true)
 
         //with compact yang 'prefix' can be added as attribute of import
         //, add new line after ending '}' of import

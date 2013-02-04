@@ -3,7 +3,7 @@
 import org.bitbucket.novakmi.yangbuilder.GroupingResolverPlugin
 
 //This is free software licensed under MIT License, see LICENSE file
-//(https://bitbucket.org/bubbles.way/yangbuilder/src/LICENSE)
+//(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 //adoc-begin - documentation purpose comment
 @GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2compatible = true)
