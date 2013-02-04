@@ -79,6 +79,40 @@ class GroupingResolverPluginTest {
 
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
+                // resolve without grouping
+                Assert.assertEquals(builder.getNodeText(newNode),
+                        '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    container container-main {
+        container container-a {
+            leaf leaf-a {
+                type uint32;
+            }
+        }
+        leaf leaf-b {
+            type uint32;
+        }
+    }
+}
+''')
+
+
+                //resolve only subnode
+                Assert.assertEquals(builder.getNodeText(newNode.children[3]),
+                        '''container container-main {
+    container container-a {
+        leaf leaf-a {
+            type uint32;
+        }
+    }
+    leaf leaf-b {
+        type uint32;
+    }
+}
+''')
+
                 builder.reset()
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
