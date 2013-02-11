@@ -68,9 +68,15 @@ builder.yangroot {                                                              
                 yngbuild('')
 
                 ['bgp', 'ospf', 'isis', 'rip'].each {k -> // create 3 containers in loop, not possible in yang       //<8>
+                        if (k == 'bgp') {
+                                yngbuild('//                                                        *<*3*>*') //#$# for asciidoc
+                        }
                         yngbuild("/* ${k} neighbor */", indent: true)
                         container("${k}-neighbor") {
                                 // as if content of the function is written here, reuse (not possible in yang)       //<9>
+                                if (k == 'bgp') {
+                                        yngbuild('//                                                        *<*4*>*') //#$# for asciidoc
+                                }
                                 makeAddressPort(builder, k)
                         }
                         yngbuild('')
@@ -92,6 +98,8 @@ builder.yangroot {                                                              
         yngbuild('//adocy-callout - documentation purpose comment') //#$# for asciidoc
         yngbuild('*<*1*>* indent 4') //#$# for asciidoc
         yngbuild('*<*2*>* call to +makeGrouping+') //#$# for asciidoc
+        yngbuild('*<*3*>* iteration') //#$# for asciidoc
+        yngbuild('*<*4*>* expanded +makeAddressPort+') //#$# for asciidoc
         yngbuild('//adocy-end - documentation purpose comment') //#$# for asciidoc
 }
 

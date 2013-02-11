@@ -28,7 +28,7 @@ repositories {
 
 // Define dependencies
 dependencies {
-        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.6'
+        groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.1.0'
         compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.7.0'
         // dependencies for tests
         testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
@@ -173,9 +173,11 @@ task documentation << {
         logger.debug("Evaluating scripts")
         gse.run("acmeYang.groovy", binding);
         gse.run("example1Yang.groovy", binding);
+        gse.run("example1CompactYang.groovy", binding);
         logger.debug("Evaluating scripts done")
         "mv ${project.projectDir}/acme-module.yang ${docDir}/acme-module_.tmp".execute().waitFor()
         "mv ${project.projectDir}/example1-module.yang ${docDir}/example1-module_.tmp".execute().waitFor()
+        "mv ${project.projectDir}/example1-compact-module.yang ${docDir}/example1-compact-module_.tmp".execute().waitFor()
 
         // prepare include files from groovy source files
         linesBetween("${project.projectDir}/LICENSE", "${docDir}/LICENSE.tmp", "-----", "-----")
@@ -183,12 +185,15 @@ task documentation << {
         linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang-callout.tmp", "adoc-callout", "adoc-end")
         linesBetween("${templatesDir}/scripts/example1Yang.groovy", "${docDir}/example1Yang.tmp", "adoc-begin", "adoc-callout")
         linesBetween("${templatesDir}/scripts/example1Yang.groovy", "${docDir}/example1Yang-callout.tmp", "adoc-callout", "adoc-end")
+        linesBetween("${templatesDir}/scripts/example1CompactYang.groovy", "${docDir}/example1CompactYang.tmp", "adoc-begin", "adoc-callout")
+        linesBetween("${templatesDir}/scripts/example1CompactYang.groovy", "${docDir}/example1CompactYang-callout.tmp", "adoc-callout", "adoc-end")
 
         // prepare inlcude files from generated yang files
         linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module.tmp", "adocy-begin", "adocy-callout")
         linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module-callout.tmp", "adocy-callout", "adocy-end")
         linesBetween("${docDir}/example1-module_.tmp", "${docDir}/example1-module.tmp", "adocy-begin", "adocy-callout")
         linesBetween("${docDir}/example1-module_.tmp", "${docDir}/example1-module-callout.tmp", "adocy-callout", "adocy-end")
+        linesBetween("${docDir}/example1-compact-module_.tmp", "${docDir}/example1-compact-module-callout.tmp", "adocy-callout", "adocy-end")
 
         // asciidoc has to be installed
         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'
