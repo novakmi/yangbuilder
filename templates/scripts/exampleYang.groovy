@@ -17,7 +17,7 @@ def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(4) // create new
 builder.declareAlias('import_', 'import') //optional alias declaration                                             //<1>
 
 //name of file to generate
-moduleName = "example1-module"   // do not use 'def' for script global variable
+moduleName = "example-module"   // do not use 'def' for script global variable
 
 def makeAddressPort(builder, kind = null) { //function with parameters  can be used by the builder                //<2>
         // in function all nodes have to be prefixed with 'builder.', except for child nodes
@@ -48,7 +48,7 @@ builder.yangroot {                                                              
                 yngbuild('') // new line
 
                 namespace "http://bitbucket.org/novakmi/yangbuilder"
-                prefix "example1"
+                prefix "example"
                 yngbuild('')
 
                 // 'import' alias is declared, it can be used instead of 'import' - workaround for clashing keyword  //<6>

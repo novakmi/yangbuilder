@@ -172,28 +172,28 @@ task documentation << {
         GroovyScriptEngine gse = new GroovyScriptEngine("${templatesDir}/scripts");
         logger.debug("Evaluating scripts")
         gse.run("acmeYang.groovy", binding);
-        gse.run("example1Yang.groovy", binding);
-        gse.run("example1CompactYang.groovy", binding);
+        gse.run("exampleYang.groovy", binding);
+        gse.run("exampleCompactYang.groovy", binding);
         logger.debug("Evaluating scripts done")
         "mv ${project.projectDir}/acme-module.yang ${docDir}/acme-module_.tmp".execute().waitFor()
-        "mv ${project.projectDir}/example1-module.yang ${docDir}/example1-module_.tmp".execute().waitFor()
-        "mv ${project.projectDir}/example1-compact-module.yang ${docDir}/example1-compact-module_.tmp".execute().waitFor()
+        "mv ${project.projectDir}/example-module.yang ${docDir}/example-module_.tmp".execute().waitFor()
+        "mv ${project.projectDir}/example-compact-module.yang ${docDir}/example-compact-module_.tmp".execute().waitFor()
 
         // prepare include files from groovy source files
         linesBetween("${project.projectDir}/LICENSE", "${docDir}/LICENSE.tmp", "-----", "-----")
         linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang.tmp", "adoc-begin", "adoc-callout")
         linesBetween("${templatesDir}/scripts/acmeYang.groovy", "${docDir}/acmeYang-callout.tmp", "adoc-callout", "adoc-end")
-        linesBetween("${templatesDir}/scripts/example1Yang.groovy", "${docDir}/example1Yang.tmp", "adoc-begin", "adoc-callout")
-        linesBetween("${templatesDir}/scripts/example1Yang.groovy", "${docDir}/example1Yang-callout.tmp", "adoc-callout", "adoc-end")
-        linesBetween("${templatesDir}/scripts/example1CompactYang.groovy", "${docDir}/example1CompactYang.tmp", "adoc-begin", "adoc-callout")
-        linesBetween("${templatesDir}/scripts/example1CompactYang.groovy", "${docDir}/example1CompactYang-callout.tmp", "adoc-callout", "adoc-end")
+        linesBetween("${templatesDir}/scripts/exampleYang.groovy", "${docDir}/exampleYang.tmp", "adoc-begin", "adoc-callout")
+        linesBetween("${templatesDir}/scripts/exampleYang.groovy", "${docDir}/exampleYang-callout.tmp", "adoc-callout", "adoc-end")
+        linesBetween("${templatesDir}/scripts/exampleCompactYang.groovy", "${docDir}/exampleCompactYang.tmp", "adoc-begin", "adoc-callout")
+        linesBetween("${templatesDir}/scripts/exampleCompactYang.groovy", "${docDir}/exampleCompactYang-callout.tmp", "adoc-callout", "adoc-end")
 
         // prepare inlcude files from generated yang files
         linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module.tmp", "adocy-begin", "adocy-callout")
         linesBetween("${docDir}/acme-module_.tmp", "${docDir}/acme-module-callout.tmp", "adocy-callout", "adocy-end")
-        linesBetween("${docDir}/example1-module_.tmp", "${docDir}/example1-module.tmp", "adocy-begin", "adocy-callout")
-        linesBetween("${docDir}/example1-module_.tmp", "${docDir}/example1-module-callout.tmp", "adocy-callout", "adocy-end")
-        linesBetween("${docDir}/example1-compact-module_.tmp", "${docDir}/example1-compact-module-callout.tmp", "adocy-callout", "adocy-end")
+        linesBetween("${docDir}/example-module_.tmp", "${docDir}/example-module.tmp", "adocy-begin", "adocy-callout")
+        linesBetween("${docDir}/example-module_.tmp", "${docDir}/example-module-callout.tmp", "adocy-callout", "adocy-end")
+        linesBetween("${docDir}/example-compact-module_.tmp", "${docDir}/example-compact-module-callout.tmp", "adocy-callout", "adocy-end")
 
         // asciidoc has to be installed
         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'

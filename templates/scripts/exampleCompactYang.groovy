@@ -22,7 +22,7 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, new CompactYangPlugin())                        //<1>
 
 //name of file to generate
-moduleName = "example1-compact-module"   // do not use 'def' for script global variable
+moduleName = "example-compact-module"   // do not use 'def' for script global variable
 
 //this is example how function can be used by the builder, parameters can be used
 def makeAddressPort(builder, kind = null) {
@@ -36,7 +36,7 @@ def makeAddressPort(builder, kind = null) {
 }
 
 //module's prefix and namespace as attributes '_nl' means new line
-builder.module(moduleName, pnl_namespace:'http://bitbucket.org/novakmi/yangbuilder', prefix_nl: 'example1') {      //<3>
+builder.module(moduleName, pnl_namespace:'http://bitbucket.org/novakmi/yangbuilder', prefix_nl: 'example') {      //<3>
         def makeGrouping = { // this is example how closure can be called be used by the builder
                 grouping('addressPort') {
                         makeAddressPort(builder)
@@ -80,12 +80,12 @@ builder.writeToFile("${builder.getYangName()}.yang")
 <1> The plugin is registered with the +builder+ in constructor or with method +registerPlugin+. When registered
     in constructor, it is passed as second attribute after +indent level+ value. It is possible to pass list of
     plugins to register several plugins at once.
-<2> +type+ and +description+ can be added as a +leaf+ attribute
-<3>  +namespace+ and +prefix+ can be added as a +module+ attribute.
+<2> +type+ and +description+ can be added as +leaf+ attribute
+<3>  +namespace+ and +prefix+ can be added as +module+ attribute.
      +pnl_namespace+ means +\n+ before a +namespace+ element,
      +prefix_nl+ means +\n+ after a +prefix+ element
-<4> +nl+ attribute evaluating to +true+ means +\n+ after element (no need for +yngbuild('')+)
-<5> can be shortened with +prefix_nl+, e.g. +'import'('ietf-inet-types', prefix_nl: 'inet')+
+<4> if +nl+ attribute evaluates to +true+, it  means +\n+ after element is added (no need for +yngbuild('')+)
+<5> +nl+ can be shortened/replaced  with +prefix_nl+, e.g. +'import'('ietf-inet-types', prefix_nl: 'inet')+
 <6> +nl+ attribute evaluating to +true+ means +\n+ before element (no need for +yngbuild('')+)
-<7> +key+ can be added as a +list+ attribute
+<7> +key+ and +description+ can be added as +list+ attributes
    adoc-end - documentation purpose comment*/
