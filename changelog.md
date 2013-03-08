@@ -1,6 +1,14 @@
 #Yangbuilder change log
 
-* 0.5.0 2013-0.-01
+* 1.0.0 2013-03-08
+    * updated dependencies to groovy 2.1.1, nodebuilder-0.8.0
+    * changed repository to https://bitbucket.org/novakmi/nodebuilder
+    * updated documentation
+    * check for GString when building quotes (txt instanceof GString)
+    * GroupingResolver plugin + tests + example
+    * updated examples
+
+* 0.5.0 2013-01-01
     * updated dependencies to groovy 2.0.6, nodebuilder-0.7.0 (testng 6.8, logback 1.0.9, slf4j 1.7.2)
     * tests - updated reading of sout, serr for pyang process
     * CompactYangPlugin now supports  'type' and 'description' attributes for 'typedef'
