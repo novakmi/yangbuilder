@@ -10,8 +10,8 @@
 @GrabResolver(name = 'novakmirepo',
 root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2compatible = true)        //<2>
 
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.7.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.5.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.8.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.0.0')
 
 //This script template represents example of usage without any plugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
@@ -68,7 +68,7 @@ builder.writeToFile("${builder.getYangName()}.yang")                            
 /* adoc-callout - documentation purpose comment
 <2> With Internet connection, use groovy <<Groovy>> +Grab+ to get dependencies automatically (may take some time for the first time to download jars)
 Without Internet connection you need to specify <<nodebuilder>> and <<yangbuilder>> jars on the classpath.
-E.g. +groovy -cp ./nodebuilder-0.7.0.jar:./yangbuilder-0.5.0.jar <scriptname>.groovy>+. In this way one can also use different version of the jar files than
+E.g. +groovy -cp ./nodebuilder-0.8.0.jar:./yangbuilder-1.0.0.jar <scriptname>.groovy>+. In this way one can also use different version of the jar files than
 <3>  function that makes main <<yang>> module
 <4> script entry point, normally we would start with +builder.module(moduleName)+, but since we want to add some comments before module, we start
 with +yangroot+ ant then continue with +ynngbuild+ (echoing commands)

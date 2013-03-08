@@ -11,8 +11,8 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //adoc-begin - documentation purpose comment
 @GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases',
         m2compatible = true)
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.7.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.5.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.8.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.0.0')
 
 // This script template represents example of usage with Compact yang plugin
 // (syntax is more different from yang, but more compact)

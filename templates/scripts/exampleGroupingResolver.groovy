@@ -7,8 +7,8 @@ import org.bitbucket.novakmi.yangbuilder.GroupingResolverPlugin
 
 //adoc-begin - documentation purpose comment
 @GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2compatible = true)
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.7.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '0.5.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.8.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.0.0')
 
 def resolver = new GroupingResolverPlugin()                                                           //<1>
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, resolver)                          //<2>
