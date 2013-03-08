@@ -82,7 +82,7 @@ builder.yangroot {                                                              
                         yngbuild('')
                 }
 
-                list('neighbors') { // key leaf can be attribute of list statement
+                list('neighbors') {
                         description('List of neighbors')
                         key('neighbor')
                         leaf('neighbor') {
