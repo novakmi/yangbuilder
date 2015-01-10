@@ -55,6 +55,9 @@ jar {
 
 clean << {  //add to clean task
         installDir.deleteDir()
+        ant.delete (includeEmptyDirs: 'false') { // todo gradle delete?
+                fileset(dir: documentationDir, includes: '*.tmp')
+        }
 }
 
 task sourcesJar(type: Jar) {
@@ -123,44 +126,51 @@ uploadArchives { // support to upload to github emulated maven repository
         }
 }
 
+def runSh(cmd) {
+        def proc = cmd.execute()
+        proc.waitFor()
+        def out = proc.in.text
+        if (proc.exitValue()) {
+                logger.error("Error running command:")
+                logger.error(cmd)
+                logger.error "return code: ${ proc.exitValue()}"
+                logger.error "stderr: ${proc.err.text}"
+                logger.error "stdout: ${out}" // *out* from the external program is *in*
+                throw new GradleException("Error running command: ${cmd}")
+        }
+        return out
+}
+
 def linesBetween(inFile, outFile, line1, line2, skipList = ['#$#'],
                  replaceMap = ['*<*':'<', '*>*':'>']) {
         def exec = "/usr/bin/awk /${line2}/{flag=0}flag;/${line1}/{flag=1} ${inFile}"
         logger.debug("exec {}", exec)
-        def proc = exec.execute()
-        proc.waitFor()
-        def out = proc.in.text
-        if (proc.exitValue()) {
-                logger.error "return code: ${ proc.exitValue()}"
-                logger.error "stderr: ${proc.err.text}"
-                logger.error "stdout: ${out}" // *out* from the external program is *in*
-        } else {
-                def finalOut = ''
-                out.eachLine {line ->
-                        def skipped = false
-                        if (skipList) {
-                                for(skip in skipList) {
-                                        if (line.contains(skip)) {
-                                                skipped = true
-                                                break
-                                        }
+        def out = runSh(exec)
+        def finalOut = ''
+        out.eachLine {line ->
+                def skipped = false
+                if (skipList) {
+                        for(skip in skipList) {
+                                if (line.contains(skip)) {
+                                        skipped = true
+                                        break
                                 }
-                        }
-                        if (!skipped) {
-                                if (replaceMap) {
-                                        replaceMap.each { k, v ->
-                                                line = line.replace(k,v)
-                                        }
-                                }
-                                finalOut += line + '\n'
                         }
                 }
-                logger.debug(out)
-                new File(outFile).write(finalOut)
+                if (!skipped) {
+                        if (replaceMap) {
+                                replaceMap.each { k, v ->
+                                        line = line.replace(k,v)
+                                }
+                        }
+                        finalOut += line + '\n'
+                }
         }
+        logger.debug(out)
+        new File(outFile).write(finalOut)
 }
 
-task documentation << {
+task documentation(dependsOn: compileGroovy) << {
         File buildDirDocumentation = new File(buildDir.toString() + '/documentation')
         def templatesDir = "${project.projectDir}/templates"
         def docDir = "${documentationDir.toString()}"
@@ -169,15 +179,28 @@ task documentation << {
 
         //run script files
         Binding binding = new Binding();
-        GroovyScriptEngine gse = new GroovyScriptEngine("${templatesDir}/scripts");
+        def urls = configurations.runtime.collect { it.toURI().toURL() }
+        urls += new URL("file://${buildDir}/classes/main")
+        //urls += new URL("file://${buildDir}/libs/yangbuilder-1.0.0.jar")
+
+        def cp = ''
+        urls.each { u ->
+                logger.info(u as String)
+                cp += u as String
+                cp +=":"
+        }
+
         logger.debug("Evaluating scripts")
-        gse.run("acmeYang.groovy", binding);
-        gse.run("exampleYang.groovy", binding);
-        gse.run("exampleCompactYang.groovy", binding);
+        def sdir = "${templatesDir}/scripts"
+        logger.info("Running: groovy -cp ${cp} ${sdir}/acmeYang.groovy")
+        runSh("groovy -cp ${cp} ${sdir}/acmeYang.groovy")
+        runSh("groovy -cp ${cp} ${sdir}/exampleYang.groovy")
+        runSh("groovy -cp ${cp} ${sdir}/exampleCompactYang.groovy")
+
         logger.debug("Evaluating scripts done")
-        "mv ${project.projectDir}/acme-module.yang ${docDir}/acme-module_.tmp".execute().waitFor()
-        "mv ${project.projectDir}/example-module.yang ${docDir}/example-module_.tmp".execute().waitFor()
-        "mv ${project.projectDir}/example-compact-module.yang ${docDir}/example-compact-module_.tmp".execute().waitFor()
+        runSh("mv ${project.projectDir}/acme-module.yang ${docDir}/acme-module_.tmp")
+        runSh("mv ${project.projectDir}/example-module.yang ${docDir}/example-module_.tmp")
+        runSh("mv ${project.projectDir}/example-compact-module.yang ${docDir}/example-compact-module_.tmp")
 
         // prepare include files from groovy source files
         linesBetween("${project.projectDir}/LICENSE", "${docDir}/LICENSE.tmp", "-----", "-----")
@@ -199,7 +222,7 @@ task documentation << {
         def cmd = 'asciidoc -d article -a data-uri -a icons -a iconsdir=/usr/share/asciidoc/images/icons -a toc -a max-width=55em'
         cmd += " -o  ${buildDirDocumentation.toString()}/yangbuilder.html"
         cmd += " ${docDir}/yangbuilder.asciidoc"
-        cmd.execute().waitFor()
+        runSh(cmd)
 
         // delete generated files
         //delete(fileTree(documentationDir.toString()).include('**/*.tmp'))
