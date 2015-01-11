@@ -36,6 +36,19 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 return retVal
         }
 
+        private compactBooleanAttr(BuilderNode node, String attrName, nlAllow = true) {
+                def retVal = false
+                def val = node.attributes[attrName]
+                if (val != null) {
+                        if (val instanceof Boolean) {
+                                retVal = compactNodeAttr(node, attrName, nlAllow)
+                        } else {
+                                throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; '${attrName}' attribute has to be 'boolean' ('true', 'false')");
+                        }
+                }
+                return retVal
+        }
+
         @Override
         protected PluginResult processNodeBefore(BuilderNode node, Object opaque, Map pluginOpaque) throws BuilderException {
                 PluginResult retVal = PluginResult.NOT_ACCEPTED
@@ -56,26 +69,37 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         processed |= compactNodeAttr(node, 'namespace')
                 }
 
+                // default  under 'leaf' - #1
+                if (node.name in ["leaf", "typedef", "deviate"]) {
+                        processed |= compactNodeAttr(node, "default")
+                }
+
                 // type  under 'leaf', 'leaf-list'. 'typedef'
                 if (node.name in ['leaf', 'leaf-list', 'typedef']) {
                         processed |= compactNodeAttr(node, 'type')
                 }
 
+                // default  under 'leaf' - #1
+                if (node.name in ["list", "leaf-list", "deviate"]) {
+                        processed |= compactNodeAttr(node, "min-elements")
+                        processed |= compactNodeAttr(node, "max-elements")
+                }
+
+                // default  under 'leaf' - #1
+                if (node.name in ["container", "leaf", "list", "leaf-list", "choice", "deviate"]) {
+                        processed |= compactBooleanAttr(node, "config")
+                }
+
                 // key under 'list'
                 if (node.name in ['list']) {
                         processed |= compactNodeAttr(node, 'key')
+                        processed |= compactNodeAttr(node, 'min-elements')
+                        processed |= compactNodeAttr(node, 'max-elements')
                 }
 
                 // mandatory under 'leaf', 'choice'
                 if (node.name in ['leaf', 'choice']) {
-                        def man = node.attributes['mandatory']
-                        if (man != null) {
-                                if (man instanceof Boolean) {
-                                        processed |= compactNodeAttr(node, 'mandatory')
-                                } else {
-                                        throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; 'mandatory' attribute has to be 'boolean' ('true', 'false')");
-                                }
-                        }
+                        processed |= compactBooleanAttr(node, "mandatory")
                 }
 
                 // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef'
