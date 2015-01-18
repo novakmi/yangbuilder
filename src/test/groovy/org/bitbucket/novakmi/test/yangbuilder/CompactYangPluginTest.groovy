@@ -240,6 +240,73 @@ class CompactYangPluginTest {
                 log.trace("<== compactImportPrefixNamespacePnlTest")
         }
 
+        @Test(groups = ["basic"])
+        public void compactDefaultTest() {
+                log.trace("==> compactDefaultTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+                        typedef("Integer", type: 'int32', default: -1, nl: true);
+                        grouping("Port", nl: true) {
+                                leaf('port', type: 'uint16', description: 'port value', default: 0)
+                        }
+                        uses("Port", nl: true) {
+                                refine("port", default: 22)
+                        }
+
+                        leaf("port2", type: "int32", default: 22, nl: true)
+
+                        deviation("/port2") {
+                                deviate("replace", default: 2222)
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    typedef Integer {
+        type int32;
+        default -1;
+    }
+
+    grouping Port {
+        leaf port {
+            description "port value";
+            type uint16;
+            default 0;
+        }
+    }
+
+    uses Port {
+        refine port {
+            default 22;
+        }
+    }
+
+    leaf port2 {
+        type int32;
+        default 22;
+    }
+
+    deviation /port2 {
+        deviate replace {
+            default 2222;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                log.trace("<== compactDefaultTest")
+        }
 
         @Test(groups = ["basic"])
         public void compactImportPrefixBelongsToTest() {

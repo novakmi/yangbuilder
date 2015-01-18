@@ -70,7 +70,7 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 }
 
                 // default  under 'leaf' - #1
-                if (node.name in ["leaf", "typedef", "deviate"]) {
+                if (node.name in ["leaf", "typedef", "deviate", "refine"]) {
                         processed |= compactNodeAttr(node, "default")
                 }
 
@@ -79,33 +79,34 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         processed |= compactNodeAttr(node, 'type')
                 }
 
-                // default  under 'leaf' - #1
-                if (node.name in ["list", "leaf-list", "deviate"]) {
-                        processed |= compactNodeAttr(node, "min-elements")
-                        processed |= compactNodeAttr(node, "max-elements")
-                }
-
-                // default  under 'leaf' - #1
-                if (node.name in ["container", "leaf", "list", "leaf-list", "choice", "deviate"]) {
-                        processed |= compactBooleanAttr(node, "config")
-                }
 
                 // key under 'list'
                 if (node.name in ['list']) {
                         processed |= compactNodeAttr(node, 'key')
-                        processed |= compactNodeAttr(node, 'min-elements')
-                        processed |= compactNodeAttr(node, 'max-elements')
                 }
 
-                // mandatory under 'leaf', 'choice'
-                if (node.name in ['leaf', 'choice']) {
+                // min-elements, max-elements  - #1
+                if (node.name in ["list", "leaf-list", "deviate", "refine"]) {
+                        processed |= compactNodeAttr(node, "min-elements")
+                        processed |= compactNodeAttr(node, "max-elements")
+                }
+
+                // config  under 'leaf' - #1
+                if (node.name in ["container", "leaf", "list", "leaf-list", "choice", "deviate", "refine"]) {
+                        processed |= compactBooleanAttr(node, "config")
+                }
+
+
+                // mandatory under 'leaf', 'choice', 'refine'
+                if (node.name in ['leaf', 'choice', "refine"]) {
                         processed |= compactBooleanAttr(node, "mandatory")
                 }
 
                 // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef'
-                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'choice', 'revision', 'typedef']) {
+                // presence under 'container', 'refine
+                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'choice', 'revision', 'typedef', "refine"]) {
                         processed |= compactNodeAttr(node, 'description')
-                        if (node.name in ['container']) {
+                        if (node.name in ['container', "refine"]) {
                                 processed |= compactNodeAttr(node, 'presence')
                         }
                 }
