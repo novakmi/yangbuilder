@@ -97,6 +97,12 @@ class CompactYangPluginTest {
                                 leaf('porta', type: 'uint16')
                                 leaf('portb', type: 'uint16', description: 'port value')
                         }
+                        grouping("Value", nl: true) {
+                                container("val", description: "val container")
+                        }
+                        uses("Value") {
+                                refine("val", description: "value container")
+                        }
                 }
 
                 Assert.assertEquals(builder.getText(),
@@ -145,6 +151,17 @@ class CompactYangPluginTest {
         leaf portb {
             description "port value";
             type uint16;
+        }
+    }
+    grouping Value {
+        container val {
+            description "val container";
+        }
+    }
+
+    uses Value {
+        refine val {
+            description "value container";
         }
     }
 }
@@ -309,6 +326,175 @@ class CompactYangPluginTest {
         }
 
         @Test(groups = ["basic"])
+        public void compactConfigTest() {
+                log.trace("==> compactConfigTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+                        grouping("Port", nl: true) {
+                                leaf('port', type: "int32", config: false)
+                        }
+                        uses("Port", nl: true) {
+                                refine("port", config: true)
+                        }
+                        choice('porta-portb', config: false) {
+                                leaf('porta', type: 'uint16')
+                                leaf('portb', type: 'uint16', description: 'port value')
+                        }
+                        'leaf-list'('codes', type: 'uint32', config: false, nl: false)
+                        list("numbers", key: "val", type: "int32", config: true, nl: true) {
+                                leaf("val", type: "int32")
+                        }
+
+                        deviation("/numbers") {
+                                deviate("replace", config: false)
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    grouping Port {
+        leaf port {
+            config false;
+            type int32;
+        }
+    }
+
+    uses Port {
+        refine port {
+            config true;
+        }
+    }
+
+    choice porta-portb {
+        config false;
+        leaf porta {
+            type uint16;
+        }
+        leaf portb {
+            description "port value";
+            type uint16;
+        }
+    }
+    leaf-list codes {
+        config false;
+        type uint32;
+    }
+    list numbers {
+        config true;
+        key val;
+        leaf val {
+            type int32;
+        }
+    }
+
+    deviation /numbers {
+        deviate replace {
+            config false;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                log.trace("<== compactConfigTest")
+        }
+
+
+        @Test(groups = ["basic"])
+        public void compactMinMaxElementsTest() {
+                log.trace("==> compactMinMaxElementsTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
+                        typedef("Integer", type: 'int32', default: -1, nl: true);
+
+                        grouping("Ports", nl: true) {
+                                "leaf-list"('ports', type: 'uint16', 'min-elements': 4, 'max-elements': 5)
+                        }
+
+                        list("port-group", key: "name", 'min-elements': 10, 'max-elements': 15, nl: true) {
+                                leaf("name", type: "string")
+                                "leaf-list"("ports", type: "int32",  'min-elements': 1, 'max-elements': 3)
+                        }
+
+                        uses("Ports", nl: true) {
+                                refine("ports", 'min-elements': 7, 'max-elements': 8)
+                        }
+
+                        deviation("/port-group") {
+                                deviate("replace", "min-elements": 2, "max-elements": 11)
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    typedef Integer {
+        type int32;
+        default -1;
+    }
+
+    grouping Ports {
+        leaf-list ports {
+            max-elements 5;
+            min-elements 4;
+            type uint16;
+        }
+    }
+
+    list port-group {
+        max-elements 15;
+        min-elements 10;
+        key name;
+        leaf name {
+            type string;
+        }
+        leaf-list ports {
+            max-elements 3;
+            min-elements 1;
+            type int32;
+        }
+    }
+
+    uses Ports {
+        refine ports {
+            max-elements 8;
+            min-elements 7;
+        }
+    }
+
+    deviation /port-group {
+        deviate replace {
+            max-elements 11;
+            min-elements 2;
+        }
+    }
+}
+''')
+                YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
+
+                log.trace("<== compactMinMaxElementsTest")
+        }
+
+        @Test(groups = ["basic"])
         public void compactImportPrefixBelongsToTest() {
                 log.trace("==> compactImportPrefixBelongsToTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
@@ -389,13 +575,21 @@ class CompactYangPluginTest {
                         leaf('port2', type: 'uint16', description: 'port value', mandatory: false, nl: true)
                         leaf('port3', type: 'uint16', description: 'port value', nl: true)
 
-                        container('port-c', mandatory: true, nl: true) {  // mandatory has no effect under contianer
+                        grouping("Ports", nl: true) {
+                                "leaf-list"('ports', type: 'uint16', config: false)
+                        }
+
+                        container('port-c', mandatory: true, nl: true) {  // mandatory has no effect under container
                                 leaf('port4', type: 'uint16', description: 'port value', mandatory: true)
                         }
 
                         choice('porta-portb', mandatory: true, nl: true) {
                                 leaf('porta', type: 'uint16', description: 'port value')
                                 leaf('portb', type: 'uint16', description: 'port value')
+                        }
+
+                        uses("Ports") {
+                                refine("ports", config: true)
                         }
                 }
 
@@ -426,6 +620,13 @@ class CompactYangPluginTest {
         type uint16;
     }
 
+    grouping Ports {
+        leaf-list ports {
+            config false;
+            type uint16;
+        }
+    }
+
     container port-c {
         leaf port4 {
             description "port value";
@@ -446,6 +647,11 @@ class CompactYangPluginTest {
         }
     }
 
+    uses Ports {
+        refine ports {
+            config true;
+        }
+    }
 }
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
@@ -474,6 +680,10 @@ class CompactYangPluginTest {
                         namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
                         prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
 
+                        grouping("Value", nl: true) {
+                                container("val", presence: true)
+                        }
+
                         container('value-c1', presence: true) {
                                 leaf('value', type: 'string')
                         }
@@ -489,12 +699,21 @@ class CompactYangPluginTest {
                         container('value-c4') {
                                 leaf('value', type: 'string')
                         }
+                        uses("Value") {
+                                refine("val", presence: false)
+                        }
                 }
 
                 Assert.assertEquals(builder.getText(),
                         '''module test {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
+
+    grouping Value {
+        container val {
+            presence true;
+        }
+    }
 
     container value-c1 {
         presence true;
@@ -517,6 +736,11 @@ class CompactYangPluginTest {
     container value-c4 {
         leaf value {
             type string;
+        }
+    }
+    uses Value {
+        refine val {
+            presence false;
         }
     }
 }
