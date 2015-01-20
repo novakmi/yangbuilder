@@ -153,22 +153,32 @@ class YangBuilderTest {
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        organization 'novakmi'
-                        contact 'it.novakmi@gmail.com'
+                        organization 'novakmi organization'
+                        contact 'it.novakmi@gmail.com e-mail'
                         description 'test quotes'
 
                         container('socket') {
-                                presence 'yes'
+                                presence 'yes socket'
                                 leaf('ipnum') {
                                         type('string') {
                                                 pattern('[0-9a-fA-F]*')
                                         }
                                 }
                                 list('ports') {
-                                        key 'port'
+                                        key 'port val'
                                         leaf('port') {
                                                 type 'uint16'
+                                                reference "Reference to port description"
                                         }
+                                        leaf('val') {
+                                                type 'uint16'
+                                        }
+                                }
+                                leaf("name") {
+                                        type("string")
+                                }
+                                must("name = 'test'") {
+                                        "error-message"('Name is not test!')
                                 }
                         }
                 }
@@ -176,21 +186,31 @@ class YangBuilderTest {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
 
-    organization novakmi;
-    contact it.novakmi@gmail.com;
+    organization "novakmi organization";
+    contact "it.novakmi@gmail.com e-mail";
     description "test quotes";
     container socket {
-        presence yes;
+        presence "yes socket";
         leaf ipnum {
             type string {
                 pattern [0-9a-fA-F]*;
             }
         }
         list ports {
-            key port;
+            key "port val";
             leaf port {
                 type uint16;
+                reference "Reference to port description";
             }
+            leaf val {
+                type uint16;
+            }
+        }
+        leaf name {
+            type string;
+        }
+        must "name = 'test'" {
+            error-message "Name is not test!";
         }
     }
 }
