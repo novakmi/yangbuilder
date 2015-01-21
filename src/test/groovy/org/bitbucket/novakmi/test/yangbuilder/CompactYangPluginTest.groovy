@@ -841,4 +841,60 @@ class CompactYangPluginTest {
 
                 log.trace("<== compactTypeEnumerationTest")
         }
+
+
+        @Test(groups = ["basic"])
+        public void compactTypeElemsTest() {
+                log.trace("==> compactTypeElemsTest")
+                def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+
+                        leaf('my-leaf', type: "string", elems: ["my:annot1", "my:annot2", "description \"My leaf descr.\""])
+                }
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    leaf my-leaf {
+        type string;
+        my:annot1;
+        my:annot2;
+        description "My leaf descr.";
+    }
+}
+''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME)
+                        leaf('my-leaf', type: "string", elems: "NoListElemes") // ensure elemes is list
+                }
+
+                try {
+                        builder.getText()
+                       Assert.fail()
+                } catch (BuilderException expected) {
+                        // do nothing
+                }
+
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME)
+                        leaf('my-leaf', type: "string", elems: ["stringElem", 1, false])   // ensure only string elems
+                }
+
+                try {
+                        builder.getText()
+                        Assert.fail()
+                } catch (BuilderException expected) {
+                        // do nothing
+                }
+
+                log.trace("<== compactTypeElemsTest")
+        }
 }

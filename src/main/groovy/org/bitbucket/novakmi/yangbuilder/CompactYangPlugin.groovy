@@ -127,6 +127,20 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         }
                 }
 
+                // support for plains
+                def plains = node.attributes["elems"]
+                if (plains) {
+                        if (!(plains instanceof List)) {
+                                throw new BuilderException("node: ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)};  'elems' attribute has to be List!")
+                        }
+                        plains.each { p ->
+                                if (!(p instanceof String)) {
+                                        throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; is not String type!")
+                                }
+                                node.children += new BuilderNode(name: p)
+                        }
+                }
+
                 if (processed) {
                         retVal = PluginResult.PROCESSED_CONTINUE
                 }
