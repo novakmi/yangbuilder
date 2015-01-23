@@ -7,6 +7,7 @@ import org.bitbucket.novakmi.nodebuilder.PluginResult
 import org.bitbucket.novakmi.nodebuilder.NodeBuilderPlugin
 import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.bitbucket.novakmi.nodebuilder.BuilderNode
+import org.bitbucket.novakmi.nodebuilder.TreeNodeBuilder
 
 /**
  * The plugin which allows for more compact building of yang.
@@ -159,5 +160,4 @@ class CompactYangPlugin extends NodeBuilderPlugin {
 
                 return retVal
         }
-
 }
