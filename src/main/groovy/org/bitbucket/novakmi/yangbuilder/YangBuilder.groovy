@@ -252,6 +252,23 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         }
 
         /**
+         * Declare aliases for the Yang language from passed keyword list.
+         *
+         * For each keyword an alias is created  where all minus ('-') and
+         * colon (':') characters are replaced with underscore ('_').
+         *
+         * @param aliasList
+         */
+        public void declareMinColAliases(ArrayList aliasList) {
+                aliasList.each { a->
+                        def al = a.replace('-', '_').replace(':', '_')
+                        if (al != a) {
+                                this.declareAlias(a.replace('-', '_').replace(':', '_'), a)
+                        }
+                }
+        }
+
+        /**
          * Declare common aliases for the Yang language conflicting with groovy syntax and keywords.
          *
          * Calling this function on the plugin allows to use Yang keywords in slightly different syntax and it is not
@@ -261,10 +278,11 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          */
         public void declareCommonAliases() {
 
-                ["leaf-list","if-feature", "min-elements",  "max-elements", "error-app-tag",  "error-message", "fraction-digits",
-                 "ordered-by",  "require-instance", "revision-date", "yang-version", "yin-element"].each {a->
-                        this.declareAlias(a.replace('-', '_'), a)
-                }
+                declareMinColAliases([
+                        "leaf-list","if-feature", "min-elements",  "max-elements",
+                         "error-app-tag",  "error-message", "fraction-digits",
+                        "ordered-by",  "require-instance", "revision-date", "yang-version", "yin-element"
+                ])
                 this.declareAlias("default_", "default")
                 this.declareAlias("import_", "import")
                 this.declareAlias("enum_", "enum")

@@ -550,4 +550,43 @@ multiline comment.
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
                 log.trace("<== commonAliasesTest")
         }
+
+        @Test(groups = ["basic"])
+        public void minColAliasesTest() {
+                log.trace("==> minColAliasesTest")
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                builder.declareMinColAliases(["my:test1", "my:test-2"])
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+                        'import'("ietf-inet-types") {
+                                prefix "inet";
+                        }
+                        leaf("number") {
+                                my_test1()
+                                my_test_2()
+                                type "int32"
+
+                        }
+                }
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+    leaf number {
+        my:test1;
+        my:test-2;
+        type int32;
+    }
+}
+''')
+                log.trace("<== minColAliasesTest")
+        }
 }
