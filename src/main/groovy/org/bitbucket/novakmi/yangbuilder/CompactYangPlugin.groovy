@@ -164,4 +164,44 @@ class CompactYangPlugin extends NodeBuilderPlugin {
 
                 return retVal
         }
+
+        /**
+         * Declare aliases for the Yang language from passed keyword list.
+         *
+         * For each keyword an alias is created  where all minus ('-') and
+         * colon (':') characters are replaced with underscore ('_').
+         *
+         * @param aliasList
+         */
+        public void declareMinColAliases(ArrayList aliasList) {
+                if (getMyBuilder()) {
+                        aliasList.each { a ->
+                                def al = a.replace('-', '_').replace(':', '_')
+                                if (al != a) {
+                                        getMyBuilder().declareAlias(a.replace('-', '_').replace(':', '_'), a)
+                                }
+                        }
+                }
+        }
+
+        /**
+         * Declare common aliases for the Yang language conflicting with groovy syntax and keywords.
+         *
+         * Calling this function on the plugin allows to use Yang keywords in slightly different syntax and it is not
+         * needed to surround them in the quotation marks. Mainly minus '-' is replaced with '_' and Groovy keywords
+         * are suffixed with '_'. E.g. 'default' -> 'default_', 'leaf-list' -> 'leaf_list'
+         * @param builder being used with the plugin
+         */
+        public void declareCommonAliases() {
+                if (getMyBuilder()) {
+                        this.declareMinColAliases([
+                                "leaf-list", "if-feature", "min-elements", "max-elements",
+                                "error-app-tag", "error-message", "fraction-digits",
+                                "ordered-by", "require-instance", "revision-date", "yang-version", "yin-element"
+                        ])
+                        getMyBuilder().declareAlias("default_", "default")
+                        getMyBuilder().declareAlias("import_", "import")
+                        getMyBuilder().declareAlias("enum_", "enum")
+                }
+        }
 }

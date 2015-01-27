@@ -250,41 +250,4 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public void addQuoteKeywords(keywordList) {
                 quoteKeywords += keywordList
         }
-
-        /**
-         * Declare aliases for the Yang language from passed keyword list.
-         *
-         * For each keyword an alias is created  where all minus ('-') and
-         * colon (':') characters are replaced with underscore ('_').
-         *
-         * @param aliasList
-         */
-        public void declareMinColAliases(ArrayList aliasList) {
-                aliasList.each { a->
-                        def al = a.replace('-', '_').replace(':', '_')
-                        if (al != a) {
-                                this.declareAlias(a.replace('-', '_').replace(':', '_'), a)
-                        }
-                }
-        }
-
-        /**
-         * Declare common aliases for the Yang language conflicting with groovy syntax and keywords.
-         *
-         * Calling this function on the plugin allows to use Yang keywords in slightly different syntax and it is not
-         * needed to surround them in the quotation marks. Mainly minus '-' is replaced with '_' and Groovy keywords
-         * are suffixed with '_'. E.g. 'default' -> 'default_', 'leaf-list' -> 'leaf_list'
-         * @param builder being used with the plugin
-         */
-        public void declareCommonAliases() {
-
-                declareMinColAliases([
-                        "leaf-list","if-feature", "min-elements",  "max-elements",
-                         "error-app-tag",  "error-message", "fraction-digits",
-                        "ordered-by",  "require-instance", "revision-date", "yang-version", "yin-element"
-                ])
-                this.declareAlias("default_", "default")
-                this.declareAlias("import_", "import")
-                this.declareAlias("enum_", "enum")
-        }
 }
