@@ -844,8 +844,8 @@ class CompactYangPluginTest {
 
 
         @Test(groups = ["basic"])
-        public void compactTypeElemsTest() {
-                log.trace("==> compactTypeElemsTest")
+        public void compactElemsTest() {
+                log.trace("==> compactElemsTest")
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
@@ -867,6 +867,28 @@ class CompactYangPluginTest {
     }
 }
 ''')
+
+                builder.reset()
+                builder.declareMinColAliases(["my:annot1", "my:annot-2"])
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+
+                        leaf('my-leaf', type: "string", elems: ["my_annot1", "my_annot_2"])
+                }
+                Assert.assertEquals(builder.getText(),
+                        '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    leaf my-leaf {
+        type string;
+        my:annot1;
+        my:annot-2;
+    }
+}
+''')
+
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test";
@@ -895,6 +917,6 @@ class CompactYangPluginTest {
                         // do nothing
                 }
 
-                log.trace("<== compactTypeElemsTest")
+                log.trace("<== compactElemsTest")
         }
 }

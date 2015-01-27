@@ -7,7 +7,7 @@ import org.bitbucket.novakmi.nodebuilder.PluginResult
 import org.bitbucket.novakmi.nodebuilder.NodeBuilderPlugin
 import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.bitbucket.novakmi.nodebuilder.BuilderNode
-import org.bitbucket.novakmi.nodebuilder.TreeNodeBuilder
+import org.bitbucket.novakmi.nodebuilder.PluginTreeNodeBuilder
 
 /**
  * The plugin which allows for more compact building of yang.
@@ -137,6 +137,10 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                         plains.each { p ->
                                 if (!(p instanceof String)) {
                                         throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; is not String type!")
+                                }
+                                PluginTreeNodeBuilder myBuilder =  this.getMyBuilder()
+                                if (myBuilder) {
+                                        p = myBuilder.convertAlias(p)
                                 }
                                 node.children += new BuilderNode(name: p)
                         }
