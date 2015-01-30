@@ -13,42 +13,7 @@ import org.bitbucket.novakmi.nodebuilder.PluginTreeNodeBuilder
  * The plugin which allows for more compact building of yang.
  * The syntax is more compact, but more different from original yang syntax.
  */
-class CompactYangPlugin extends NodeBuilderPlugin {
-
-        private compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
-                def retVal = false
-                // if attribute ends with _'nl', add new line to new node, unless forbidden by 'nlAllow'
-                def pnlVariant = nlAllow && (node.attributes['pnl_'+ attrName] != null || node.attributes['pnl_'+ attrName + '_nl'] != null)
-                def nlVariant = nlAllow && (node.attributes[attrName + '_nl'] != null ||  node.attributes['pnl_'+ attrName + '_nl'] != null)
-                if (node.attributes[attrName] != null || nlVariant || pnlVariant) {  // do we have the attribute or nl attribute variant?
-
-                        BuilderNode typeNode =
-                                new BuilderNode(name: attrName, value: node.attributes[(pnlVariant ? 'pnl_' : '') + attrName + (nlVariant ? '_nl' : '')])
-                        typeNode.setParent(node)
-                        if (pnlVariant) {
-                                typeNode.attributes['pnl'] = true
-                        }
-                        if (nlVariant) {
-                                typeNode.attributes['nl'] = true
-                        }
-                        node.children = [typeNode] + node.children // prepend to list
-                        retVal = true
-                }
-                return retVal
-        }
-
-        private compactBooleanAttr(BuilderNode node, String attrName, nlAllow = true) {
-                def retVal = false
-                def val = node.attributes[attrName]
-                if (val != null) {
-                        if (val instanceof Boolean) {
-                                retVal = compactNodeAttr(node, attrName, nlAllow)
-                        } else {
-                                throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; '${attrName}' attribute has to be 'boolean' ('true', 'false')");
-                        }
-                }
-                return retVal
-        }
+class CompactYangPlugin extends CompactPluginBase {
 
         @Override
         protected PluginResult processNodeBefore(BuilderNode node, Object opaque, Map pluginOpaque) throws BuilderException {
@@ -81,15 +46,15 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 }
 
 
+                // min-elements, max-elements  - #1
+                if (node.name in ["list", "leaf-list", "deviate", "refine"]) {
+                        processed |= compactNodeAttr(node, "max-elements")
+                        processed |= compactNodeAttr(node, "min-elements")
+                }
+
                 // key under 'list'
                 if (node.name in ['list']) {
                         processed |= compactNodeAttr(node, 'key')
-                }
-
-                // min-elements, max-elements  - #1
-                if (node.name in ["list", "leaf-list", "deviate", "refine"]) {
-                        processed |= compactNodeAttr(node, "min-elements")
-                        processed |= compactNodeAttr(node, "max-elements")
                 }
 
                 // config  under 'leaf' - #1
@@ -163,25 +128,6 @@ class CompactYangPlugin extends NodeBuilderPlugin {
                 }
 
                 return retVal
-        }
-
-        /**
-         * Declare aliases for the Yang language from passed keyword list.
-         *
-         * For each keyword an alias is created  where all minus ('-') and
-         * colon (':') characters are replaced with underscore ('_').
-         *
-         * @param aliasList
-         */
-        public void declareMinColAliases(ArrayList aliasList) {
-                if (getMyBuilder()) {
-                        aliasList.each { a ->
-                                def al = a.replace('-', '_').replace(':', '_')
-                                if (al != a) {
-                                        getMyBuilder().declareAlias(a.replace('-', '_').replace(':', '_'), a)
-                                }
-                        }
-                }
         }
 
         /**

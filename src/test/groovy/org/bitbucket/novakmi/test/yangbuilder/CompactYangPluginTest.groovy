@@ -454,37 +454,37 @@ class CompactYangPluginTest {
 
     grouping Ports {
         leaf-list ports {
-            max-elements 5;
             min-elements 4;
+            max-elements 5;
             type uint16;
         }
     }
 
     list port-group {
-        max-elements 15;
-        min-elements 10;
         key name;
+        min-elements 10;
+        max-elements 15;
         leaf name {
             type string;
         }
         leaf-list ports {
-            max-elements 3;
             min-elements 1;
+            max-elements 3;
             type int32;
         }
     }
 
     uses Ports {
         refine ports {
-            max-elements 8;
             min-elements 7;
+            max-elements 8;
         }
     }
 
     deviation /port-group {
         deviate replace {
-            max-elements 11;
             min-elements 2;
+            max-elements 11;
         }
     }
 }
@@ -985,9 +985,12 @@ class CompactYangPluginTest {
                                 max_elements(100)
                                 ordered_by("user")
                         }
-                        leaf("port") {
-                                type("int32")
-                                default_ 22
+                        leaf_list("names", type: "string", pnl_min_elements: "10", pnl_max_elements_nl: 20)
+                        list("ports", key: "port", min_elements: 10, max_elements: 20) {
+                                leaf("port") {
+                                        type("int32")
+                                        default_ 22
+                                }
                         }
                         typedef('my-type1') {
                                 type('enumeration') {
@@ -1015,9 +1018,22 @@ class CompactYangPluginTest {
         max-elements 100;
         ordered-by user;
     }
-    leaf port {
-        type int32;
-        default 22;
+    leaf-list names {
+
+        min-elements 10;
+
+        max-elements 20;
+
+        type string;
+    }
+    list ports {
+        key port;
+        min-elements 10;
+        max-elements 20;
+        leaf port {
+            type int32;
+            default 22;
+        }
     }
     typedef my-type1 {
         type enumeration {
