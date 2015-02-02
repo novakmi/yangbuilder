@@ -11,8 +11,16 @@ import org.bitbucket.novakmi.nodebuilder.NodeBuilderPlugin
 
 abstract class CompactPluginBase extends NodeBuilderPlugin {
 
-        protected compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
-                def retVal = false
+
+        public static final String PNL_ = 'pnl_'
+        public static final String _NL = '_nl'
+
+        protected String getPnlNameNl(val) {
+                return val.pnl ? PNL_ : "" + val.name + val.nl ? _NL : ""
+        }
+
+        protected getAtrributeInfo(BuilderNode node, attrName) {
+                def retVal = null
                 def nameList = [attrName]
                 if (getMyBuilder()) {
                         def aliases = getMyBuilder().getAliases(attrName)
@@ -20,31 +28,64 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                                 nameList += aliases
                         }
                 }
-                for (a in nameList) {
-                        // if attribute ends with _'nl', add new line to new node, unless forbidden by 'nlAllow'
-                        def pnlVariant = nlAllow && (node.attributes['pnl_' + a] != null || node.attributes['pnl_' + a + '_nl'] != null)
-                        def nlVariant = nlAllow && (node.attributes[a + '_nl'] != null || node.attributes['pnl_' + a + '_nl'] != null)
-                        if (node.attributes[a] != null || nlVariant || pnlVariant) {
-                                // do we have the attribute or nl attribute variant?
-
-                                BuilderNode typeNode =
-                                        new BuilderNode(name: attrName, value: node.attributes[(pnlVariant ? 'pnl_' : '') + a + (nlVariant ? '_nl' : '')])
-                                typeNode.setParent(node)
-                                if (pnlVariant) {
-                                        typeNode.attributes['pnl'] = true
+                for (n in nameList) {
+                        for (a in node.attributes) {
+                                if (a.key == n) {
+                                        retVal = [pnl: false, nl: false, name: attrName, value: a.value]
+                                        break;
                                 }
-                                if (nlVariant) {
-                                        typeNode.attributes['nl'] = true
+                                if (a.key == PNL_ + n) {
+                                        retVal = [pnl: true, nl: false, name: attrName, value: a.value]
+                                        break;
                                 }
-                                node.children = [typeNode] + node.children // prepend to list
-                                retVal = true
+                                if (a.key == n + _NL) {
+                                        retVal = [pnl: false, nl: true, name: attrName, value: a.value]
+                                        break;
+                                }
+                                if (a.key == PNL_ + n + _NL) {
+                                        retVal = [pnl: true, nl: true, name: attrName, value: a.value]
+                                        break;
+                                }
+                        }
+                        if (retVal) {
                                 break;
                         }
                 }
                 return retVal
         }
 
-        protected compactBooleanAttr(BuilderNode node, String attrName, nlAllow = true) {
+        protected addNodeFromAttrInfo(BuilderNode node, Map attrInfo, boolean nlAllow = true) {
+                def retVal = true
+                def allow = true
+                if (!nlAllow && (attrInfo.pnl || attrInfo.nl)) {
+                        allow = false
+                }
+                if (attrInfo && allow) {
+                        BuilderNode typeNode =
+                                new BuilderNode(name: attrInfo.name, value: attrInfo.value)
+                        typeNode.setParent(node)
+                        if (attrInfo.pnl) {
+                                typeNode.attributes['pnl'] = true
+                        }
+                        if (attrInfo.nl) {
+                                typeNode.attributes['nl'] = true
+                        }
+                        node.children = [typeNode] + node.children // prepend to list
+                        retVal =  true
+                }
+                return retVal
+        }
+
+        protected boolean compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
+                def retVal =  false
+
+                def attrInfo = getAtrributeInfo(node, attrName)
+                retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
+
+                return retVal
+        }
+
+        protected boolean compactBooleanAttr(BuilderNode node, String attrName, nlAllow = true) {
                 def retVal = false
                 def val = node.attributes[attrName]
                 if (val != null) {
