@@ -1,7 +1,6 @@
 //This is free software licensed under MIT License, see LICENSE file
 //(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
-
 package org.bitbucket.novakmi.yangbuilder
 
 import org.bitbucket.novakmi.nodebuilder.BuilderException
@@ -16,7 +15,30 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
         public static final String _NL = '_nl'
 
         protected String getPnlNameNl(val) {
-                return val.pnl ? PNL_ : "" + val.name + val.nl ? _NL : ""
+                return (val.pnl ? PNL_ : "") + val.name + (val.nl ? _NL : "")
+        }
+
+        protected Map splitPnlNameNlNoAlias(String name) {
+                def new_name
+                def pnl = false
+                def nl = false
+                def from = 0
+                def to = name.length() - 1
+
+                if (name.startsWith(PNL_)) {
+                        pnl = true
+                        from = 4
+                }
+                if (name.endsWith(_NL)) {
+                        nl = true
+                        to -= 3
+                }
+
+                new_name = name[from .. to]
+                if  (getMyBuilder()) {
+                        new_name = getMyBuilder().convertAlias(new_name)
+                }
+                return ["name": new_name, "pnl":  pnl, "nl" : nl]
         }
 
         protected getAtrributeInfo(BuilderNode node, attrName) {
@@ -55,33 +77,32 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
         }
 
         protected addNodeFromAttrInfo(BuilderNode node, Map attrInfo, boolean nlAllow = true) {
-                def retVal = true
+                def retVal = false
                 def allow = true
-                if (!nlAllow && (attrInfo.pnl || attrInfo.nl)) {
-                        allow = false
-                }
-                if (attrInfo && allow) {
-                        BuilderNode typeNode =
-                                new BuilderNode(name: attrInfo.name, value: attrInfo.value)
-                        typeNode.setParent(node)
-                        if (attrInfo.pnl) {
-                                typeNode.attributes['pnl'] = true
+                if (attrInfo) {
+                        if (!nlAllow && (attrInfo.pnl || attrInfo.nl)) {
+                                allow = false
                         }
-                        if (attrInfo.nl) {
-                                typeNode.attributes['nl'] = true
+                        if (allow) {
+                                BuilderNode typeNode =
+                                        new BuilderNode(name: attrInfo.name, value: attrInfo.value)
+                                typeNode.setParent(node)
+                                if (attrInfo.pnl) {
+                                        typeNode.attributes['pnl'] = true
+                                }
+                                if (attrInfo.nl) {
+                                        typeNode.attributes['nl'] = true
+                                }
+                                node.children = [typeNode] + node.children // prepend to list
+                                retVal = true
                         }
-                        node.children = [typeNode] + node.children // prepend to list
-                        retVal =  true
                 }
                 return retVal
         }
 
         protected boolean compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
-                def retVal =  false
-
                 def attrInfo = getAtrributeInfo(node, attrName)
-                retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
-
+                def retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
                 return retVal
         }
 

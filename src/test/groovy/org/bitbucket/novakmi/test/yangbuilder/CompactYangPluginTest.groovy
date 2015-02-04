@@ -961,7 +961,7 @@ class CompactYangPluginTest {
 ''')
 
                 builder.reset()
-                plugin.declareCommonAliases()
+                plugin.declareCommonAliasesAndQuotes()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test";
                         // semicolon at the end can be preset (yang style)

@@ -138,7 +138,7 @@ class CompactYangPlugin extends CompactPluginBase {
          * are suffixed with '_'. E.g. 'default' -> 'default_', 'leaf-list' -> 'leaf_list'
          * @param builder being used with the plugin
          */
-        public void declareCommonAliases() {
+        public void declareCommonAliasesAndQuotes() {
                 if (getMyBuilder()) {
                         this.declareMinColAliases([
                                 "leaf-list", "if-feature", "min-elements", "max-elements",
