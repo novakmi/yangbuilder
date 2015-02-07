@@ -102,7 +102,11 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
 
         protected boolean compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
                 def attrInfo = getAtrributeInfo(node, attrName)
-                def retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
+                def retVal = false
+                if (attrInfo) {
+                        retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
+                        node.attributes.remove(getPnlNameNl(attrInfo)) //remove added description, so it is not caught by other plugin
+                }
                 return retVal
         }
 
@@ -137,4 +141,6 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                         }
                 }
         }
+
+        abstract void declareCommonAliasesAndQuotes();
 }
