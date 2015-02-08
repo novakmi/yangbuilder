@@ -1,5 +1,17 @@
 #Yangbuilder change log
 
+* 1.1.0 2015-02-08 preparation
+
+    * updated dependencies
+    * examples updated to the new jcenter repository
+    * documentation cleaned during `clean` gradle task
+    * Issue #1 - `CompactYangPlugin` - support for more attributes
+    * Issue #3 - `CompactYangPlugin` - `error-message` added to default quote keyword
+    * Issue #4 - `CompactYangPlugin` - support for `elems` attribute (value is list of strings which are turned directly into the yang child elements)
+    * Created `CompactPluginBase` calss
+    * Issue #5 - `CompactYangPlugin` - support to declare common aliases (provided plugin is registered to the builder)
+    * Issue #2 - minimalistic `TailfCompactYangPlugin` - support for `tailf:info` and `tailf:info-description`
+
 * 1.0.0 2013-03-08
     * updated dependencies to groovy 2.1.1, nodebuilder-0.8.0
     * changed repository to https://bitbucket.org/novakmi/nodebuilder
