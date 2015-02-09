@@ -7,18 +7,41 @@ import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.bitbucket.novakmi.nodebuilder.BuilderNode
 import org.bitbucket.novakmi.nodebuilder.NodeBuilderPlugin
 
-
+/**
+ * This class serves as base for CompactPlugins.
+ * Provides various reusable methods.
+ */
 abstract class CompactPluginBase extends NodeBuilderPlugin {
 
+        /**
+         * Attribute prefix indicating to place new line on previous line
+         */
+        protected static final String PNL_ = 'pnl_'
 
-        public static final String PNL_ = 'pnl_'
-        public static final String _NL = '_nl'
+        /**
+         * Attribute prefix indicating to place new line on next line
+         */
+        protected static final String _NL = '_nl'
 
-        protected String getPnlNameNl(val) {
-                return (val.pnl ? PNL_ : "") + val.name + (val.nl ? _NL : "")
+        /**
+         * Return attribute name with new line prefix and suffix
+         * @param attrInfo map with key 'name' representing attribute name
+         * @return attribute name with prefix and suffix
+         */
+        protected static String getPnlNameNl(final Map attrInfo) {
+                return (attrInfo.pnl ? PNL_ : "") + attrInfo.name + (attrInfo.nl ? _NL : "")
         }
 
-        protected Map splitPnlNameNlNoAlias(String name) {
+        /**
+         * Split attribute name to attribute info map with keys 'pnl', 'name' and 'nl'.
+         * If the attribute name is alias, it is converted to the correct name.
+         * @param name attribute name (also alias) with possible new line prefix ('PNL_') and suffix ('_NL')
+         * @return map (attribute info) where key 'name' is attribute name (possible alias converted), key 'pnl' indicates new line prefix in
+         *         original name string, key 'nl' indicates new line suffix was present in original name string
+         * @see PNL_
+         * @see _NL
+         */
+        protected Map splitPnlNameNlNoAlias(final String name) {
                 def new_name
                 def pnl = false
                 def nl = false
@@ -41,7 +64,13 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                 return ["name": new_name, "pnl":  pnl, "nl" : nl]
         }
 
-        protected getAtrributeInfo(BuilderNode node, attrName) {
+        /**
+         * Get attribute info (name, new line prefix/suffix) from node attributes  for given attribute name
+         * @param node the node to search attributes in
+         * @param attrName attribute name (or attribute alias)
+         * @return Map representing found attribute info or null (not found)
+         */
+        protected Map getAtrributeInfo(final BuilderNode node, final String attrName) {
                 def retVal = null
                 def nameList = [attrName]
                 if (getMyBuilder()) {
@@ -76,7 +105,14 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                 return retVal
         }
 
-        protected addNodeFromAttrInfo(BuilderNode node, Map attrInfo, boolean nlAllow = true) {
+        /**
+         * Add child node to the given node from attribute info map
+         * @param node node to which child node is to be added
+         * @param attrInfo attribute info with node name (cannot be alias) a  new line prefix/suffix
+         * @param nlAllow indicates if new line prefix/suffix is allowed (default true)
+         * @return true if node was successfully added
+         */
+        protected boolean addNodeFromAttrInfo(BuilderNode node, final Map attrInfo, final boolean nlAllow = true) {
                 def retVal = false
                 def allow = true
                 if (attrInfo) {
@@ -100,17 +136,35 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                 return retVal
         }
 
-        protected boolean compactNodeAttr(BuilderNode node, String attrName, nlAllow = true) {
+        /**
+         * Find attribute in nodes attribute and if found, convert it to child element.
+         *
+         * In addition handle new line prefix/suffix and alias in nodes attribute.
+         * If child element is added, the attribute is removed from the node.
+         * @param node to search attribute and to add new elements to
+         * @param attrName attribute name (no alias)
+         * @param nlAllow allow handling  of new line prefix/suffix
+         * @return true if element was added
+         */
+        protected boolean compactNodeAttr(BuilderNode node, final String attrName, final nlAllow = true) {
                 def attrInfo = getAtrributeInfo(node, attrName)
                 def retVal = false
                 if (attrInfo) {
                         retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
-                        node.attributes.remove(getPnlNameNl(attrInfo)) //remove added description, so it is not caught by other plugin
+                        node.attributes.remove(getPnlNameNl(attrInfo)) //remove added attribute, so it is not caught by other plugin
                 }
                 return retVal
         }
 
-        protected boolean compactBooleanAttr(BuilderNode node, String attrName, nlAllow = true) {
+        /**
+         * Find attribute in nodes attribute and if found, convert it to child element. The value of attribute must be boolean (true or false)
+         * @param node  o search attribute and to add new elements to
+         * @param attrName  attribute name (no alias)
+         * @param nlAllow   allow handling  of new line prefix/suffix
+         * @return  true if element was added
+         * @throw  BuilderException if attribute value is not boolean
+         */
+        protected boolean compactBooleanAttr(BuilderNode node, final String attrName, final nlAllow = true) {
                 def retVal = false
                 def val = node.attributes[attrName]
                 if (val != null) {
@@ -129,7 +183,7 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
          * For each keyword an alias is created  where all minus ('-') and
          * colon (':') characters are replaced with underscore ('_').
          *
-         * @param aliasList
+         * @param aliasList  list of string keywords for which aliases are declared
          */
         protected void declareMinColAliases(ArrayList aliasList) {
                 if (getMyBuilder()) {
@@ -142,5 +196,11 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                 }
         }
 
-        abstract void declareCommonAliasesAndQuotes();
+        /**
+         * Declare commonly used aliases and quotes keywords for given plugin.
+         * In CompactPluginBase class this method does nothing and can be overridden
+         */
+        public void declareCommonAliasesAndQuotes() {
+                // empty in base class
+        }
 }
