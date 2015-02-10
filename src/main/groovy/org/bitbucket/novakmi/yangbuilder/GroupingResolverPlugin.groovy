@@ -3,7 +3,6 @@
 
 package org.bitbucket.novakmi.yangbuilder
 
-import groovy.transform.CompileStatic
 import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.bitbucket.novakmi.nodebuilder.BuilderNode
 import org.bitbucket.novakmi.nodebuilder.NodeBuilderPlugin
@@ -32,14 +31,6 @@ class GroupingResolverPlugin extends NodeBuilderPlugin {
                         retVal = PluginResult.PROCESSED_CONTINUE
                 }
                 return retVal
-        }
-
-        /**
-         * TODO move to BuilderNode?
-         * @return
-         */
-        static private BuilderNode shallowCopyNode(BuilderNode node) {
-                return new BuilderNode(name: node.name, value: node.value, attributes: node.attributes, parent: node.parent)
         }
 
         /**
@@ -93,7 +84,7 @@ class GroupingResolverPlugin extends NodeBuilderPlugin {
                         throw new BuilderException("Cannot resolve ${node.name} ${node.value} node!")
                 }
 
-                def newNode = shallowCopyNode(node)
+                def newNode = node.shallowCopy()
                 newNode.parent = null
                 newNode.children = resolveGroupingsInSubnodes(node)
                 newNode.children.each { ch ->
