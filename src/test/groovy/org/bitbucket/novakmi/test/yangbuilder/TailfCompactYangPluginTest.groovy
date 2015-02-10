@@ -97,6 +97,64 @@ class TailfCompactYangPluginTest {
         description "My description";
         tailf:info "My2 description and info";
     }
+    leaf my3 {
+
+        tailf:info "My3 info pnl";
+    }
+    leaf my4 {
+        tailf:info "My4 info nl";
+
+    }
+    leaf my5 {
+
+        tailf:info "My5 info pnl and nl";
+
+    }
+    leaf my6 {
+
+        tailf:info "My6 info pnl";
+    }
+    leaf my7 {
+        tailf:info "My7 info nl";
+
+    }
+    leaf my8 {
+
+        tailf:info "My8 info pnl and nl";
+
+    }
+    leaf my9 {
+
+        tailf:info "My9 info pnl";
+        description "My9 info pnl";
+    }
+    leaf my10 {
+        tailf:info "My10 info nl";
+        description "My10 info nl";
+
+    }
+    leaf my11 {
+
+        tailf:info "My11 info pnl and nl";
+        description "My11 info pnl and nl";
+
+    }
+    leaf my12 {
+
+        tailf:info "My12 info pnl";
+        description "My12 info pnl";
+    }
+    leaf my13 {
+        tailf:info "My13 info nl";
+        description "My13 info nl";
+
+    }
+    leaf my14 {
+
+        tailf:info "My14 info pnl and nl";
+        description "My14 info pnl and nl";
+
+    }
 }
 '''
 
@@ -108,6 +166,25 @@ class TailfCompactYangPluginTest {
                         leaf("my", tailf_info_description: "My description and info")
                         leaf("my2", tailf_info_description: "My2 description and info", description: "My description")
                         // descr. not added as no CompactPluginUsed
+
+                        //test pnl and nl
+                        leaf("my3", "pnl_tailf:info": "My3 info pnl")
+                        leaf("my4", "tailf:info_nl": "My4 info nl")
+                        leaf("my5", "pnl_tailf:info_nl": "My5 info pnl and nl")
+
+                        leaf("my6", pnl_tailf_info: "My6 info pnl")
+                        leaf("my7", tailf_info_nl: "My7 info nl")
+                        leaf("my8", pnl_tailf_info_nl: "My8 info pnl and nl")
+
+                        leaf("my9", "pnl_tailf:info-description": "My9 info pnl")
+                        leaf("my10", "tailf:info-description_nl": "My10 info nl")
+                        leaf("my11", "pnl_tailf:info-description_nl": "My11 info pnl and nl")
+
+                        leaf("my12", pnl_tailf_info_description: "My12 info pnl")
+                        leaf("my13", tailf_info_description_nl: "My13 info nl")
+                        leaf("my14", pnl_tailf_info_description_nl: "My14 info pnl and nl")
+
+
                 }
 
                 Assert.assertEquals(builder.getText(), yangText)
