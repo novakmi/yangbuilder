@@ -114,24 +114,18 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
          */
         protected boolean addNodeFromAttrInfo(BuilderNode node, final Map attrInfo, final boolean nlAllow = true) {
                 def retVal = false
-                def allow = true
                 if (attrInfo) {
-                        if (!nlAllow && (attrInfo.pnl || attrInfo.nl)) {
-                                allow = false
+                        BuilderNode typeNode =
+                                new BuilderNode(name: attrInfo.name, value: attrInfo.value)
+                        typeNode.setParent(node)
+                        if (attrInfo.pnl && nlAllow) {
+                                typeNode.attributes['pnl'] = true
                         }
-                        if (allow) {
-                                BuilderNode typeNode =
-                                        new BuilderNode(name: attrInfo.name, value: attrInfo.value)
-                                typeNode.setParent(node)
-                                if (attrInfo.pnl) {
-                                        typeNode.attributes['pnl'] = true
-                                }
-                                if (attrInfo.nl) {
-                                        typeNode.attributes['nl'] = true
-                                }
-                                node.children = [typeNode] + node.children // prepend to list
-                                retVal = true
+                        if (attrInfo.nl && nlAllow) {
+                                typeNode.attributes['nl'] = true
                         }
+                        node.children = [typeNode] + node.children // prepend to list
+                        retVal = true
                 }
                 return retVal
         }
