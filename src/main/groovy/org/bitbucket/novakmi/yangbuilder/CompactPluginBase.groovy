@@ -191,7 +191,7 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
         }
 
         /**
-         * Declare commonly used aliases and quotes keywords for given plugin.
+         * Declare commonly used aliases and quotes keywords (e.g. conflicting with Groovy syntax) for the given plugin.
          * In CompactPluginBase class this method does nothing and can be overridden
          */
         public void declareCommonAliasesAndQuotes() {

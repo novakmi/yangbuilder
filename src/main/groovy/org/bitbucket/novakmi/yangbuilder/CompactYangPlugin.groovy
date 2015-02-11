@@ -132,11 +132,6 @@ class CompactYangPlugin extends CompactPluginBase {
 
         /**
          * Declare common aliases for the Yang language conflicting with groovy syntax and keywords.
-         *
-         * Calling this function on the plugin allows to use Yang keywords in slightly different syntax and it is not
-         * needed to surround them in the quotation marks. Mainly minus '-' is replaced with '_' and Groovy keywords
-         * are suffixed with '_'. E.g. 'default' -> 'default_', 'leaf-list' -> 'leaf_list'
-         * @param builder being used with the plugin
          */
         public void declareCommonAliasesAndQuotes() {
                 if (getMyBuilder()) {

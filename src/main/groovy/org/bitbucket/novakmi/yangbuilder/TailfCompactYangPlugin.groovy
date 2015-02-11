@@ -13,7 +13,11 @@ import org.bitbucket.novakmi.nodebuilder.PluginResult
  */
 class TailfCompactYangPlugin extends CompactPluginBase {
 
-
+        /**
+         * Process artificial "tailf:info-description" attribute
+         * @param node
+         * @return
+         */
         private boolean processInfoDescription(BuilderNode node) {
                 boolean retVal = false
                 def descrAdded = false
@@ -53,7 +57,6 @@ class TailfCompactYangPlugin extends CompactPluginBase {
                 def processed = false
 
                 // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef'
-                // presence under 'container', 'refine
                 if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'typedef', "refine", "length", "type", "enum"]) {
                         if (node.name != "type") { // type cannot have description
                                 processed |= processInfoDescription(node)
@@ -68,10 +71,6 @@ class TailfCompactYangPlugin extends CompactPluginBase {
                 return retVal
         }
 
-        /**
-         * Declare common aliases for the Yang language conflicting with groovy syntax and keywords.
-         * @param builder being used with the plugin
-         */
         public void declareCommonAliasesAndQuotes() {
                 declareMinColAliases(["tailf:info", "tailf:info-description"])
                 if (getMyBuilder()) {
