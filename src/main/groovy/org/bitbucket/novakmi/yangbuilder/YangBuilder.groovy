@@ -122,6 +122,36 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         }
                                 }
                                 break
+                        case "geninfo":
+                                indentIfNeeded(node, opaque)
+                                opaque.println("/*")
+                                indentIfNeeded(node, opaque)
+                                opaque.println("DO NOT EDIT!")
+                                indentIfNeeded(node, opaque)
+                                opaque.println("This 'yang' file was generated with Groovy 'yangbuilder' (http://bitbucket.org/novakmi/yangbuilder)")
+                                def file = node.attributes.file?:null
+                                def time = node.attributes.time?:null
+                                if (time && !(time instanceof GString)) {
+                                        time = new Date().toString()
+                                }
+                                def extraLine = null
+                                if (file) {
+                                        extraLine = "Original file is ${file}"
+                                }
+                                if (time) {
+                                        if (!extraLine) {
+                                                extraLine = "Generated on ${time}"
+                                        } else {
+                                                extraLine += ", generated on ${time}"
+                                        }
+                                }
+                                if (extraLine) {
+                                        indentIfNeeded(node, opaque)
+                                        opaque.println(extraLine)
+                                }
+                                indentIfNeeded(node, opaque)
+                                opaque.println("*/")
+                                break;
                         default:
                                 //qoute handling attributes
                                 //*************************
