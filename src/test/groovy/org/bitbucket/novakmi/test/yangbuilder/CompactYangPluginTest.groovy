@@ -32,7 +32,7 @@ class CompactYangPluginTest {
                                 leaf('port', type: 'uint16')
                         }
                         'leaf-list'('codes', type: 'uint32')
-                        list('values', type: 'type without key is ignored') {
+                        list('values') {
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -44,8 +44,8 @@ class CompactYangPluginTest {
     prefix test;
 
     typedef my-string {
-        description "compact typedef";
         type string;
+        description "compact typedef";
     }
     container socket {
         leaf ip {
@@ -93,7 +93,7 @@ class CompactYangPluginTest {
                                 leaf('port', type: 'uint16', description: 'port vlaue')
                         }
                         'leaf-list'('codes', type: 'uint32', description: 'list of codes')
-                        list('values', description: 'values', type: 'type without key is ignored') {
+                        list('values', description: 'values') {
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -119,27 +119,27 @@ class CompactYangPluginTest {
     }
 
     typedef my-string1 {
-        description "compact typedef";
         type string;
+        description "compact typedef";
     }
     typedef my-string2 {
-        description compact_typedef;
         type string;
+        description compact_typedef;
     }
     container socket {
         description "socket ip address and port";
         leaf ip {
-            description "ip address ";
             type string;
+            description "ip address ";
         }
         leaf port {
-            description "port vlaue";
             type uint16;
+            description "port vlaue";
         }
     }
     leaf-list codes {
-        description "list of codes";
         type uint32;
+        description "list of codes";
     }
     list values {
         description values;
@@ -153,8 +153,8 @@ class CompactYangPluginTest {
             type uint16;
         }
         leaf portb {
-            description "port value";
             type uint16;
+            description "port value";
         }
     }
     grouping Value {
@@ -192,7 +192,7 @@ class CompactYangPluginTest {
                         }
 
                         'leaf-list'('codes', type: 'uint32', nl: false) //  nl:0 , nl: false or missing => no new line
-                        list('values', type: 'type without key is ignored', pnl: true) {
+                        list('values', pnl: true) {
                                 //pnl:true - new line before node is processed
                                 key 'value'
                                 leaf('value', type: 'string')
@@ -238,7 +238,7 @@ class CompactYangPluginTest {
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
                         'import'('ietf-inet-types', prefix: 'inet', nl: 1)
 
-                        leaf('port', pnl_type_nl: 'uint16', description: 'port value')
+                        leaf('port', description: 'port value', pnl_type_nl: 'uint16')
                 }
 
                 Assert.assertEquals(builder.getText(),
@@ -303,8 +303,8 @@ class CompactYangPluginTest {
 
     grouping Port {
         leaf port {
-            description "port value";
             type uint16;
+            description "port value";
             default 0;
         }
     }
@@ -340,7 +340,7 @@ class CompactYangPluginTest {
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
                         'import'('ietf-inet-types', prefix: 'inet', nl: 1)
                         grouping("Port", nl: true) {
-                                leaf('port', type: "int32", config: false)
+                                leaf('port', config: false, type: "int32")
                         }
                         uses("Port", nl: true) {
                                 refine("port", config: true)
@@ -349,8 +349,8 @@ class CompactYangPluginTest {
                                 leaf('porta', type: 'uint16')
                                 leaf('portb', type: 'uint16', description: 'port value')
                         }
-                        'leaf-list'('codes', type: 'uint32', config: false, nl: false)
-                        list("numbers", key: "val", type: "int32", config: true, nl: true) {
+                        'leaf-list'('codes', config: false, type: 'uint32',  nl: false)
+                        list("numbers", config: true, key: "val", nl: true) {
                                 leaf("val", type: "int32")
                         }
 
@@ -388,8 +388,8 @@ class CompactYangPluginTest {
             type uint16;
         }
         leaf portb {
-            description "port value";
             type uint16;
+            description "port value";
         }
     }
     leaf-list codes {
@@ -432,7 +432,7 @@ class CompactYangPluginTest {
 
                         list("port-group", key: "name", 'min-elements': 10, 'max-elements': 15, nl: true) {
                                 leaf("name", type: "string")
-                                "leaf-list"("ports", type: "int32", 'min-elements': 1, 'max-elements': 3)
+                                "leaf-list"("ports", 'min-elements': 1, 'max-elements': 3, type: "int32")
                         }
 
                         uses("Ports", nl: true) {
@@ -461,9 +461,9 @@ class CompactYangPluginTest {
 
     grouping Ports {
         leaf-list ports {
+            type uint16;
             min-elements 4;
             max-elements 5;
-            type uint16;
         }
     }
 
@@ -527,8 +527,8 @@ class CompactYangPluginTest {
     }
 
     leaf port {
-        description "port value";
         type uint16;
+        description "port value";
     }
 }
 ''')
@@ -548,7 +548,7 @@ class CompactYangPluginTest {
                         prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1)
                         // or semicolon can be missing (more groovy like style)
 
-                        list('values', key: 'value', description: 'values', type: 'type without key is ignored') {
+                        list('values', description: 'values', key: 'value') {
                                 leaf('value', type: 'string')
                         }
                 }
@@ -585,10 +585,10 @@ class CompactYangPluginTest {
                         leaf('port3', type: 'uint16', description: 'port value', nl: true)
 
                         grouping("Ports", nl: true) {
-                                "leaf-list"('ports', type: 'uint16', config: false)
+                                "leaf-list"('ports', config: false, type: 'uint16')
                         }
 
-                        container('port-c', mandatory: true, nl: true) {  // mandatory has no effect under container
+                        container('port-c', nl: true) {  // mandatory has no effect under container
                                 leaf('port4', type: 'uint16', description: 'port value', mandatory: true)
                         }
 
@@ -613,20 +613,20 @@ class CompactYangPluginTest {
     }
 
     leaf port1 {
+        type uint16;
         description "port value";
         mandatory true;
-        type uint16;
     }
 
     leaf port2 {
+        type uint16;
         description "port value";
         mandatory false;
-        type uint16;
     }
 
     leaf port3 {
-        description "port value";
         type uint16;
+        description "port value";
     }
 
     grouping Ports {
@@ -638,21 +638,21 @@ class CompactYangPluginTest {
 
     container port-c {
         leaf port4 {
+            type uint16;
             description "port value";
             mandatory true;
-            type uint16;
         }
     }
 
     choice porta-portb {
         mandatory true;
         leaf porta {
-            description "port value";
             type uint16;
+            description "port value";
         }
         leaf portb {
-            description "port value";
             type uint16;
+            description "port value";
         }
     }
 
@@ -664,19 +664,6 @@ class CompactYangPluginTest {
 }
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
-
-                builder.reset()
-                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
-                        leaf('port1', type: 'uint16', description: 'port value', mandatory: 'true', nl: true)
-                        // mandatory cannot be string
-                }
-                try {
-                        builder.getText()
-                        Assert.fail()
-                } catch (BuilderException expected) {
-                        // do nothing
-                }
 
                 log.trace("<== compactMandatoryTest")
         }
@@ -960,11 +947,13 @@ class CompactYangPluginTest {
     prefix test;
     leaf my-leaf {
         type enumeration {
-            enum b {
-                description "Description b";
-            }
             enum a {
+                value 1;
                 description "Description a";
+            }
+            enum b {
+                value 2;
+                description "Description b";
             }
         }
     }
@@ -1037,7 +1026,7 @@ class CompactYangPluginTest {
                                 max_elements(100)
                                 ordered_by("user")
                         }
-                        leaf_list("names", type: "string", pnl_min_elements: "10", pnl_max_elements_nl: 20)
+                        leaf_list("names", pnl_min_elements: "10", pnl_max_elements_nl: 20, type: "string")
                         list("ports", key: "port", min_elements: 10, max_elements: 20) {
                                 leaf("port") {
                                         type("int32")

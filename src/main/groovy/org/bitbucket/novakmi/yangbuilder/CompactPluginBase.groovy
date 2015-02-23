@@ -33,7 +33,7 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
          * @param attrInfo map with key 'name' representing attribute name
          * @return attribute name with prefix and suffix
          */
-        protected static String getPnlNameNl(final Map attrInfo) {
+        protected static String getAttrPnlNameNl(final Map attrInfo) {
                 return (attrInfo.pnl ? PNL_ : "") + attrInfo.name + (attrInfo.nl ? _NL : "")
         }
 
@@ -46,7 +46,7 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
          * @see PNL_
          * @see _NL
          */
-        protected Map splitPnlNameNlNoAlias(final String name) {
+        protected Map splitAttrPnlNameNlAndResolveAlias(final String name) {
                 def new_name
                 def pnl = false
                 def nl = false
@@ -144,47 +144,6 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
         }
 
         /**
-         * Find attribute in nodes attribute and if found, convert it to child element.
-         *
-         * In addition handle new line prefix/suffix and alias in nodes attribute.
-         * If child element is added, the attribute is removed from the node.
-         * @param node to search attribute and to add new elements to
-         * @param attrName attribute name (no alias)
-         * @param nlAllow allow handling  of new line prefix/suffix
-         * @return true if element was added
-         */
-        protected boolean compactNodeAttr(BuilderNode node, final String attrName, final nlAllow = true) {
-                def attrInfo = getAtrributeInfo(node, attrName)
-                def retVal = false
-                if (attrInfo) {
-                        retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
-                        node.attributes.remove(getPnlNameNl(attrInfo)) //remove added attribute, so it is not caught by other plugin
-                }
-                return retVal
-        }
-
-        /**
-         * Find attribute in nodes attribute and if found, convert it to child element. The value of attribute must be boolean (true or false)
-         * @param node  o search attribute and to add new elements to
-         * @param attrName  attribute name (no alias)
-         * @param nlAllow   allow handling  of new line prefix/suffix
-         * @return  true if element was added
-         * @throw  BuilderException if attribute value is not boolean
-         */
-        protected boolean compactBooleanAttr(BuilderNode node, final String attrName, final nlAllow = true) {
-                def retVal = false
-                def val = node.attributes[attrName]
-                if (val != null) {
-                        if (val instanceof Boolean) {
-                                retVal = compactNodeAttr(node, attrName, nlAllow)
-                        } else {
-                                throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; '${attrName}' attribute has to be 'boolean' ('true', 'false')");
-                        }
-                }
-                return retVal
-        }
-
-        /**
          * Process attribute where  value is Map (attribute Map)
          * The node is create from the map with use of following rules:
          * node name - attribute name
@@ -198,11 +157,10 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
          * @throw BuilderException
          */
         protected boolean processMapAttribute(BuilderNode node, attrName, attrValue, final nlAllow = true) {
-                def retVal = false
                 if (!attrValue instanceof Map) {
                         throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; '${attrName}' attribute value has to be 'Map'!");
                 }
-                def attrInfo = splitPnlNameNlNoAlias(attrName)
+                def attrInfo = splitAttrPnlNameNlAndResolveAlias(attrName)
                 if (((Map) attrValue).containsKey(VAL)) {
                         attrInfo.value = attrValue[VAL]
                         ((Map) attrValue).remove(VAL)
@@ -210,7 +168,7 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                 if (((Map) attrValue).size()) {
                         attrInfo.attributes = (Map) attrValue
                 }
-                retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
+                def retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
                 return retVal
         }
 

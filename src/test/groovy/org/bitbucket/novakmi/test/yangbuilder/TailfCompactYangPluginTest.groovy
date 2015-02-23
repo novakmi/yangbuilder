@@ -17,8 +17,9 @@ class TailfCompactYangPluginTest {
         @Test(groups = ["basic"])
         public void tailfCompactInfoDescrTest() {
                 log.trace("==> tailfCompactInfoDescrTest")
+                def pluginCompact = new CompactYangPlugin()
                 def plugin = new TailfCompactYangPlugin()
-                def builder = new YangBuilder(4, [plugin])
+                def builder = new YangBuilder(4, [plugin, pluginCompact])
                 plugin.declareCommonAliasesAndQuotes()
 
                 def yangText = '''module test {
@@ -35,6 +36,11 @@ class TailfCompactYangPluginTest {
     }
     leaf my2 {
         tailf:info "My2 description and info";
+        description "My2 description";
+    }
+    leaf my3 {
+        description "My3 description";
+        tailf:info "My3 description and info";
     }
 }
 '''
@@ -48,7 +54,8 @@ class TailfCompactYangPluginTest {
                                 type("string")
                         }
                         leaf("my", "tailf:info-description": "My description and info")
-                        leaf("my2", "tailf:info-description": "My2 description and info", description: "My description")
+                        leaf("my2","tailf:info-description": "My2 description and info", description: "My2 description")
+                        leaf("my3", description: "My3 description", "tailf:info-description": "My3 description and info")
                         // descr. not added as no CompactPluginUsed
                 }
 
@@ -64,7 +71,8 @@ class TailfCompactYangPluginTest {
                                 type("string")
                         }
                         leaf("my", tailf_info_description: "My description and info")
-                        leaf("my2", tailf_info_description: "My2 description and info", description: "My description")
+                        leaf("my2", tailf_info_description: "My2 description and info", description: "My2 description")
+                        leaf("my3", description: "My3 description", "tailf_info_description": "My3 description and info")
                         // descr. not added as no CompactPluginUsed
                 }
                 Assert.assertEquals(builder.getText(), yangText)
@@ -85,17 +93,17 @@ class TailfCompactYangPluginTest {
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
     typedef my-string {
+        tailf:info "My info";
         description "compact typedef";
         type string;
-        tailf:info "My info";
     }
     leaf my {
         tailf:info "My description and info";
         description "My description and info";
     }
     leaf my2 {
-        description "My description";
         tailf:info "My2 description and info";
+        description "My description";
     }
     leaf my3 {
 

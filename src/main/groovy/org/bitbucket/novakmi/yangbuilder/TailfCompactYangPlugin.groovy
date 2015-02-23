@@ -26,26 +26,23 @@ class TailfCompactYangPlugin extends CompactPluginBase {
                 if (attrInfoDescrInfo) {
                         Map newAttributes = [:]
                         node.attributes.each { k, v ->
-                                def val = splitPnlNameNlNoAlias(k)
+                                def val = splitAttrPnlNameNlAndResolveAlias(k)
                                 def isInfoDescr = val.name == attrInfoDescrInfo?.name
                                 if (!isInfoDescr) {
-                                        newAttributes[getPnlNameNl(val)] = v   // just copy the attribute
+                                        newAttributes[getAttrPnlNameNl(val)] = v   // just copy the attribute
                                 } else {
                                         def aVal = [pnl: val.pnl, name: "tailf:info", nl: false]
-                                        newAttributes[getPnlNameNl(aVal)] = v // convert to 'tailf:info'
+                                        newAttributes[getAttrPnlNameNl(aVal)] = v // convert to 'tailf:info'
                                         def attrDescrInfo = getAtrributeInfo(node, "description")
                                         if (!attrDescrInfo) {
                                                 //convert to description only if other description attribute not present
                                                 aVal = [pnl: false, name: "description", nl: val.nl]
-                                                newAttributes[getPnlNameNl(aVal)] = v
+                                                newAttributes[getAttrPnlNameNl(aVal)] = v
                                                 descrAdded = true
                                         }
                                 }
                         }
                         node.attributes = newAttributes
-                }
-                if (descrAdded) {
-                        retVal = compactNodeAttr(node, "description")
                 }
                 return retVal
         }
@@ -61,7 +58,7 @@ class TailfCompactYangPlugin extends CompactPluginBase {
                         if (node.name != "type") { // type cannot have description
                                 processed |= processInfoDescription(node)
                         }
-                        processed |= compactNodeAttr(node, "tailf:info")
+                        //processed |= compactNodeAttr(node, "tailf:info")
                 }
 
                 if (processed) {

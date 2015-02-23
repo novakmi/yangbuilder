@@ -3,11 +3,9 @@
 
 package org.bitbucket.novakmi.yangbuilder
 
-import org.bitbucket.novakmi.nodebuilder.PluginResult
-import org.bitbucket.novakmi.nodebuilder.NodeBuilderPlugin
 import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.bitbucket.novakmi.nodebuilder.BuilderNode
-import org.bitbucket.novakmi.nodebuilder.PluginTreeNodeBuilder
+import org.bitbucket.novakmi.nodebuilder.PluginResult
 
 /**
  * The plugin which allows for more compact building of yang.
@@ -15,106 +13,37 @@ import org.bitbucket.novakmi.nodebuilder.PluginTreeNodeBuilder
  */
 class CompactYangPlugin extends CompactPluginBase {
 
-        @Override
-        protected PluginResult processNodeBefore(BuilderNode node, Object opaque, Map pluginOpaque) throws BuilderException {
-                PluginResult retVal = PluginResult.NOT_ACCEPTED
+        private boolean skipAttr(final String name) {
+                def retVal = (name in ["pnl", "nl"])
+                return retVal
+        }
 
-                def processed = false
-
-                Map attributesValMap = [:]
-                Map attributesMapMap = [:]
-
-                for (e in node.attributes) {
-                        if (e.value instanceof Map) {
-                                attributesMapMap.put(e.key, e.value)
-                        } else {
-                                attributesValMap.put(e.key, e.value)
+        private boolean processEnums(BuilderNode node, enums) {
+                def retVal = false
+                if (enums) {
+                        if (!(enums instanceof List)) {
+                                throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)};  'enums' attribute of 'type enumeration' has to be List")
+                        }
+                        enums.each { e ->
+                                if (!(e instanceof String) && !(e instanceof GString)) {
+                                        throw new BuilderException("enum value ${e} is not String type!")
+                                }
+                                node.children += new BuilderNode(name: 'enum', value: e)
+                                retVal = true
                         }
                 }
-                node.attributes = attributesValMap
+                return retVal
+        }
 
-                if (node.attributes['pnl']) {
-                        opaque.println('') // new line before processed
-                        processed |= true
-                }
-
-                // prefix under 'import', 'belongs-to', 'module'
-                if (node.name in ['import', 'belongs-to', 'module']) {
-                        processed |= compactNodeAttr(node, 'prefix')
-                }
-
-                if (node.name in ['module'])  {
-                        processed |= compactNodeAttr(node, 'namespace')
-                }
-
-                // default  under 'leaf' - #1
-                if (node.name in ["leaf", "typedef", "deviate", "refine"]) {
-                        processed |= compactNodeAttr(node, "default")
-                }
-
-                // type  under 'leaf', 'leaf-list'. 'typedef'
-                if (node.name in ['leaf', 'leaf-list', 'typedef']) {
-                        processed |= compactNodeAttr(node, 'type')
-                }
-
-
-                // min-elements, max-elements  - #1
-                if (node.name in ["list", "leaf-list", "deviate", "refine"]) {
-                        processed |= compactNodeAttr(node, "max-elements")
-                        processed |= compactNodeAttr(node, "min-elements")
-                }
-
-                // key under 'list'
-                if (node.name in ['list']) {
-                        processed |= compactNodeAttr(node, 'key')
-                }
-
-                // config  under 'leaf' - #1
-                if (node.name in ["container", "leaf", "list", "leaf-list", "choice", "deviate", "refine"]) {
-                        processed |= compactBooleanAttr(node, "config")
-                }
-
-
-                // mandatory under 'leaf', 'choice', 'refine'
-                if (node.name in ['leaf', 'choice', "refine"]) {
-                        processed |= compactBooleanAttr(node, "mandatory")
-                }
-
-                //description and reference allowed under (almost) any node
-                processed |= compactNodeAttr(node, 'description')
-                processed |= compactNodeAttr(node, 'reference')
-
-                // presence under 'container', 'refine
-                if (node.name in ['container', "refine"]) {
-                        processed |= compactNodeAttr(node, 'presence')
-                }
-
-
-                // enumerations in type
-                if (node.name  == 'type' && node.value == 'enumeration') {
-                        def enums = node.attributes['enums']
-                        if (enums) {
-                                if (!(enums instanceof List)) {
-                                        throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)};  'enums' attribute of 'type enumeration' has to be List")
-                                }
-                                enums.each { e ->
-                                        if (!(e instanceof String)) {
-                                                throw new BuilderException("enum value ${e} is not String type!")
-                                        }
-                                        node.children += new BuilderNode(name: 'enum', value: e)
-                                }
-                        }
-                }
-
-                // support for elems
-                def elems = node.attributes["elems"]
+        private boolean processElems(BuilderNode node, elems) {
+                def retVal = false
                 if (elems) {
                         if (!(elems instanceof List)) {
                                 throw new BuilderException("node: ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)};  'elems' attribute has to be List!")
                         }
-                        elems.each { p ->
-                                if (!(p instanceof String) && !(p instanceof List)) {
-                                        //TODO error
+                        elems.reverseEach { p ->
+                                if (!(p instanceof String) && !(p instanceof GString) && !(p instanceof List)) {
+                                        throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; must be String or Map!")
                                 }
                                 if (p instanceof List) {
                                         if (p.size() != 2) {
@@ -126,20 +55,57 @@ class CompactYangPlugin extends CompactPluginBase {
                                         if (!(p[1] instanceof Map)) {
                                                 throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; Second element must be Map representing attributes!")
                                         }
-                                        processed != processMapAttribute(node, p[0], p[1])
+                                        retVal = processMapAttribute(node, p[0], p[1])
                                 } else {
-                                        def attrInfo = [:]
                                         if (!(p instanceof String) && !(p instanceof GString)) {
                                                 throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; is not String type!")
                                         }
-                                        attrInfo = splitPnlNameNlNoAlias(p)
-                                        processed |= addNodeFromAttrInfo(node, attrInfo, true, true)
+                                        def attrInfo = splitAttrPnlNameNlAndResolveAlias(p)
+                                        retVal = addNodeFromAttrInfo(node, attrInfo)
                                 }
                         }
                 }
 
-                for (e in attributesMapMap) {
-                        processed != processMapAttribute(node, e.key, e.value)
+                return retVal
+        }
+
+        private boolean processComplexAttr(BuilderNode node, final String attrName, attrValue) {
+                def retVal = false
+                if (node.name == "type" && node.value == "enumeration" && attrName == "enums") {
+                        retVal = processEnums(node, attrValue)
+                } else {
+                        if (attrValue instanceof Map) {
+                                retVal = processMapAttribute(node, attrName, attrValue)
+                        } else {
+                                if (attrName == "elems") {
+                                        retVal = processElems(node, attrValue)
+                                }
+                        }
+                }
+                return retVal
+        }
+
+        @Override
+        protected PluginResult processNodeBefore(BuilderNode node, Object opaque, Map pluginOpaque) throws BuilderException {
+                PluginResult retVal = PluginResult.NOT_ACCEPTED
+
+                def processed = false
+
+                if (node.attributes['pnl']) {
+                        opaque.println('') // new line before processed
+                        processed |= true
+                }
+
+                node.attributes.reverseEach { e ->
+                        if (!skipAttr(e.key)) {
+                                def complex = processComplexAttr(node, e.key, e.value)
+                                processed |= complex
+                                if (!complex) {
+                                        def attrInfo = splitAttrPnlNameNlAndResolveAlias(e.key)
+                                        attrInfo.value = e.value
+                                        processed |= addNodeFromAttrInfo(node, attrInfo)
+                                }
+                        }
                 }
 
                 if (processed) {
