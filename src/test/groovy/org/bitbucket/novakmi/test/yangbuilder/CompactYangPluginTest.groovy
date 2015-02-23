@@ -936,7 +936,41 @@ class CompactYangPluginTest {
                         // do nothing
                 }
 
+
                 log.trace("<== compactElemsTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void compactElemsMapTest() {
+                log.trace("==> compactElemsMapTest")
+                CompactYangPlugin plugin = new CompactYangPlugin()
+                def builder = new YangBuilder(4, [plugin]) // new instance
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME)
+                        leaf('my-leaf', type: [val:"enumeration", elems: [
+                                ["enum",[val: "a", value: 1, description: "Description a"]],
+                                ["enum",[val: "b", value: 2, description: "Description b"]],
+                        ]])
+                }
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    leaf my-leaf {
+        type enumeration {
+            enum b {
+                description "Description b";
+            }
+            enum a {
+                description "Description a";
+            }
+        }
+    }
+}
+''')
+                log.trace("<== compactElemsMapTest")
         }
 
         @Test(groups = ["basic"])
@@ -1120,7 +1154,7 @@ class CompactYangPluginTest {
                         'import'("ietf-inet-types") {
                                 prefix "inet";
                         }
-                        leaf("text", type: [val:"enumeration", enums: ["a", "b", "c"]])
+                        leaf("text", type: [val:"enumeration", enums: ["a", "b", "c"], description: "My enumeration"])
                 }
 
                 Assert.assertEquals(builder.getText(), '''module test {
@@ -1131,6 +1165,7 @@ class CompactYangPluginTest {
     }
     leaf text {
         type enumeration {
+            description "My enumeration";
             enum a;
             enum b;
             enum c;

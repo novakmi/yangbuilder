@@ -80,14 +80,15 @@ class CompactYangPlugin extends CompactPluginBase {
                         processed |= compactBooleanAttr(node, "mandatory")
                 }
 
-                // description  under 'leaf', 'leaf-list', 'list', 'container', 'revision', 'typedef'
+                //description and reference allowed under (almost) any node
+                processed |= compactNodeAttr(node, 'description')
+                processed |= compactNodeAttr(node, 'reference')
+
                 // presence under 'container', 'refine
-                if (node.name in ['leaf', 'leaf-list', 'list', 'container', 'choice', 'revision', 'typedef', "refine"]) {
-                        processed |= compactNodeAttr(node, 'description')
-                        if (node.name in ['container', "refine"]) {
-                                processed |= compactNodeAttr(node, 'presence')
-                        }
+                if (node.name in ['container', "refine"]) {
+                        processed |= compactNodeAttr(node, 'presence')
                 }
+
 
                 // enumerations in type
                 if (node.name  == 'type' && node.value == 'enumeration') {
@@ -115,28 +116,31 @@ class CompactYangPlugin extends CompactPluginBase {
                                 if (!(p instanceof String) && !(p instanceof List)) {
                                         //TODO error
                                 }
-                                def attrInfo = [:]
                                 if (p instanceof List) {
-                                        // TODO
-                                        // list has 2 items
-                                        // first list item is string
-                                        // second item is Map
-                                        // possible value is p[1].val
-
+                                        if (p.size() != 2) {
+                                                throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; must have 2 elements, but has ${p.size()}!")
+                                        }
+                                        if (!(p[0] instanceof String) && !(p[0] instanceof GString)) {
+                                                throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; First element must be String representing element name!")
+                                        }
+                                        if (!(p[1] instanceof Map)) {
+                                                throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; Second element must be Map representing attributes!")
+                                        }
+                                        processed != processMapAttribute(node, p[0], p[1])
                                 } else {
-                                        if (!(p instanceof String)) {
+                                        def attrInfo = [:]
+                                        if (!(p instanceof String) && !(p instanceof GString)) {
                                                 throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; is not String type!")
                                         }
                                         attrInfo = splitPnlNameNlNoAlias(p)
+                                        processed |= addNodeFromAttrInfo(node, attrInfo, true, true)
                                 }
-                                addNodeFromAttrInfo(node, attrInfo, true, true)
                         }
                 }
 
                 for (e in attributesMapMap) {
                         processed != processMapAttribute(node, e.key, e.value)
                 }
-
 
                 if (processed) {
                         retVal = PluginResult.PROCESSED_CONTINUE
