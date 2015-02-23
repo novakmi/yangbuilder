@@ -3,7 +3,7 @@ yangbuilder
 :Author:    Michal Novák
 :Email:     it.novakmi@gmail.com
 :URL:       https://bitbucket.org/novakmi/yangbuilder
-:Date:      2013-03-08
+:Date:      2015-03-08
 :Revision:  1.0.0
 
 This  document describes how to use Groovy builder for Yang data modeling language.
@@ -15,6 +15,7 @@ The document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc].
 |======
 | Version     | Notes          | Date        | Author
 | 0.0.1       | Initial version| 2012-04-14  | {author}
+| 1.0.0       | Updated        | 2013-03-08  | {author}
 | {revision}  | Updated        | {date}      | {author}
 |======
 
@@ -424,7 +425,7 @@ See +CompactYangPlugin.groovy+ for implementation and
 
 === GroupingResolverPlugin
 
-This pugins resolves all +groupings+ within the builder and returns new +BuilderNode+ which represents root of
+This pugin resolves all +groupings+ within the builder and returns new +BuilderNode+ which represents root of
 the <<yang>> model, in which all +groupings+ are expanded (resolved).
 
 See +GroupingResolverPlugin+ for example of plugin implementation and

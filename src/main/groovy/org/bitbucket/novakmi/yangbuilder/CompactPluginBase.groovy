@@ -24,6 +24,11 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
         protected static final String _NL = '_nl'
 
         /**
+         * attribute value map key indicating the value element
+         */
+        public static final String VAL = "val"
+
+        /**
          * Return attribute name with new line prefix and suffix
          * @param attrInfo map with key 'name' representing attribute name
          * @return attribute name with prefix and suffix
@@ -108,15 +113,19 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
         /**
          * Add child node to the given node from attribute info map
          * @param node node to which child node is to be added
-         * @param attrInfo attribute info with node name (cannot be alias) a  new line prefix/suffix
+         * @param attrInfo attribute info with node name (cannot be alias) a  new line prefix/suffix indication, value and attributes (optional)
          * @param nlAllow indicates if new line prefix/suffix is allowed (default true)
+         * @param append append or prepend (default) new child node
          * @return true if node was successfully added
          */
-        protected boolean addNodeFromAttrInfo(BuilderNode node, final Map attrInfo, final boolean nlAllow = true) {
+        protected boolean addNodeFromAttrInfo(BuilderNode node, final Map attrInfo, final boolean nlAllow = true, append = false) {
                 def retVal = false
                 if (attrInfo) {
                         BuilderNode typeNode =
                                 new BuilderNode(name: attrInfo.name, value: attrInfo.value)
+                        if (attrInfo.attributes) {
+                                typeNode.attributes = attrInfo.attributes
+                        }
                         typeNode.setParent(node)
                         if (attrInfo.pnl && nlAllow) {
                                 typeNode.attributes['pnl'] = true
@@ -124,7 +133,11 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                         if (attrInfo.nl && nlAllow) {
                                 typeNode.attributes['nl'] = true
                         }
-                        node.children = [typeNode] + node.children // prepend to list
+                        if (!append) {
+                                node.children = [typeNode] + node.children // prepend to list
+                        } else {
+                                node.children += typeNode  // append to list
+                        }
                         retVal = true
                 }
                 return retVal
@@ -170,6 +183,37 @@ abstract class CompactPluginBase extends NodeBuilderPlugin {
                 }
                 return retVal
         }
+
+        /**
+         * Process attribute where  value is Map (attribute Map)
+         * The node is create from the map with use of following rules:
+         * node name - attribute name
+         * node value - the value of attrVal Map with key "val" or null
+         * node attributes - attrVal Map (without attribute key "val", if exists)
+         * @param node
+         * @param attrName - attribute name
+         * @param attrValue - a Map  representing the attributes
+         * @param nlAllow allow handling  of new line prefix/suffix
+         * @return true if processed, false if not processed
+         * @throw BuilderException
+         */
+        protected boolean processMapAttribute(BuilderNode node, attrName, attrValue, final nlAllow = true) {
+                def retVal = false
+                if (!attrValue instanceof Map) {
+                        throw new BuilderException("node: ${node.name} path: ${BuilderNode.getNodePath(node)}; '${attrName}' attribute value has to be 'Map'!");
+                }
+                def attrInfo = splitPnlNameNlNoAlias(attrName)
+                if (((Map) attrValue).containsKey(VAL)) {
+                        attrInfo.value = attrValue[VAL]
+                        ((Map) attrValue).remove(VAL)
+                }
+                if (((Map) attrValue).size()) {
+                        attrInfo.attributes = (Map) attrValue
+                }
+                retVal = addNodeFromAttrInfo(node, attrInfo, nlAllow)
+                return retVal
+        }
+
 
         /**
          * Declare aliases for the Yang language from passed keyword list.

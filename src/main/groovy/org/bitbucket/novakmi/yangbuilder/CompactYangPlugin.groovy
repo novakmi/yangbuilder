@@ -21,6 +21,18 @@ class CompactYangPlugin extends CompactPluginBase {
 
                 def processed = false
 
+                Map attributesValMap = [:]
+                Map attributesMapMap = [:]
+
+                for (e in node.attributes) {
+                        if (e.value instanceof Map) {
+                                attributesMapMap.put(e.key, e.value)
+                        } else {
+                                attributesValMap.put(e.key, e.value)
+                        }
+                }
+                node.attributes = attributesValMap
+
                 if (node.attributes['pnl']) {
                         opaque.println('') // new line before processed
                         processed |= true
@@ -93,23 +105,38 @@ class CompactYangPlugin extends CompactPluginBase {
                         }
                 }
 
-                // support for plains
-                def plains = node.attributes["elems"]
-                if (plains) {
-                        if (!(plains instanceof List)) {
+                // support for elems
+                def elems = node.attributes["elems"]
+                if (elems) {
+                        if (!(elems instanceof List)) {
                                 throw new BuilderException("node: ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)};  'elems' attribute has to be List!")
                         }
-                        plains.each { p ->
-                                if (!(p instanceof String)) {
-                                        throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; is not String type!")
+                        elems.each { p ->
+                                if (!(p instanceof String) && !(p instanceof List)) {
+                                        //TODO error
                                 }
-                                PluginTreeNodeBuilder myBuilder =  this.getMyBuilder()
-                                if (myBuilder) {
-                                        p = myBuilder.convertAlias(p)
+                                def attrInfo = [:]
+                                if (p instanceof List) {
+                                        // TODO
+                                        // list has 2 items
+                                        // first list item is string
+                                        // second item is Map
+                                        // possible value is p[1].val
+
+                                } else {
+                                        if (!(p instanceof String)) {
+                                                throw new BuilderException("'elems' value ${p} of node ${node.name}(${node.value}) path: ${BuilderNode.getNodePath(node)}; is not String type!")
+                                        }
+                                        attrInfo = splitPnlNameNlNoAlias(p)
                                 }
-                                node.children += new BuilderNode(name: p)
+                                addNodeFromAttrInfo(node, attrInfo, true, true)
                         }
                 }
+
+                for (e in attributesMapMap) {
+                        processed != processMapAttribute(node, e.key, e.value)
+                }
+
 
                 if (processed) {
                         retVal = PluginResult.PROCESSED_CONTINUE

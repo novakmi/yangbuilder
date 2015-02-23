@@ -19,8 +19,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         typedef('my-string', type: 'string', description: 'compact typedef')
@@ -75,8 +77,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         revision('2012-06-29', description: "initial revision")
@@ -177,8 +181,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style), no new line
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: true) // nl:true, nl:1, nl:<non false val> - make new line after node is printed
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style), no new line
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: true)
+                        // nl:true, nl:1, nl:<non false val> - make new line after node is printed
 
                         container('socket', nl: 1) { // nl:1 is same as nl:true
                                 leaf('ip', type: 'string') //compact way to type leafs with simple types
@@ -186,7 +192,8 @@ class CompactYangPluginTest {
                         }
 
                         'leaf-list'('codes', type: 'uint32', nl: false) //  nl:0 , nl: false or missing => no new line
-                        list('values', type: 'type without key is ignored', pnl: true) { //pnl:true - new line before node is processed
+                        list('values', type: 'type without key is ignored', pnl: true) {
+                                //pnl:true - new line before node is processed
                                 key 'value'
                                 leaf('value', type: 'string')
                         }
@@ -425,7 +432,7 @@ class CompactYangPluginTest {
 
                         list("port-group", key: "name", 'min-elements': 10, 'max-elements': 15, nl: true) {
                                 leaf("name", type: "string")
-                                "leaf-list"("ports", type: "int32",  'min-elements': 1, 'max-elements': 3)
+                                "leaf-list"("ports", type: "int32", 'min-elements': 1, 'max-elements': 3)
                         }
 
                         uses("Ports", nl: true) {
@@ -536,8 +543,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1)
+                        // or semicolon can be missing (more groovy like style)
 
                         list('values', key: 'value', description: 'values', type: 'type without key is ignored') {
                                 leaf('value', type: 'string')
@@ -659,7 +668,8 @@ class CompactYangPluginTest {
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
                         'import'('ietf-inet-types', prefix: 'inet', nl: 1)
-                        leaf('port1', type: 'uint16', description: 'port value', mandatory: 'true', nl: true) // mandatory cannot be string
+                        leaf('port1', type: 'uint16', description: 'port value', mandatory: 'true', nl: true)
+                        // mandatory cannot be string
                 }
                 try {
                         builder.getText()
@@ -677,8 +687,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1)
+                        // or semicolon can be missing (more groovy like style)
 
                         grouping("Value", nl: true) {
                                 container("val", presence: true)
@@ -756,8 +768,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1)
+                        // or semicolon can be missing (more groovy like style)
 
                         typedef('my-type1') {
                                 type('enumeration') {
@@ -850,8 +864,10 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [plugin]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1)
+                        // or semicolon can be missing (more groovy like style)
 
                         leaf('my-leaf', type: "string", elems: ["my:annot1", "my:annot2", "description \"My leaf descr.\""])
                 }
@@ -872,8 +888,10 @@ class CompactYangPluginTest {
                 builder.reset()
                 plugin.declareMinColAliases(["my:annot1", "my:annot-2"])
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1) // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix(YangBuilderTestCommon._TEST_MODULE_NAME, nl: 1)
+                        // or semicolon can be missing (more groovy like style)
 
                         leaf('my-leaf', type: "string", elems: ["my_annot1", "my_annot_2"])
                 }
@@ -899,7 +917,7 @@ class CompactYangPluginTest {
 
                 try {
                         builder.getText()
-                       Assert.fail()
+                        Assert.fail()
                 } catch (BuilderException expected) {
                         // do nothing
                 }
@@ -1086,5 +1104,42 @@ class CompactYangPluginTest {
 }
 ''')
                 log.trace("<== minColAliasesTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void mapAttrTest() {
+                log.trace("==> mapAttrTest")
+                CompactYangPlugin plugin = new CompactYangPlugin()
+                def builder = new YangBuilder(4, [plugin]) // new instance/use indent 4
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
+                        'import'("ietf-inet-types") {
+                                prefix "inet";
+                        }
+                        leaf("text", type: [val:"enumeration", enums: ["a", "b", "c"]])
+                }
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    import ietf-inet-types {
+        prefix inet;
+    }
+    leaf text {
+        type enumeration {
+            enum a;
+            enum b;
+            enum c;
+        }
+    }
+}
+''')
+
+                log.trace("<== mapAttrTest")
+
         }
 }
