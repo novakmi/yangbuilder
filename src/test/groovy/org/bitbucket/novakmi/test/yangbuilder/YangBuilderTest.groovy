@@ -470,4 +470,46 @@ multiline comment.
 ''')
                 log.trace("<== geninfoTest")
         }
+
+        @Test(groups = ["basic"])
+        public void ygnTest() {
+                log.trace("==> ygnTest")
+                def builder = new YangBuilder(4) // new instance/use indent 4
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        'import'("ietf-inet-types") {
+                                prefix "inet"
+                        }
+                        container("my_text") {
+                                leaf("text") {
+                                        type "string"
+                                }
+                                my_leaf(_ygn: true)
+                        }
+                        container("not_in_yang", _ygn: true)
+                        container("not_in_yang2", _ygn: true) {
+                                container("in_yang", presence: true) { //child nodes not ignored
+                                        presence(true)
+                                }
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    import ietf-inet-types {
+        prefix inet;
+    }
+    container my_text {
+        leaf text {
+            type string;
+        }
+    }
+    container in_yang {
+        presence true;
+    }
+}
+''')
+                log.trace("<== ygnTest")
+        }
 }

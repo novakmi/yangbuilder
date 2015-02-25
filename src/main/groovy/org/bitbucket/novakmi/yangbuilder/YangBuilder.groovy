@@ -10,6 +10,7 @@ import org.bitbucket.novakmi.nodebuilder.TreeNodeBuilder
 
 class YangBuilder extends TextPluginTreeNodeBuilder {
 
+        public static final String _YGN = "_ygn"
         final private String YANG_ROOT = 'yangroot'
 
         // list of keywords with special quote handling
@@ -153,6 +154,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 opaque.println("*/")
                                 break;
                         default:
+                                if (node.attributes[_YGN]) { // do not process ignored node
+                                        break;
+                                }
                                 //qoute handling attributes
                                 //*************************
                                 //quotes - force quotes
@@ -217,8 +221,12 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         @Override
         protected void processNodeBeforeChildren(BuilderNode node, Object opaque) throws BuilderException {
                 if (node.name != YANG_ROOT) {
-                        opaque.print(" {") // block opening bracket
-                        processInlindeComment(node, opaque)
+                        if (!(node.attributes[_YGN])) {
+                                opaque.print(" {") // block opening bracket
+                                processInlindeComment(node, opaque)
+                        } else {
+                                opaque.decrementIndent()
+                        }
                 }
                 super.processNodeBeforeChildren(node, opaque) //incrementIndent()
         }
@@ -227,8 +235,10 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         protected void processNodeAfterChildren(BuilderNode node, Object opaque) throws BuilderException {
                 super.processNodeAfterChildren(node, opaque)  //decrementIndent()
                 if (node.name != YANG_ROOT) {
-                        opaque.printIndent()
-                        opaque.println("}") // block closing bracket
+                        if (!(node.attributes[_YGN])) {
+                                opaque.printIndent()
+                                opaque.println("}") // block closing bracket
+                        }
                 } else {
                         opaque.setIndentLevel(0) //reset indent
                 }

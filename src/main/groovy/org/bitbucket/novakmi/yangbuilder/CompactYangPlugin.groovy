@@ -15,6 +15,7 @@ class CompactYangPlugin extends CompactPluginBase {
 
         private boolean skipAttr(final String name) {
                 def retVal = (name in ["pnl", "nl"])
+                retVal |=  (name.startsWith("${YangBuilder._YGN}_")) //if attribute name starts with '_ygn_', skip this attribute from processing
                 return retVal
         }
 
@@ -90,26 +91,30 @@ class CompactYangPlugin extends CompactPluginBase {
                 PluginResult retVal = PluginResult.NOT_ACCEPTED
 
                 def processed = false
+                if (node.attributes[YangBuilder._YGN]) { // if '_ygn' attribute is present, skip attribute processing
+                        retVal = PluginResult.PROCESSED_CONTINUE
+                } else {
 
-                if (node.attributes['pnl']) {
-                        opaque.println('') // new line before processed
-                        processed |= true
-                }
+                        if (node.attributes['pnl']) {
+                                opaque.println('') // new line before processed
+                                processed |= true
+                        }
 
-                node.attributes.reverseEach { e ->
-                        if (!skipAttr(e.key)) {
-                                def complex = processComplexAttr(node, e.key, e.value)
-                                processed |= complex
-                                if (!complex) {
-                                        def attrInfo = splitAttrPnlNameNlAndResolveAlias(e.key)
-                                        attrInfo.value = e.value
-                                        processed |= addNodeFromAttrInfo(node, attrInfo)
+                        node.attributes.reverseEach { e ->
+                                if (!skipAttr(e.key)) {
+                                        def complex = processComplexAttr(node, e.key, e.value)
+                                        processed |= complex
+                                        if (!complex) {
+                                                def attrInfo = splitAttrPnlNameNlAndResolveAlias(e.key)
+                                                attrInfo.value = e.value
+                                                processed |= addNodeFromAttrInfo(node, attrInfo)
+                                        }
                                 }
                         }
-                }
 
-                if (processed) {
-                        retVal = PluginResult.PROCESSED_CONTINUE
+                        if (processed) {
+                                retVal = PluginResult.PROCESSED_CONTINUE
+                        }
                 }
 
                 return retVal

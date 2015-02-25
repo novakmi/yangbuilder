@@ -1164,6 +1164,63 @@ class CompactYangPluginTest {
 ''')
 
                 log.trace("<== mapAttrTest")
-
         }
+
+        @Test(groups = ["basic"])
+        public void ygnTest() {
+                log.trace("==> ygnTest")
+                CompactYangPlugin plugin = new CompactYangPlugin()
+                def builder = new YangBuilder(4, [plugin]) // new instance/use indent 4
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        'import'("ietf-inet-types", prefix: "inet")
+                        leaf("text", type: "string", _ygn_my_attr: "attr")
+                }
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    import ietf-inet-types {
+        prefix inet;
+    }
+    leaf text {
+        type string;
+    }
+}
+''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        'import'("ietf-inet-types", prefix: "inet")
+                        container("my_text") {
+                                leaf("text", type: "string", _ygn_my_attr: "attr")
+                                my_leaf(type: "string", description: "not in yang", _ygn: true)
+                        }
+                        container("not_in_yang", _ygn: true)
+                        container("not_in_yang2", _ygn: true) {
+                                container("in_yang", presence: true)  //child nodes not ignored
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    import ietf-inet-types {
+        prefix inet;
+    }
+    container my_text {
+        leaf text {
+            type string;
+        }
+    }
+    container in_yang {
+        presence true;
+    }
+}
+''')
+                log.trace("<== ygnTest")
+        }
+
 }
