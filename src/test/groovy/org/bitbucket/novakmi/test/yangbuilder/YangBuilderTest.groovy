@@ -295,10 +295,9 @@ class YangBuilderTest {
                         organization 'novakmi'
                         contact('it.novakmi@gmail.com', quotes: '"')
                         description(
-                                '''test quotes
-in multiline
-description''',
-                                multiline: true, indent: true) // multiline and indent
+                                '''"test quotes
+    in multiline
+description"''', noAutoQuotes: true) // multiline and indent
                 }
                 Assert.assertEquals(builder.getText(), '''module test {
     namespace "http://novakmi.bitbucket.org/test";
@@ -308,8 +307,8 @@ description''',
     contact "it.novakmi@gmail.com";
     description
         "test quotes
-         in multiline
-         description";
+        in multiline
+        description";
 }
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)

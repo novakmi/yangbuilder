@@ -11,7 +11,9 @@ import org.bitbucket.novakmi.nodebuilder.TreeNodeBuilder
 class YangBuilder extends TextPluginTreeNodeBuilder {
 
         public static final String _YGN = "_ygn"
-        final private String YANG_ROOT = 'yangroot'
+        public static final String YANG_ROOT = 'yangroot'
+        public static final String YANG_CMD = 'yngcmd'
+        public static final reservedCommands = ["cmt", "geninfo", "yngbuild", YANG_ROOT ,YANG_CMD]
 
         // list of keywords with special quote handling
         private quoteKeywords = []
@@ -89,7 +91,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         break
                                 }
                                 throw new BuilderException("Node: ${BuilderNode.getNodePath(node)} must be root node!")
-                // this node directly echoes its value with indentation or without indentation (attribute indent is set to false)
+                        // this node directly echoes its value with indentation or without indentation (if attribute indent is set to false)
                         case 'yngbuild':
                         case 'cmt':
                                 if (node.children.size()) {
@@ -114,6 +116,10 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                 indentIfNeeded(node, opaque)
                                                 if (isInline) {
                                                         opaque.print('// ')
+                                                } else {
+                                                        if (isIndent(node)) {
+                                                               l = l.trim()
+                                                        }
                                                 }
                                                 opaque.println(l)
                                         }
@@ -153,48 +159,49 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 indentIfNeeded(node, opaque)
                                 opaque.println("*/")
                                 break;
+                        case "yngcmd": //reserved for YangBuilder commands (can be used by plugins)
+                                break;
                         default:
                                 if (node.attributes[_YGN]) { // do not process ignored node
                                         break;
                                 }
+                                opaque.printIndent()
+                                opaque.print("$node.name")
                                 //qoute handling attributes
                                 //*************************
                                 //quotes - force quotes
                                 //noAutoQuotes - no quotes handling
-                                //always - even if not needed
-                                //multiline - handle multiline string
-                                if (quotes == '' && node.name in quoteKeywords) { //if quote Keyword and quotes not disabled
+                                if (quotes == '' && node.name in quoteKeywords && (node.value instanceof String || node.value instanceof GString)) {
+                                        //if quote Keyword and quotes not disabled
                                         if (!node.attributes.noAutoQuotes) {
                                                 quotes = getQuotes(node.value)
                                         }
-                                        if (node.attributes.multiline) {
-                                                opaque.printIndent()
-                                                opaque.println("$node.name")
-                                                def quotesFill = ' ' * quotes.size()
-                                                def lines = node?.value?.split('\n')
-                                                lines?.eachWithIndex {l, i ->
+                                        def quotesFill = ' ' * quotes.size()
+                                        def lines = node?.value?.split('\n')
+                                        if (lines.size() == 1) {
+                                                opaque.print(" ${quotes}${lines[0]}${quotes}")
+                                        } else {
+                                                opaque.println("")
+                                                lines.eachWithIndex { l, i ->
+                                                        indentIfNeeded(node, opaque)
+                                                        opaque.print("${opaque.indent}") //TODO indent private
                                                         if (i == 0) {
-                                                                l = quotes + l
+                                                                opaque.print("${quotes}")
                                                         } else {
-                                                                l = quotesFill + l
+                                                                opaque.print("${quotesFill}")
                                                         }
+                                                        opaque.print("${l.trim()}")
                                                         if (i == lines.size() - 1) {
-                                                                l = l + quotes + ';'
+                                                                opaque.print("${quotes}")
+                                                        } else {
+                                                                opaque.println("")
                                                         }
-                                                        indentIfNeeded(node, opaque)
-                                                        def level = opaque.getIndentLevel() // indent only
-                                                        opaque.setIndentLevel(1)            // one indent level
-                                                        indentIfNeeded(node, opaque)
-                                                        opaque.setIndentLevel(level)        //restore indent
-                                                        opaque.println("${l}") //print just
                                                 }
-                                                break
                                         }
-                                }
-                                opaque.printIndent()
-                                opaque.print("$node.name")
-                                if (node.value != null) {
-                                        opaque.print(" ${quotes}${node.value}${quotes}")
+                                }  else {
+                                        if (node.value != null) {
+                                                opaque.print(" ${quotes}${node.value}${quotes}")
+                                        }
                                 }
                                 if (!node?.children?.size()) {
                                         opaque.print(";") // yang statements not having children end with semicolon
@@ -204,9 +211,13 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 }
         }
 
+
+        private boolean isIndent(BuilderNode node) {
+                return node.attributes.indent == null || node.attributes.indent
+        }
+
         private void indentIfNeeded(BuilderNode node, opaque) {
-                def isIndent = node.attributes.indent == null || node.attributes.indent
-                if (isIndent) {
+                if (isIndent(node)) {
                         opaque.printIndent()
                 }
         }
