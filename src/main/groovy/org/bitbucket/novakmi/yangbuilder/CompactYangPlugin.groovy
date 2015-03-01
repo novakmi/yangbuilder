@@ -13,9 +13,18 @@ import org.bitbucket.novakmi.nodebuilder.PluginResult
  */
 class CompactYangPlugin extends CompactPluginBase {
 
+        private HashSet autoNlLevels = new HashSet();
+        private HashSet autoPnlLevels = new HashSet();
+
+
         private boolean skipAttr(final String name) {
-                def retVal = (name in ["pnl", "nl"])
+                def retVal = (name in ["pnl", "nl", "nlLevel", "pnlLevel", "indent", "cmt"])
                 retVal |=  (name.startsWith("${YangBuilder._YGN}_")) //if attribute name starts with '_ygn_', skip this attribute from processing
+                return retVal
+        }
+
+        private skipNode(final String nodeName) {
+                def retVal = (nodeName in YangBuilder.reservedCommands)
                 return retVal
         }
 
@@ -95,19 +104,33 @@ class CompactYangPlugin extends CompactPluginBase {
                         retVal = PluginResult.PROCESSED_CONTINUE
                 } else {
 
-                        if (node.attributes['pnl']) {
+                        def handleLevel = { attr, set ->
+                                def level = node.attributes[attr]
+                                if (level != null) {
+                                        if (level) {
+                                                set.add(opaque.getIndentLevel())
+                                        } else {
+                                                set.remove(opaque.getIndentLevel())
+                                        }
+                                }
+                        }
+                        handleLevel("pnlLevel", autoPnlLevels)
+                        handleLevel("nlLevel", autoNlLevels)
+
+                        if (node.attributes['pnl'] || (opaque.getIndentLevel() in autoPnlLevels)) {
                                 opaque.println('') // new line before processed
                                 processed |= true
                         }
-
-                        node.attributes.reverseEach { e ->
-                                if (!skipAttr(e.key)) {
-                                        def complex = processComplexAttr(node, e.key, e.value)
-                                        processed |= complex
-                                        if (!complex) {
-                                                def attrInfo = splitAttrPnlNameNlAndResolveAlias(e.key)
-                                                attrInfo.value = e.value
-                                                processed |= addNodeFromAttrInfo(node, attrInfo)
+                        if (!skipNode(node.name)) {
+                                node.attributes.reverseEach { e ->
+                                        if (!skipAttr(e.key)) {
+                                                def complex = processComplexAttr(node, e.key, e.value)
+                                                processed |= complex
+                                                if (!complex) {
+                                                        def attrInfo = splitAttrPnlNameNlAndResolveAlias(e.key)
+                                                        attrInfo.value = e.value
+                                                        processed |= addNodeFromAttrInfo(node, attrInfo)
+                                                }
                                         }
                                 }
                         }
@@ -123,10 +146,11 @@ class CompactYangPlugin extends CompactPluginBase {
         @Override
         protected PluginResult processNodeAfter(BuilderNode node, Object opaque, Map pluginMap) throws BuilderException {
                 PluginResult retVal = PluginResult.NOT_ACCEPTED
-
-                if (node.attributes['nl']) {
-                        opaque.println('') // new line after processed
-                        retVal = PluginResult.PROCESSED_CONTINUE
+                if (node.name != YangBuilder.YANG_CMD) {
+                        if (node.attributes['nl'] || (opaque.getIndentLevel() in autoNlLevels)) {
+                                opaque.println('') // new line after processed
+                                retVal = PluginResult.PROCESSED_CONTINUE
+                        }
                 }
 
                 return retVal
