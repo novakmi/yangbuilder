@@ -15,7 +15,7 @@ plugin.declareCommonAliasesAndQuotes()
 moduleName = "ietf-interfaces"
 
 builder.module(moduleName) {
-        geninfo(file: "${moduleName}.groovy", time: true)
+        geninfo file: "${moduleName}.groovy", time: true
 
         yang_version 1, nlLevel: true
         namespace "urn:ietf:params:xml:ns:yang:ietf-interfaces"
@@ -64,11 +64,11 @@ builder.module(moduleName) {
                 configured interfaces.
                 '''
 
-        typedef("interface-state-ref", type: [val: "leafref", path: "/if:interfaces-state/if:interface/if:name"],
+        typedef "interface-state-ref", type: [val: "leafref", path: "/if:interfaces-state/if:interface/if:name"],
                 description: '''
                 This type is used by data models that need to reference
                 the operationally present interfaces.
-                ''')
+                '''
 
         identity "interface-type", description: "Base identity from which specific interface types are derived."
 
@@ -82,8 +82,8 @@ builder.module(moduleName) {
                 map['nl'] = 1
                 feature f.val, map
         }
-        container("interfaces", description: "Interface configuration parameters.") {
-                list("interface", key: "name") {
+        container "interfaces", description: "Interface configuration parameters.", {
+                list "interface", key: "name", {
                         description      '''The list of configured interfaces on the device.
 
                                             The operational state of an interface is available in the
@@ -97,7 +97,7 @@ builder.module(moduleName) {
                                             the configured interface is not instantiated in the
                                             /interfaces-state/interface list.'''
 
-                        leaf("name", type: "string", reference: "RFC 2863: The Interfaces Group MIB - ifName") {
+                        leaf "name", type: "string", reference: "RFC 2863: The Interfaces Group MIB - ifName", {
                                 description     '''The name of the interface.
 
                                                    A server implementation MAY map this leaf to the ifName
