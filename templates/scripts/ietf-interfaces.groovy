@@ -15,7 +15,7 @@ plugin.declareCommonAliasesAndQuotes()
 moduleName = "ietf-interfaces"
 
 builder.module(moduleName) {
-        geninfo file: "${moduleName}.groovy", time: true
+        geninfo file: "${moduleName}.groovy", time: true, cmt: "Example implementation of the RFC 7223 in the yangbuilder."
 
         yang_version 1, nlLevel: true
         namespace "urn:ietf:params:xml:ns:yang:ietf-interfaces"

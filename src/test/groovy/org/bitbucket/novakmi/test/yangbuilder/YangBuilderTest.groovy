@@ -467,6 +467,30 @@ multiline comment.
     }
 }
 ''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        geninfo(file: "test.groovy", time:false, cmt: "Example implementation.")
+                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+
+                        leaf('port') {
+                                type 'uint16'
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    /*
+    DO NOT EDIT!
+    This 'yang' file was generated with Groovy 'yangbuilder' (http://bitbucket.org/novakmi/yangbuilder)
+    Original file is test.groovy
+    Example implementation.
+    */
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    leaf port {
+        type uint16;
+    }
+}
+''')
                 log.trace("<== geninfoTest")
         }
 

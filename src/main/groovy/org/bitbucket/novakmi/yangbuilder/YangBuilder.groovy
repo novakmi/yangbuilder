@@ -136,8 +136,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 opaque.println("DO NOT EDIT!")
                                 indentIfNeeded(node, opaque)
                                 opaque.println("This 'yang' file was generated with Groovy 'yangbuilder' (http://bitbucket.org/novakmi/yangbuilder)")
-                                def file = node.attributes.file?:null
-                                def time = node.attributes.time?:null
+                                def file = node.attributes?.file
+                                def time = node.attributes?.time
                                 if (time && !(time instanceof GString)) {
                                         time = new Date().toString()
                                 }
@@ -155,6 +155,10 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 if (extraLine) {
                                         indentIfNeeded(node, opaque)
                                         opaque.println(extraLine)
+                                }
+                                if (node.attributes?.cmt) {
+                                        indentIfNeeded(node, opaque)
+                                        opaque.println(node.attributes?.cmt)
                                 }
                                 indentIfNeeded(node, opaque)
                                 opaque.println("*/")
