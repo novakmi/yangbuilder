@@ -176,9 +176,16 @@ class YangBuilderTest {
                                 }
                                 leaf("name") {
                                         type("string")
+                                        description '''This is loooooooong and even looooonger and ...........
+                                                       multiline dexription that should be nicely formatted according
+                                                       to new line and indented to next level. The lines should be trimmed as well'''
                                 }
                                 must("name = 'test'") {
                                         "error-message"('Name is not test!')
+                                        description '''This is loooooooong and even looooonger and ...........
+                                                       multiline dexription that should be nicely formatted according
+                                                       to new line and not indented to parent level (indent is kept to parent).
+                                                       The lines should be trimmed''', indent: false
                                 }
                         }
                 }
@@ -208,9 +215,18 @@ class YangBuilderTest {
         }
         leaf name {
             type string;
+            description
+                "This is loooooooong and even looooonger and ...........
+                 multiline dexription that should be nicely formatted according
+                 to new line and indented to next level. The lines should be trimmed as well";
         }
         must "name = 'test'" {
             error-message "Name is not test!";
+            description
+"This is loooooooong and even looooonger and ...........
+ multiline dexription that should be nicely formatted according
+ to new line and not indented to parent level (indent is kept to parent).
+ The lines should be trimmed";
         }
     }
 }

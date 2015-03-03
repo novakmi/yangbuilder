@@ -175,12 +175,16 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 //*************************
                                 //quotes - force quotes
                                 //noAutoQuotes - no quotes handling
-                                if (quotes == '' && node.name in quoteKeywords && (node.value instanceof String || node.value instanceof GString)) {
+                                def quotesFill = ''
+                                if (quotes == '' && node.name in quoteKeywords /*&& (node.value instanceof String || node.value instanceof GString)*/) {
                                         //if quote Keyword and quotes not disabled
                                         if (!node.attributes.noAutoQuotes) {
                                                 quotes = getQuotes(node.value)
+                                                quotesFill = ' '
                                         }
-                                        def quotesFill = ' ' * quotes.size()
+                                }
+                                if (node.value instanceof String || node.value instanceof GString) {
+                                        quotesFill *= quotes.size()
                                         def lines = node?.value?.split('\n')
                                         if (lines.size() == 1) {
                                                 opaque.print(" ${quotes}${lines[0]}${quotes}")
@@ -188,7 +192,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                 opaque.println("")
                                                 lines.eachWithIndex { l, i ->
                                                         indentIfNeeded(node, opaque)
-                                                        opaque.print("${opaque.indent}") //TODO indent private
+                                                        if (isIndent(node)) {
+                                                                opaque.print("${opaque.indent}") //TODO indent private
+                                                        }
                                                         if (i == 0) {
                                                                 opaque.print("${quotes}")
                                                         } else {
