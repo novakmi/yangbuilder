@@ -1223,4 +1223,101 @@ class CompactYangPluginTest {
                 log.trace("<== ygnTest")
         }
 
+        @Test(groups = ["basic"])
+        public void pnlAndNlLevelTest() {
+                log.trace("==> pnlAndNlLevelTest")
+                CompactYangPlugin plugin = new CompactYangPlugin()
+                def builder = new YangBuilder(4, [plugin]) // new instance/use indent 4
+
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test",nlLevel: true
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        'import'("ietf-inet-types", prefix: "inet")
+                        list("ports", key: "name") {
+                                leaf("name", type: "string", nlLevel: false, pnlLevel: true) {
+                                        description "myDescr"
+                                }
+                                list("ports2", key: "name") {
+                                        leaf("name", type: "string", nlLevel: false, pnlLevel: true) {
+                                                description "myDescr"
+                                        }
+                                        leaf("port1", type: "int32", pnlLevel: false)
+                                }
+                                leaf("port1", type: "int32", pnlLevel: false)
+
+                        }
+                        leaf("text", type: "string", _ygn_my_attr: "attr", nlLevel: false)
+                }
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    list ports {
+        key name;
+
+        leaf name {
+            type string;
+            description myDescr;
+        }
+
+        list ports2 {
+            key name;
+
+            leaf name {
+                type string;
+                description myDescr;
+            }
+            leaf port1 {
+                type int32;
+            }
+        }
+        leaf port1 {
+            type int32;
+        }
+    }
+
+    leaf text {
+        type string;
+    }
+}
+''')
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test"
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        'import'("ietf-inet-types", prefix: "inet")
+                        container("my_text") {
+                                leaf("text", type: "string", _ygn_my_attr: "attr")
+                                my_leaf(type: "string", description: "not in yang", _ygn: true)
+                        }
+                        container("not_in_yang", _ygn: true)
+                        container("not_in_yang2", _ygn: true) {
+                                container("in_yang", presence: true)  //child nodes not ignored
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    import ietf-inet-types {
+        prefix inet;
+    }
+    container my_text {
+        leaf text {
+            type string;
+        }
+    }
+    container in_yang {
+        presence true;
+    }
+}
+''')
+                log.trace("<== pnlAndNlLevelTest")
+        }
+
 }
