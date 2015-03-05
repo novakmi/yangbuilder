@@ -12,7 +12,7 @@ def plugin = new CompactYangPlugin()
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin)
 plugin.declareCommonAliasesAndQuotes()
 
-moduleName = "ietf-interfaces"
+moduleName = "ietf-interfaces-1"
 
 builder.module(moduleName) {
         geninfo file: "${moduleName}.groovy", time: true, cmt: "Example implementation of the RFC 7223 in the yangbuilder."
