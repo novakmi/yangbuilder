@@ -181,7 +181,7 @@ builder.module(moduleName) {
                         leaf "type", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifType", {
                                 type "identityref", base: "interface-type";
 
-                                description '''"The type of the interface.
+                                description '''The type of the interface.
 
                                 When an interface entry is created, a server MAY
                                 initialize the type leaf with a valid value, e.g., if it
@@ -355,7 +355,7 @@ builder.module(moduleName) {
                                                         'discontinuity-time'.''';
                                 }
 
-                                leaf "in-multicast-pkts", type: "yang:counter64", refernce: "RFC 2863: The Interfaces Group MIB - ifHCInMulticastPkts", {
+                                leaf "in-multicast-pkts", type: "yang:counter64", reference: "RFC 2863: The Interfaces Group MIB - ifHCInMulticastPkts", {
                                         description '''The number of packets, delivered by this sub-layer to a
                                                         higher (sub-)layer, that were addressed to a multicast
                                                         address at this sub-layer.  For a MAC-layer protocol,
