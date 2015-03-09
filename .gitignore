@@ -3,7 +3,6 @@
 *.err
 *.log
 *.testng
-*.yang
 .gradle
 build
 install
