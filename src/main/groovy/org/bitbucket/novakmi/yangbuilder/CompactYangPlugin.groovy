@@ -18,7 +18,7 @@ class CompactYangPlugin extends CompactPluginBase {
 
 
         private boolean skipAttr(final String name) {
-                def retVal = (name in ["pnl", "nl", "nlLevel", "pnlLevel", "indent", "cmt"])
+                def retVal = (name in ["pnl", "nl", "nlLevel", "pnlLevel", "indent", "cmt", "noAutoQuotes", "quotes"])
                 retVal |=  (name.startsWith("${YangBuilder._YGN}_")) //if attribute name starts with '_ygn_', skip this attribute from processing
                 return retVal
         }
