@@ -40,7 +40,7 @@ builder.module(moduleName) {
                              <mailto:j.schoenwaelder@jacobs-university.de>
 
                    Editor:   Martin Bjorklund
-                             <mailto:mbj@tail-f.com>''';
+                             <mailto:mbj@tail-f.com>'''
 
         description '''
         This module contains a collection of YANG definitions for
@@ -60,7 +60,7 @@ builder.module(moduleName) {
         the RFC itself for full legal notices.
         '''
 
-        revision "2014-05-08", description: "Initial revision.", reference: "RFC 7223: A YANG Data Model for Interface Management";
+        revision "2014-05-08", description: "Initial revision.", reference: "RFC 7223: A YANG Data Model for Interface Management"
 
 
         typedef "interface-ref", type: [val: "leafref", path: "/if:interfaces/if:interface/if:name"], // element subtree written as mup
@@ -74,19 +74,19 @@ builder.module(moduleName) {
         cmt("Identities", inline: false)
         identity "interface-type", description: "Base identity from which specific interface types are derived."
 
-        cmt("Features", inline: false);
+        cmt("Features", inline: false)
         feature "arbitrary-names", description: '''This feature indicates that the device allows user-controlled
                                                     interfaces to be named arbitrarily.'''
 
         feature "pre-provisioning", description: '''This feature indicates that the device supports
                                                     pre-provisioning of interface configuration, i.e., it is
                                                     possible to configure an interface whose physical interface
-                                                    hardware is not present on the device.''';
+                                                    hardware is not present on the device.'''
         feature "if-mib", description: "This feature indicates that the device implements the IF-MIB.",
-                reference: "RFC 2863: The Interfaces Group MIB";
+                reference: "RFC 2863: The Interfaces Group MIB"
 
 
-        cmt("Configuration data nodes", inline: false);
+        cmt("Configuration data nodes", inline: false)
         container "interfaces", description: "Interface configuration parameters.", {
 
                 list "interface", key: "name",
