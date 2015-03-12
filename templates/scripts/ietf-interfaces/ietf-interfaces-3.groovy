@@ -16,89 +16,10 @@ moduleName = "ietf-interfaces-3"
 
 def enume(el) { [val: "enumeration", elems: el.collect { ["enum", it] }] }
 
-builder.module(moduleName) {
-        geninfo file: "${moduleName}.groovy", time: true,
-                cmt: '''
-                        Example implementation of the RFC 7223 in the yangbuilder in the syntax similar to the Yang, with minimal curly brackets.
-                        See https://tools.ietf.org/html/rfc7223'''
 
-        //pnl:true - add one \n before this element, nlLevel: true - for this indent level, add \n after each closing }
-        yang_version 1, pnl: true, nlLevel: true // semicolons are not needed
-
-        namespace "urn:ietf:params:xml:ns:yang:ietf-interfaces"
-        prefix "if"
-
-        import_ "ietf-yang-types", prefix: "yang"
-
-        organization "IETF NETMOD (NETCONF Data Modeling Language) Working Group"
-
-        contact '''WG Web:   <http://tools.ietf.org/wg/netmod/>
-                   WG List:  <mailto:netmod@ietf.org>
-
-                   wG Chair: Thomas Nadeau
-                             <mailto:tnadeau@lucidvision.com>
-
-                   WG Chair: Juergen Schoenwaelder
-                             <mailto:j.schoenwaelder@jacobs-university.de>
-
-                   Editor:   Martin Bjorklund
-                             <mailto:mbj@tail-f.com>''';
-
-        description '''
-        This module contains a collection of YANG definitions for
-        managing network interfaces.
-
-        Copyright (c) 2014 IETF Trust and the persons identified as
-        authors of the code.  All rights reserved.
-
-                Redistribution and use in source and binary forms, with or
-        without modification, is permitted pursuant to, and subject
-        to the license terms contained in, the Simplified BSD License
-        set forth in Section 4.c of the IETF Trust's Legal Provisions
-        Relating to IETF Documents
-        (http://trustee.ietf.org/license-info).
-
-        This version of this YANG module is part of RFC 7223; see
-        the RFC itself for full legal notices.
-        '''
-
-        revision "2014-05-08", description: "Initial revision.", reference: "RFC 7223: A YANG Data Model for Interface Management";
-
-        // use closure for quick reuse
-        def lfref_typedef = { v, p, d = "configured" ->
-                typedef v, type: [val: "leafref", path: p], description:
-                        '''This type is used by data models that need to reference
-                ''' + "${d} interfaces."
-        }
-        lfref_typedef("interface-ref", "/if:interfaces/if:interface/if:name") // call with brackets
-        lfref_typedef "interface-state-ref", "/if:interfaces-state/if:interface/if:name", "the operationally present"
-        //or without brackets
-
-        cmt("Identities", inline: false)
-        identity "interface-type", description: "Base identity from which specific interface types are derived."
-
-        cmt("Features", inline: false);
-
-        def dev_feature = { name, descr, ref = null ->
-                feature name, description: "This feature indicates that the device ${descr}", {
-                        if (ref) {
-                                reference ref
-                        }
-                }
-        }
-
-        dev_feature "arbitrary-names", '''allows user-controlled
-                                          interfaces to be named arbitrarily.'''
-
-        dev_feature "pre-provisioning", '''supports
-                                      pre-provisioning of interface configuration, i.e., it is
-                                      possible to configure an interface whose physical interface
-                                      hardware is not present on the device.'''
-
-        dev_feature "if-mib", "implements the IF-MIB.", "RFC 2863: The Interfaces Group MIB";
-
-        cmt("Configuration data nodes", inline: false);
-        container "interfaces", description: "Interface configuration parameters.", {
+def makeConfiguration(builder) {
+        builder.cmt "Configuration data nodes", inline: false  // note: in function each top element must be witten with "builder....."
+        builder.container "interfaces", description: "Interface configuration parameters.", {
 
                 // pnl_ attribute - add \n before attribute
                 list "interface", key: "name", pnl_description:
@@ -215,9 +136,11 @@ builder.module(moduleName) {
                                              ifLinkUpDownTrapEnable'''
                 }
         }
+}
 
-        cmt("Operational state data nodes", inline: false)
-        container "interfaces-state", config: false, description: "Data nodes for the operational state of interfaces.", {
+def makeOperational(builder) {
+        builder.cmt("Operational state data nodes", inline: false)
+        builder.container "interfaces-state", config: false, description: "Data nodes for the operational state of interfaces.", {
                 list "interface", key: "name", description: '''The list of interfaces on the device.
 
                                                                 System-controlled interfaces created by the system are
@@ -400,6 +323,95 @@ builder.module(moduleName) {
                         }
                 }
         }
+}
+
+
+builder.module(moduleName) {
+        geninfo file: "${moduleName}.groovy", time: true,
+                cmt: '''
+                        Example implementation of the RFC 7223 in the yangbuilder in the syntax similar to the Yang, with minimal curly brackets.
+                        See https://tools.ietf.org/html/rfc7223'''
+
+        //pnl:true - add one \n before this element, nlLevel: true - for this indent level, add \n after each closing }
+        yang_version 1, pnl: true, nlLevel: true // semicolons are not needed
+
+        namespace "urn:ietf:params:xml:ns:yang:ietf-interfaces"
+        prefix "if"
+
+        import_ "ietf-yang-types", prefix: "yang"
+
+        def header = {
+                organization "IETF NETMOD (NETCONF Data Modeling Language) Working Group"
+
+                contact '''WG Web:   <http://tools.ietf.org/wg/netmod/>
+                   WG List:  <mailto:netmod@ietf.org>
+
+                   wG Chair: Thomas Nadeau
+                             <mailto:tnadeau@lucidvision.com>
+
+                   WG Chair: Juergen Schoenwaelder
+                             <mailto:j.schoenwaelder@jacobs-university.de>
+
+                   Editor:   Martin Bjorklund
+                             <mailto:mbj@tail-f.com>'''
+
+                description '''
+        This module contains a collection of YANG definitions for
+        managing network interfaces.
+
+        Copyright (c) 2014 IETF Trust and the persons identified as
+        authors of the code.  All rights reserved.
+
+                Redistribution and use in source and binary forms, with or
+        without modification, is permitted pursuant to, and subject
+        to the license terms contained in, the Simplified BSD License
+        set forth in Section 4.c of the IETF Trust's Legal Provisions
+        Relating to IETF Documents
+        (http://trustee.ietf.org/license-info).
+
+        This version of this YANG module is part of RFC 7223; see
+        the RFC itself for full legal notices.
+        '''
+
+                revision "2014-05-08", description: "Initial revision.", reference: "RFC 7223: A YANG Data Model for Interface Management"
+
+                // use closure for quick reuse
+                def lfref_typedef = { v, p, d = "configured" ->
+                        typedef v, type: [val: "leafref", path: p], description:
+                                '''This type is used by data models that need to reference
+                ''' + "${d} interfaces."
+                }
+                lfref_typedef("interface-ref", "/if:interfaces/if:interface/if:name") // call with brackets
+                lfref_typedef "interface-state-ref", "/if:interfaces-state/if:interface/if:name", "the operationally present"
+                //or without brackets
+
+                cmt("Identities", inline: false)
+                identity "interface-type", description: "Base identity from which specific interface types are derived."
+
+                cmt("Features", inline: false)
+
+                def dev_feature = { name, descr, ref = null ->
+                        feature name, description: "This feature indicates that the device ${descr}", {
+                                if (ref) {
+                                        reference ref
+                                }
+                        }
+                }
+
+                dev_feature "arbitrary-names", '''allows user-controlled
+                                          interfaces to be named arbitrarily.'''
+
+                dev_feature "pre-provisioning", '''supports
+                                      pre-provisioning of interface configuration, i.e., it is
+                                      possible to configure an interface whose physical interface
+                                      hardware is not present on the device.'''
+
+                dev_feature "if-mib", "implements the IF-MIB.", "RFC 2863: The Interfaces Group MIB"
+        }
+
+        header() //block of code can be placed into closure
+        this.makeConfiguration(builder) // or even seprate function (Note: this. not needed)
+        this.makeOperational(builder)
 }
 
 println builder.getText()
