@@ -18,7 +18,7 @@ def enume(el) { [val: "enumeration", elems: el.collect { ["enum", it] }] }
 
 
 def makeConfiguration(builder) {
-        builder.cmt "Configuration data nodes", inline: false  // note: in function each top element must be witten with "builder....."
+        builder.cmt "Configuration data nodes", inline: false  // note: in function each top element must be written with "builder....."
         builder.container "interfaces", description: "Interface configuration parameters.", {
 
                 // pnl_ attribute - add \n before attribute
@@ -139,16 +139,17 @@ def makeConfiguration(builder) {
 }
 
 def makeOperational(builder) {
-        builder.cmt("Operational state data nodes", inline: false)
-        builder.container "interfaces-state", config: false, description: "Data nodes for the operational state of interfaces.", {
-                list "interface", key: "name", description: '''The list of interfaces on the device.
+        builder.operation(_ygn:true) { //any node with attribute '_ygn' is  ignored
+                cmt("Operational state data nodes", inline: false) //no need to write 'builder.' as this node is child node now
+                container "interfaces-state", config: false, description: "Data nodes for the operational state of interfaces.", {
+                        list "interface", key: "name", description: '''The list of interfaces on the device.
 
                                                                 System-controlled interfaces created by the system are
                                                                 always present in this list, whether they are configured or
                                                                 not.''', {
 
-                        leaf "name", type: "string", reference: "RFC 2863: The Interfaces Group MIB - ifName",
-                                description: '''The name of the interface.
+                                leaf "name", type: "string", reference: "RFC 2863: The Interfaces Group MIB - ifName",
+                                        description: '''The name of the interface.
 
                                 A server implementation MAY map this leaf to the ifName
                                 MIB object.  Such an implementation needs to use some
@@ -156,43 +157,43 @@ def makeOperational(builder) {
                                 allowed between this leaf and ifName.  The definition of
                                 such a mechanism is outside the scope of this document.'''
 
-                        leaf "type", mandatory: true, description: "The type of the interface.", reference: "RFC 2863: The Interfaces Group MIB - ifType",
-                                type: [val: "identityref", base: "interface-type"]
+                                leaf "type", mandatory: true, description: "The type of the interface.", reference: "RFC 2863: The Interfaces Group MIB - ifType",
+                                        type: [val: "identityref", base: "interface-type"]
 
-                        leaf "admin-status", if_feature: "if-mib", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifAdminStatus",
-                                type: enume([[val: "up", value: 1, description: "Ready to pass packets."],
-                                             [val: "down", value: 2, description: "Not ready to pass packets and not in some test mode."],
-                                             [val: "testing", value: 3, description: "In some test mode."]]),
-                                description: '''The desired state of the interface.
+                                leaf "admin-status", if_feature: "if-mib", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifAdminStatus",
+                                        type: enume([[val: "up", value: 1, description: "Ready to pass packets."],
+                                                     [val: "down", value: 2, description: "Not ready to pass packets and not in some test mode."],
+                                                     [val: "testing", value: 3, description: "In some test mode."]]),
+                                        description: '''The desired state of the interface.
 
                                                     This leaf has the same read semantics as ifAdminStatus.'''
 
-                        leaf "oper-status", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifOperStatus",
-                                type: enume([[val: "up", value: 1, description: "Ready to pass packets."],
-                                             [val: "down", value: 2, description: "The interface does not pass any packets."],
-                                             [val: "testing", value: 3, description: '''In some test mode.  No operational packets can
+                                leaf "oper-status", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifOperStatus",
+                                        type: enume([[val: "up", value: 1, description: "Ready to pass packets."],
+                                                     [val: "down", value: 2, description: "The interface does not pass any packets."],
+                                                     [val: "testing", value: 3, description: '''In some test mode.  No operational packets can
                                                                                    be passed.'''],
-                                             [val: "unknown", value: 4, description: "Status cannot be determined for some reason."],
-                                             [val: "dormant", value: 5, description: "Waiting for some external event."],
-                                             [val: "not-present", value: 6, description: "Some component (typically hardware) is missing."],
-                                             [val: "lower-layer-down", value: 7, description: "Down due to state of lower-layer interface(s)."]]),
-                                description: '''The current operational state of the interface.
+                                                     [val: "unknown", value: 4, description: "Status cannot be determined for some reason."],
+                                                     [val: "dormant", value: 5, description: "Waiting for some external event."],
+                                                     [val: "not-present", value: 6, description: "Some component (typically hardware) is missing."],
+                                                     [val: "lower-layer-down", value: 7, description: "Down due to state of lower-layer interface(s)."]]),
+                                        description: '''The current operational state of the interface.
 
                                                 This leaf has the same semantics as ifOperStatus.'''
 
-                        leaf "last-change", type: "yang:date-and-time", reference: "RFC 2863: The Interfaces Group MIB - ifLastChange",
-                                description: '''The time the interface entered its current operational
+                                leaf "last-change", type: "yang:date-and-time", reference: "RFC 2863: The Interfaces Group MIB - ifLastChange",
+                                        description: '''The time the interface entered its current operational
                                                 state.  If the current state was entered prior to the
                                                 last re-initialization of the local network management
                                                 subsystem, then this node is not present.'''
 
-                        leaf "if-index", if_feature: "if-mib", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifIndex",
-                                type: [val: "int32", range: "1..2147483647"],
-                                description: '''The ifIndex value for the ifEntry represented by this
+                                leaf "if-index", if_feature: "if-mib", mandatory: true, reference: "RFC 2863: The Interfaces Group MIB - ifIndex",
+                                        type: [val: "int32", range: "1..2147483647"],
+                                        description: '''The ifIndex value for the ifEntry represented by this
                                                interface.'''
 
-                        leaf "phys-address", type: "yang:phys-address", reference: "RFC 2863: The Interfaces Group MIB - ifPhysAddress",
-                                description: '''The interface's address at its protocol sub-layer.  For
+                                leaf "phys-address", type: "yang:phys-address", reference: "RFC 2863: The Interfaces Group MIB - ifPhysAddress",
+                                        description: '''The interface's address at its protocol sub-layer.  For
                                                example, for an 802.x interface, this object normally
                                                contains a Media Access Control (MAC) address.  The
                                                interface's media-specific modules must define the bit
@@ -200,71 +201,71 @@ def makeOperational(builder) {
                                                object.  For interfaces that do not have such an address
                                                (e.g., a serial line), this node is not present.'''
 
-                        leaf_list "higher-layer-if", type: "interface-state-ref", reference: "RFC 2863: The Interfaces Group MIB - ifStackTable",
-                                description: '''A list of references to interfaces layered on top of this
+                                leaf_list "higher-layer-if", type: "interface-state-ref", reference: "RFC 2863: The Interfaces Group MIB - ifStackTable",
+                                        description: '''A list of references to interfaces layered on top of this
                                                interface.'''
 
-                        leaf_list "lower-layer-if", type: "interface-state-ref", reference: "RFC 2863: The Interfaces Group MIB - ifStackTable",
-                                description: '''A list of references to interfaces layered underneath this
+                                leaf_list "lower-layer-if", type: "interface-state-ref", reference: "RFC 2863: The Interfaces Group MIB - ifStackTable",
+                                        description: '''A list of references to interfaces layered underneath this
                                                interface.'''
 
-                        leaf "speed", type: "yang:gauge64", units: "bits/second", reference: "RFC 2863: The Interfaces Group MIB - ifSpeed, ifHighSpeed",
-                                description: '''An estimate of the interface's current bandwidth in bits
+                                leaf "speed", type: "yang:gauge64", units: "bits/second", reference: "RFC 2863: The Interfaces Group MIB - ifSpeed, ifHighSpeed",
+                                        description: '''An estimate of the interface's current bandwidth in bits
                                                per second.  For interfaces that do not vary in
                                                bandwidth or for those where no accurate estimation can
                                                be made, this node should contain the nominal bandwidth.
                                                For interfaces that have no concept of bandwidth, this
                                                node is not present.'''
 
-                        container "statistics", description: "A collection of interface-related statistics objects.", {
+                                container "statistics", description: "A collection of interface-related statistics objects.", {
 
-                                leaf "discontinuity-time", type: "yang:date-and-time", mandatory: true,
-                                        description: '''The time on the most recent occasion at which any one or
+                                        leaf "discontinuity-time", type: "yang:date-and-time", mandatory: true,
+                                                description: '''The time on the most recent occasion at which any one or
                                                         more of this interface's counters suffered a
                                                         discontinuity.  If no such discontinuities have occurred
                                                         since the last re-initialization of the local management
                                                         subsystem, then this node contains the time the local
                                                         management subsystem re-initialized itself.'''
 
-                                def stat_leaf = { name, yang_type, ref, descr ->
-                                        leaf name, type: "yang:${yang_type}", reference: "RFC 2863: The Interfaces Group MIB - ${ref}",
-                                                description: descr + '''
+                                        def stat_leaf = { name, yang_type, ref, descr ->
+                                                leaf name, type: "yang:${yang_type}", reference: "RFC 2863: The Interfaces Group MIB - ${ref}",
+                                                        description: descr + '''
 
                                                         Discontinuities in the value of this counter can occur
                                                         at re-initialization of the management system, and at
                                                         other times as indicated by the value of
                                                         'discontinuity-time'.'''
-                                }
+                                        }
 
-                                stat_leaf "in-octets", "counter64", "ifHCInOctets",
-                                        '''The total number of octets received on the interface,
+                                        stat_leaf "in-octets", "counter64", "ifHCInOctets",
+                                                '''The total number of octets received on the interface,
                                            including framing characters.'''
 
-                                stat_leaf "in-unicast-pkts", "counter64", "ifHCInUcastPkts",
-                                        '''The number of packets, delivered by this sub-layer to a
+                                        stat_leaf "in-unicast-pkts", "counter64", "ifHCInUcastPkts",
+                                                '''The number of packets, delivered by this sub-layer to a
                                              higher (sub-)layer, that were not addressed to a
                                              multicast or broadcast address at this sub-layer.'''
 
-                                stat_leaf "in-broadcast-pkts", "counter64", "ifHCInBroadcastPkts",
-                                        '''The number of packets, delivered by this sub-layer to a
+                                        stat_leaf "in-broadcast-pkts", "counter64", "ifHCInBroadcastPkts",
+                                                '''The number of packets, delivered by this sub-layer to a
                                             higher (sub-)layer, that were addressed to a broadcast
                                             address at this sub-layer.'''
 
-                                stat_leaf "in-multicast-pkts", "counter64", "ifHCInMulticastPkts",
-                                        '''The number of packets, delivered by this sub-layer to a
+                                        stat_leaf "in-multicast-pkts", "counter64", "ifHCInMulticastPkts",
+                                                '''The number of packets, delivered by this sub-layer to a
                                            higher (sub-)layer, that were addressed to a multicast
                                            address at this sub-layer.  For a MAC-layer protocol,
                                            this includes both Group and Functional addresses.'''
 
-                                stat_leaf "in-discards", "counter32", "ifInDiscards",
-                                        '''The number of inbound packets that were chosen to be
+                                        stat_leaf "in-discards", "counter32", "ifInDiscards",
+                                                '''The number of inbound packets that were chosen to be
                                            discarded even though no errors had been detected to
                                            prevent their being deliverable to a higher-layer
                                            protocol.  One possible reason for discarding such a
                                            packet could be to free up buffer space.'''
 
-                                stat_leaf "in-errors", "counter32", "ifInErrors",
-                                        '''For packet-oriented interfaces, the number of inbound
+                                        stat_leaf "in-errors", "counter32", "ifInErrors",
+                                                '''For packet-oriented interfaces, the number of inbound
                                            packets that contained errors preventing them from being
                                            deliverable to a higher-layer protocol.  For character-
                                            oriented or fixed-length interfaces, the number of
@@ -272,8 +273,8 @@ def makeOperational(builder) {
                                            preventing them from being deliverable to a higher-layer
                                            protocol.'''
 
-                                stat_leaf "in-unknown-protos", "counter32", "ifInUnknownProtos",
-                                        '''For packet-oriented interfaces, the number of packets
+                                        stat_leaf "in-unknown-protos", "counter32", "ifInUnknownProtos",
+                                                '''For packet-oriented interfaces, the number of packets
                                            received via the interface that were discarded because
                                            of an unknown or unsupported protocol.  For
                                            character-oriented or fixed-length interfaces that
@@ -283,43 +284,44 @@ def makeOperational(builder) {
                                            For any interface that does not support protocol
                                            multiplexing, this counter is not present.'''
 
-                                stat_leaf "out-octets", "counter64", "ifHCOutOctets",
-                                        '''The total number of octets transmitted out of the
+                                        stat_leaf "out-octets", "counter64", "ifHCOutOctets",
+                                                '''The total number of octets transmitted out of the
                                            interface, including framing characters.'''
 
-                                stat_leaf "out-unicast-pkts", "counter64", "ifHCOutUcastPkts",
-                                        '''The total number of packets that higher-level protocols
+                                        stat_leaf "out-unicast-pkts", "counter64", "ifHCOutUcastPkts",
+                                                '''The total number of packets that higher-level protocols
                                            requested be transmitted, and that were not addressed
                                            to a multicast or broadcast address at this sub-layer,
                                            including those that were discarded or not sent.'''
 
-                                stat_leaf "out-broadcast-pkts", "counter64", "ifHCOutBroadcastPkts",
-                                        '''The total number of packets that higher-level protocols
+                                        stat_leaf "out-broadcast-pkts", "counter64", "ifHCOutBroadcastPkts",
+                                                '''The total number of packets that higher-level protocols
                                             requested be transmitted, and that were addressed to a
                                             broadcast address at this sub-layer, including those
                                             that were discarded or not sent.'''
 
-                                stat_leaf "out-multicast-pkts", "counter64", "ifHCOutMulticastPkts",
-                                        '''The total number of packets that higher-level protocols
+                                        stat_leaf "out-multicast-pkts", "counter64", "ifHCOutMulticastPkts",
+                                                '''The total number of packets that higher-level protocols
                                            requested be transmitted, and that were addressed to a
                                            multicast address at this sub-layer, including those
                                            that were discarded or not sent.  For a MAC-layer
                                            protocol, this includes both Group and Functional
                                            addresses.'''
 
-                                stat_leaf "out-discards", "counter32", "ifOutDiscards",
-                                        '''The number of outbound packets that were chosen to be
+                                        stat_leaf "out-discards", "counter32", "ifOutDiscards",
+                                                '''The number of outbound packets that were chosen to be
                                            discarded even though no errors had been detected to
                                            prevent their being transmitted.  One possible reason
                                            for discarding such a packet could be to free up buffer
                                            space.'''
 
-                                stat_leaf "out-errors", "counter32", "ifOutErrors",
-                                        '''For packet-oriented interfaces, the number of outbound
+                                        stat_leaf "out-errors", "counter32", "ifOutErrors",
+                                                '''For packet-oriented interfaces, the number of outbound
                                            packets that could not be transmitted because of errors.
                                            For character-oriented or fixed-length interfaces, the
                                            number of outbound transmission units that could not be
                                            transmitted because of errors.'''
+                                }
                         }
                 }
         }
