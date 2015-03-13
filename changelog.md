@@ -1,8 +1,9 @@
 #Yangbuilder change log
 
-* 1.1.0 2015-02-08 preparation
+* 1.1.0 2015-03-14 preparation
 
     * updated dependencies
+    * updated copyright
     * examples updated to the new jcenter repository
     * documentation cleaned during `clean` gradle task
     * Issue #1 - `CompactYangPlugin` - support for more attributes
@@ -11,6 +12,11 @@
     * Created `CompactPluginBase` calss
     * Issue #5 - `CompactYangPlugin` - support to declare common aliases (provided plugin is registered to the builder)
     * Issue #2 - minimalistic `TailfCompactYangPlugin` - support for `tailf:info` and `tailf:info-description`
+    * refactoring of `CompactYangPluging` - new support for `enums`, `elems`, attributes (almost any attribute is now accepted)
+    * `YangBuilder` - nodes with attribute `_ygn` and attributes with prefix `_ygn_` are ignored from processing
+    * `CompactYangPluging` - support for `autoPnlLevel` and `autoNlLevel` attributes
+    * better handling of multiline 'quoted' elements (indentation, trim)
+    * added examples -  RFC 7223  `ietf-interfaces` - 3 variants
 
 * 1.0.0 2013-03-08
     * updated dependencies to groovy 2.1.1, nodebuilder-0.8.0
