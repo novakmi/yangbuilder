@@ -571,6 +571,9 @@ multiline comment.
                                         presence(true)
                                 }
                         }
+                        leaf("after_ygn") { // check indentation is not influenced by _ygn node
+                            type("uint32")
+                        }
                 }
                 Assert.assertEquals(builder.getText(), '''module test {
     namespace "http://novakmi.bitbucket.org/test";
@@ -585,6 +588,9 @@ multiline comment.
     }
     container in_yang {
         presence true;
+    }
+    leaf after_ygn {
+        type uint32;
     }
 }
 ''')

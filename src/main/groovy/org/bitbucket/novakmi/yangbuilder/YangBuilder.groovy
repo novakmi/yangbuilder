@@ -269,6 +269,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                         if (!(node.attributes[_YGN])) {
                                 opaque.printIndent()
                                 opaque.println("}") // block closing bracket
+                        } else {
+                            opaque.incrementIndent()
                         }
                 } else {
                         opaque.setIndentLevel(0) //reset indent
