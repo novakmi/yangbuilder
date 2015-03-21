@@ -386,93 +386,6 @@ TBD footnoteref:[future]
 TBD footnoteref:[future]
 ////
 
-== <<yangbuilder>> interface methods
-
-
-=== <<nodebuilder>> interface
-
-The <<yangbuilder>> inherits interface methods from the <<nodebuilder>>. 
-
-==== <<nodebuilder>> builder interface
-
-===== Methods from `TreeNodeBuilder`
-
-* `declareAlias` declare alias for keyword; e.g. can be used to declare aliases for  <<yang>> keywords, which are also <<groovy>> keywords 
-* `reset` - reset the content of the builder (calls also `reset` on all registerted plugins)
-* `findNode` - return first `BuilderNode` with given name
-* `getRootNode` - return `BuilderNode` reference to the root node
-
-===== Methods from `PluginTreeNodeBuilder`
-
-* `registerPlugin`
-* `unregisterPlugin`
-* `getNumberOfRegisteredPlugins`
-
-===== Methods from `TextPluginTreeNodeBuilder`
-
-* `getText` return textual representation of the <<yang>> data model
-* `writeToFile` write textual representation of the <<yang>> data model to the file
-
-[source,java]
----------
-builder.declareAlias('import_', 'import') // declare 'import' keyword alias 'import_'
-builder.'import'('my-module1') //groovy keyword has to be surrounded with quotes
-builder.import_('my-module2') //or alias can be used
----------
-
-==== <<nodebuilder>> node interface
-
-From `BuilderNode`
-
-===== Attributes from `BuilderNode`
-
-* `name`
-* `parent`
-* `attributes`
-* `value`
-* `children`
-
-===== Methods from `BuilderNode`
-
-* `getNodePath`
-* `shallowCopy`
-
-==== <<nodebuilder>>  plugin interface
-
-===== Methods from `NodeBuilderPlugin`
-
-* `reset`
-* `setMyBuilder`
-* `getMyBuilder`
-
-=== <<yangbuilder>> interface
-
-Following interface methods are added by the <<yangbuilder>> itself.
-
-* `getYangName` returns the name of first `module` or `submodule` element
-
-[source,java]
----------
-builder.getYangName()
----------
-
-* `getPrefixName` returns the name of `prefix` of the first `module` or `submodule` (`belongs-to` prefix)
-
-[source,java]
----------
-builder.getPrefixName()
----------
-
-See `YangBuilderTest.groovy` file (`src/test` directory), tests `yangNameTest`, `prefixNameTest` for examples of usage.
-
-
-* `addQuoteKeywords` specify additional keywords for <<quotes,special quotes handling>>
-
-[source,java]
----------
-builder.addQuoteKeywords('my-annotation')
----------
-
 == Build in attributes
 
 In the <<yangbuilder>>, each element can have following attributes:
@@ -641,3 +554,84 @@ the <<yang>> model, in which all `groupings` are expanded (resolved).
 See `GroupingResolverPlugin` for example of plugin implementation and
 `GroupingResolverPluginTest.groovy` for plugin usage examples.
 
+== The <<groovy>> interface 
+
+=== <<nodebuilder>> <<groovy>> interface
+
+The <<yangbuilder>> inherits interface methods from the <<nodebuilder>>. 
+
+==== <<nodebuilder>> builder interface
+
+===== Methods from the `TreeNodeBuilder`
+
+* `declareAlias` declare alias for keyword; e.g. can be used to declare aliases for  <<yang>> keywords, which are also <<groovy>> keywords 
+* `reset` - reset the content of the builder (calls also `reset` on all registerted plugins)
+* `findNode` - return first `BuilderNode` with given name
+* `getRootNode` - return `BuilderNode` reference to the root node
+
+===== Methods from the `PluginTreeNodeBuilder`
+
+* `registerPlugin`
+* `unregisterPlugin`
+* `getNumberOfRegisteredPlugins`
+
+===== Methods from the `TextPluginTreeNodeBuilder`
+
+* `getText` return textual representation of the <<yang>> data model
+* `writeToFile` write textual representation of the <<yang>> data model to the file
+
+[source,java]
+---------
+builder.declareAlias('import_', 'import') // declare 'import' keyword alias 'import_'
+builder.'import'('my-module1') //groovy keyword has to be surrounded with quotes
+builder.import_('my-module2') //or alias can be used
+---------
+
+===== Attributes from the `BuilderNode`
+
+* `name`
+* `parent`
+* `attributes`
+* `value`
+* `children`
+
+===== Methods from the `BuilderNode`
+
+* `getNodePath`
+* `shallowCopy`
+
+===== Methods from the`NodeBuilderPlugin`
+
+* `reset`
+* `setMyBuilder`
+* `getMyBuilder`
+
+=== <<yangbuilder>> <<groovy>> interface
+
+==== Methods from the the `YangBuilder`
+
+* `getYangName` returns the name of first `module` or `submodule` element
+* `getPrefixName`
+* `addQuoteKeywords`
+
+[source,java]
+---------
+builder.getYangName()
+---------
+
+* `getPrefixName` returns the name of `prefix` of the first `module` or `submodule` (`belongs-to` prefix)
+
+[source,java]
+---------
+builder.getPrefixName()
+---------
+
+See `YangBuilderTest.groovy` file (`src/test` directory), tests `yangNameTest`, `prefixNameTest` for examples of usage.
+
+
+* `addQuoteKeywords` specify additional keywords for <<quotes,special quotes handling>>
+
+[source,java]
+---------
+builder.addQuoteKeywords('my-annotation')
+---------
