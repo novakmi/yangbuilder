@@ -53,7 +53,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          * @see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
          */
 
-        def getQuotes(txt) {
+        private def getQuotes(txt) {
                 def retVal = ''
                 while (1) {
                         if (((txt instanceof String) || (txt instanceof GString)) && txt?.size() > 1) {
