@@ -169,6 +169,7 @@ class CompactYangPlugin extends CompactPluginBase {
                         getMyBuilder().declareAlias("default_", "default")
                         getMyBuilder().declareAlias("import_", "import")
                         getMyBuilder().declareAlias("enum_", "enum")
+                        getMyBuilder().declareAlias("case_", "case")
                 }
         }
 }
