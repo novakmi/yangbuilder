@@ -40,7 +40,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                         'pattern',
                         'prefix',
                         'must',
-                        'error-message'
+                        'error-message',
+                        'when'
                 ]
         }
 
