@@ -364,17 +364,17 @@ builder.module(moduleName) {
 
     augment "/rt:active-route/rt:output/rt:route", uses: "route-content", description: "ISIS-specific route attributes."
 
-    def leaf_metric = {kind -> leaf "${kind}-metric", type: "std-metric", description: "This leaf describes the ISIS ${kind} metric value"}
+    def leaf_up_down = {leaf "up-down", type: "boolean", description: "This leaf expresses the value of up/down bit."}
+    def ip_prefix_len = {afi = 4 ->
+        leaf "ip-prefix", type: "inet:ipv${afi}-address", description: "This leaf describes the IPv${afi} prefix"
+        leaf "prefix-len", type: "uint8", description: "This leaf describes the IPv${afi} prefix len in bits"
+    }
+    def leaf_metric = { kind = "default" -> leaf "${kind == "default" ? "default-" : ""}metric", type: "${kind == "wide" ? kind : "std"}-metric",
+        description: "This leaf describes the ISIS ${kind != "wide" ? "${kind} " : ""}metric value" }
 
-    grouping "prefix-ipv4-std", {
-        description '''This group defines attributes of an
-                        IPv4 standard prefix.'''
-        leaf "up-down", type: "boolean", description: "This leaf expresses the value of up/down bit."
+    def ie_and_metrics = {
         leaf "i-e", type: "boolean", description: "This leaf expresses the value of I/E bit."
-        leaf "ip-prefix", type: "inet:ipv4-address", description: "This leaf describes the IPv4 prefix"
-        leaf "prefix-len", type: "uint8", description: "This leaf describes the IPv4 prefix len in bits"
-
-        leaf_metric("default")
+        leaf_metric "default"
         ["delay", "expense", "error"].each { kind ->
             container "${kind}-metric", description: "This container defines the ISIS ${kind} metric.", {
                 leaf_metric(kind)
@@ -384,512 +384,217 @@ builder.module(moduleName) {
         }
     }
 
-    grouping "prefix-ipv4-extended", {
-        description \
-        '''This group defines attributes of an
-            IPv4 extended prefix.'''
-        leaf "up-down", {
-            type "boolean"
-            description \
-            "This leaf expresses the value of up/down bit."
-        }
-        leaf "ip-prefix", {
-            type "inet:ipv4-address"
-            description \
-            "This leaf describes the IPv4 prefix"
-        }
-        leaf "prefix-len", {
-            type "uint8"
-            description \
-            "This leaf describes the IPv4 prefix len in bits"
-        }
-
-        leaf "metric", {
-            type "wide-metric"
-            description \
-            "This leaf describes the ISIS metric value"
-        }
-        leaf_list "tag", {
-            type "uint32"
-            description \
-            '''This leaf describes a list of tags associated with
-                the prefix.'''
-        }
-        leaf_list "tag64", {
-            type "uint64"
-            description \
-            '''This leaf describes a list of 64-bit tags associated with
-                the prefix.'''
-        }
+    grouping "prefix-ipv4-std", {
+        description '''This group defines attributes of an
+                        IPv4 standard prefix.'''
+        leaf_up_down()
+        ip_prefix_len()
+        ie_and_metrics()
     }
 
-    grouping "prefix-ipv6-extended", {
-        description \
-        '''This group defines attributes of an
-            IPv6 prefix.'''
-        leaf "up-down", {
-            type "boolean"
-            description \
-            "This leaf expresses the value of up/down bit."
+    def leaf_tag = { bits = 32 ->
+        leaf_list "tag${bits == 64 ? "64" : ""}", type: "uint${bits}", {
+            description "This leaf describes a list of ${bits == 64 ? "64-bit" : ""} tags " + '''associated with
+                            the prefix.'''
         }
-        leaf "ip-prefix", {
-            type "inet:ipv6-address"
-            description \
-            "This leaf describes the IPv6 prefix"
-        }
-        leaf "prefix-len", {
-            type "uint8"
-            description \
-            "This leaf describes the IPv4 prefix len in bits"
-        }
-
-        leaf "metric", {
-            type "wide-metric"
-            description \
-            "This leaf describes the ISIS metric value"
-        }
-        leaf_list "tag", {
-            type "uint32"
-            description \
-            '''This leaf describes a list of tags associated with
-                the prefix.'''
-        }
-        leaf_list "tag64", {
-            type "uint64"
-            description \
-            '''This leaf describes a list of 64-bit tags associated with
-                the prefix.'''
+    }
+    [4, 6].each { afi ->
+        grouping "prefix-ipv${afi}-extended", {
+            description '''This group defines attributes of an
+                        IPv4 extended prefix.'''
+            leaf_up_down()
+            ip_prefix_len(afi)
+            leaf_metric("wide")
+            leaf_tag()
+            leaf_tag(64)
         }
     }
 
     grouping "neighbor-extended", {
-        description \
-        '''This group defines attributes of an
-            ISIS extended neighbor.'''
-        leaf "neighbor-id", {
-            type "system-id"
-            description \
-            "This leaf describes the system-id of the neighbor."
-        }
-        leaf "metric", {
-            type "wide-metric"
-            description \
-            "This leaf describes the ISIS metric value"
-        }
+        description  '''This group defines attributes of an
+                        ISIS extended neighbor.'''
+        leaf "neighbor-id", type: "system-id", description: "This leaf describes the system-id of the neighbor."
+        leaf_metric("wide")
     }
 
     grouping "neighbor", {
-        description \
-        '''This group defines attributes of an
-            ISIS standard neighbor.'''
-        leaf "neighbor-id", {
-            type "system-id"
-            description \
-            "This leaf describes the system-id of the neighbor."
-        }
-        leaf "i-e", {
-            type "boolean"
-            description \
-            "This leaf expresses the value of I/E bit."
-        }
-        leaf "default-metric", {
-            type "std-metric"
-            description \
-            "This leaf describes the ISIS default metric value"
-        }
-        container "delay-metric", {
-            leaf "metric", {
-                type "std-metric"
-                description \
-                "This leaf describes the ISIS delay metric value"
-            }
-            leaf "supported", {
-                type "boolean"
-                default_ "false"
-                description \
-                "This leaf describes if the metric is supported."
-            }
-            description \
-            "This container defines the ISIS delay metric."
-        }
-        container "expense-metric", {
-            leaf "metric", {
-                type "std-metric"
-                description \
-                "This leaf describes the ISIS delay expense value"
-            }
-            leaf "supported", {
-                type "boolean"
-                default_ "false"
-                description \
-                "This leaf describes if the metric is supported."
-            }
-            description \
-            "This container defines the ISIS expense metric."
-        }
-        container "error-metric", {
-            leaf "metric", {
-                type "std-metric"
-                description \
-                "This leaf describes the ISIS error metric value"
-            }
-            leaf "supported", {
-                type "boolean"
-                default_ "false"
-                description \
-                "This leaf describes if the metric is supported."
-            }
-            description \
-            "This container defines the ISIS error metric."
-        }
+        description '''This group defines attributes of an
+                        ISIS standard neighbor.'''
+        leaf "neighbor-id", type: "system-id", description: "This leaf describes the system-id of the neighbor."
+        ie_and_metrics()
     }
 
     grouping "database", {
-        description \
-        '''This group defines attributes of an
-            ISIS database (Link State DB).'''
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "This leaf describes the LSP ID of the LSP."
+        def make_bit = {name, descr ->
+            bit name,  description: "If set, the originator " + descr
         }
-        leaf "checksum", {
-            type "uint16"
-            description \
-            "This leaf describes the checksum of the LSP."
+        def make_bit_overload = {
+            make_bit "OVERLOAD", '''is overloaded,
+                                        and must be avoided in path calculation.'''
         }
-        leaf "remaining-lifetime", {
-            type "uint16"
-            units "seconds"
-            description \
-            '''This leaf describes the remaining lifetime
-                in seconds before the LSP expiration.'''
-        }
-        leaf "sequence", {
-            type "uint32"
-            description \
-            "This leaf describes the sequence number of the LSP."
-        }
-        leaf "attributes", {
+        description  '''This group defines attributes of an
+                        ISIS database (Link State DB).'''
+        leaf "lsp-id", type: "lsp-id", description: "This leaf describes the LSP ID of the LSP."
+        leaf "checksum", type: "uint16", description: "This leaf describes the checksum of the LSP."
+        leaf "remaining-lifetime", type: "uint16",  units: "seconds", description: '''This leaf describes the remaining lifetime
+                                                                                      in seconds before the LSP expiration.'''
+        leaf "sequence", type: "uint32", description: "This leaf describes the sequence number of the LSP."
+        leaf "attributes",  description: "This leaf describes attributes of the LSP.", {
             type "bits", {
-                bit "PARTITIONNED", {
-                    description \
-                    '''If set, the originator supports partition
-                        repair.'''
+                make_bit "PARTITIONNED", '''supports partition
+                                            repair.'''
+                ["ATTACHED-ERROR", "ATTACHED-EXPENSE", "ATTACHED-DELAY", "ATTACHED-DEFAULT"].each {name ->
+                    make_bit name, '''is attached to
+                                      another area using the referred metric.'''
                 }
-                bit "ATTACHED-ERROR", {
-                    description \
-                    '''If set, the originator is attached to
-                        another area using the referred metric.'''
-                }
-                bit "ATTACHED-EXPENSE", {
-                    description \
-                    '''If set, the originator is attached to
-                        another area using the referred metric.'''
-                }
-                bit "ATTACHED-DELAY", {
-                    description \
-                    '''If set, the originator is attached to
-                        another area using the referred metric.'''
-                }
-                bit "ATTACHED-DEFAULT", {
-                    description \
-                    '''If set, the originator is attached to
-                        another area using the referred metric.'''
-                }
-                bit "OVERLOAD", {
-                    description \
-                    '''If set, the originator is overloaded,
-                        and must be avoided in path calculation.'''
-                }
+                make_bit_overload()
             }
-            description \
-            "This leaf describes attributes of the LSP."
         }
 
-        container "is-neighbor", {
-             list "neighbor", {
-                key "neighbor-id"
-                uses "neighbor"
-                description \
-                "List of neighbors."
+        def isis_ref = {ref ->"ISIS reference is TLV ${ref}."}
+        def leaf_mt = {
+            leaf "MT-ID", {
+                type "uint16", range: "0..4095"
+                description '''This leaf defines the identifier
+                               of a topology.'''
             }
-            description \
-            '''This leaf describes list of ISIS neighbors.
-                ISIS reference is TLV 2.'''
         }
+
+        def neighbors_container = {kind = null, ref = 2 ->
+            container "${kind?"${kind}-":""}is-neighbor", {
+                def uses = kind?"-${kind}":""
+                def descr = kind ? "${kind} " : ""
+                if (kind == "mt") {
+                    uses = "-extended"
+                    descr = "multi-topology "
+                }
+                list "neighbor", key: "neighbor-id", uses: "neighbor${uses}", description: "List of neighbors.", {
+                    if (kind == "mt") leaf_mt()
+                }
+                description "This container describes list of ISIS ${descr}" + '''neighbors.
+                             ''' + isis_ref(ref)
+            }
+        }
+        neighbors_container()
 
         container "authentication", {
-            leaf "authentication-type", {
-                type "authentication-type"
-                description \
-                '''This leaf describes the authentication type
-                    to be used.'''
-            }
-            leaf "authentication-key", {
-                type "string"
-                description \
-                '''This leaf describes the authentication key
-                    to be used. For security reason, the
-                    authentication key MUST NOT be presented
-                    in plaintext format. Authors recommends
-                    to use MD5 hash to present the authentication-key.'''
-            }
+            leaf "authentication-type", type: "authentication-type", description:  '''This leaf describes the authentication type
+                                                                                       to be used.'''
+            leaf "authentication-key", type: "string", description:  '''This leaf describes the authentication key
+                                                                        to be used. For security reason, the
+                                                                        authentication key MUST NOT be presented
+                                                                        in plaintext format. Authors recommends
+                                                                        to use MD5 hash to present the authentication-key.'''
             description ''' This container describes authentication
-                information of the node. ISIS reference is TLV 10.'''
+                            information of the node. ''' + isis_ref(10)
         }
+        neighbors_container("extended", 22)
 
-        container "extended-is-neighbor", {
-             list "neighbor", {
-                key "neighbor-id"
-                uses "neighbor-extended"
-                description \
-                "List of neighbors."
+        def reachability = {kind, ref ->
+            container "${kind == "extended"?"${kind}-":""}ipv4${kind != "extended"?"-${kind}":""}-reachability", {
+                list "prefixes", key: "ip-prefix", uses: "prefix-ipv4-${kind == "extended"?"${kind}":"std"}", description: "List of prefixes."
+                description "This container describes list of IPv4 ${kind}"+'''
+                           reachability information.
+                            ''' + isis_ref(ref)
             }
-            description \
-            '''This container describes list of ISIS extended
-                neighbors.
-                    ISIS reference is TLV 22.'''
         }
 
-        container "ipv4-internal-reachability", {
-             list "prefixes", {
-                key "ip-prefix"
-                uses "prefix-ipv4-std"
-                description \
-                "List of prefixes."
+        reachability "internal", 128
+
+        leaf_list "protocol-supported",  type: "uint8", {
+            description  '''This leaf describes the list of
+                            supported protocols.
+                            ''' + isis_ref(129)
+        }
+
+        reachability "external", 130
+        def make_ip_address = { afi, ref ->
+            leaf_list "ipv${afi}-addresses", type: "inet:ipv${afi}-address", {
+                description "This leaf describes the IPv${afi} " + '''addresses of the node.
+                           ''' + isis_ref(ref)
             }
-            description \
-            '''This container describes list of IPv4 internal
-                reachability information.
-                    ISIS reference is TLV 128.'''
         }
+        make_ip_address 4, 132
 
-        leaf_list "protocol-supported", {
-            type "uint8"
-            description \
-            '''This leaf describes the list of
-                supported protocols.
-                    ISIS reference is TLV 129.'''
-        }
-
-        container "ipv4-external-reachability", {
-             list "prefixes", {
-                key "ip-prefix"
-                uses "prefix-ipv4-std"
-                description \
-                "List of prefixes."
+        def router_id = { afi, ref  ->
+            leaf "ipv${afi}-te-routerid", type: "inet:ipv${afi}-address", {
+                description "This leaf describes the IPv${afi} "+ '''Traffic Engineering
+                            router ID of the node.
+                            ''' + isis_ref(ref)
             }
-            description \
-            '''This container describes list of IPv4 external
-                reachability information.
-                    ISIS reference is TLV 130.'''
         }
+        router_id(4, 134)
+        reachability "extended", 135
 
-        leaf_list "ipv4-addresses", {
-            type "inet:ipv4-address"
-            description \
-            '''This leaf describes the IPv4 addresses of the node.
-                ISIS reference is TLV 132.'''
-        }
-
-        leaf "ipv4-te-routerid", {
-
-            type "inet:ipv4-address"
-            description \
-            '''This leaf describes the IPv4 Traffic Engineering
-                router ID of the node.
-                ISIS reference is TLV 134.'''
-        }
-
-        container "extended-ipv4-reachability", {
-
-             list "prefixes", {
-                key "ip-prefix"
-                uses "prefix-ipv4-extended"
-                description \
-                "List of prefixes."
-            }
-            description \
-            '''This container describes list of IPv4 extended
-                reachability information.
-                    ISIS reference is TLV 135.'''
-        }
-
-        leaf "dynamic-hostname", {
-            type "string"
-
-            description \
-            '''This leaf describes the name of the node.
-                ISIS reference is TLV 137.'''
-        }
-
-        leaf "ipv6-te-routerid", {
-            type "inet:ipv6-address"
-            description \
-            '''This leaf describes the IPv6 Traffic Engineering
-                router ID of the node.
-                ISIS reference is TLV 140.'''
-        }
-
-
-        container "mt-is-neighbor", {
-             list "neighbor", {
-                key "neighbor-id"
-                leaf "MT-ID", {
-                    type "uint16", {
-                        range "0..4095"
-                    }
-                    description \
-                    '''This leaf defines the identifier
-                        of a topology.'''
-                }
-                uses "neighbor-extended"
-                description \
-                "List of neighbors."
-            }
-            description \
-            '''This container describes list of ISIS multi-topology
-                neighbors.
-                    ISIS reference is TLV 223.'''
-        }
+        leaf "dynamic-hostname", type: "string", description: '''This leaf describes the name of the node.
+                                                                ''' + isis_ref(137)
+        router_id(6, 140)
+        neighbors_container "mt", 223
 
         container "mt-entries", {
-             list "topology", {
-                key "MT-ID"
-
-                leaf "MT-ID", {
-                    type "uint16", {
-                        range "0..4095"
-                    }
-                    description \
-                    '''This leaf defines the identifier
-                        of a topology.'''
-                }
-
+             list "topology",  key: "MT-ID", description: "List of topologies supported.",{
+                leaf_mt()
                 leaf "attributes", {
                     type "bits", {
-                        bit "OVERLOAD", {
-                            description \
-                            '''If set, the originator is overloaded,
-                                and must be avoided in path
-                                calculation.'''
-                        }
-                        bit "ATTACHED", {
-                            description \
-                            '''If set, the originator is attached to
-                                another area using the referred metric.'''
-                        }
+                        make_bit_overload()
+                        make_bit "ATTACHED", '''is attached to
+                                                another area using the referred metric.'''
                     }
-                    description \
-                    '''This leaf describes attributes of the LSP
-                        for the associated topology.'''
+                    description '''This leaf describes attributes of the LSP
+                                    for the associated topology.'''
                 }
-                description \
-                "List of topologies supported."
             }
-            description \
-            '''This container describes the topology supported.
-                ISIS reference is TLV 229.'''
+            description '''This container describes the topology supported.
+                           ''' + isis_ref(229)
         }
 
-        leaf_list "ipv6-addresses", {
-            type "inet:ipv6-address"
-            description \
-            '''This leaf describes the IPv6 interface
-                addresses of the node.
-                    ISIS reference is TLV 232.'''
+        make_ip_address 6, 232
+
+        def make_prefixes = {afi = 4, mt = true ->
+            list "prefixes", key: "ip-prefix", uses: "prefix-ipv${afi}-extended", description: "List of prefixes.", {
+                if (mt) leaf_mt()
+            }
         }
-
-
-
 
         container "mt-extended-ipv4-reachability", {
-             list "prefixes", {
-                key "ip-prefix"
-                leaf "MT-ID", {
-                    type "uint16", {
-                        range "0..4095"
-                    }
-                    description \
-                    '''This leaf defines the identifier
-                        of a topology.'''
-                }
-                uses "prefix-ipv4-extended"
-                description \
-                "List of prefixes."
-
-            }
-            description \
-            '''This container describes list of IPv4
-                reachability information in multi-topology
-                environment.
-                    ISIS reference is TLV 235.'''
+            make_prefixes()
+            description '''This container describes list of IPv4
+                            reachability information in multi-topology
+                            environment.
+                            ''' + isis_ref(235)
         }
 
         container "mt-ipv6-reachability", {
-             list "prefixes", {
-                key "ip-prefix"
-                leaf "MT-ID", {
-                    type "uint16", {
-                        range "0..4095"
-                    }
-                    description \
-                    '''This leaf defines the identifier
-                        of a topology.'''
-                }
-                uses "prefix-ipv6-extended"
-                description \
-                "List of prefixes."
-            }
-            description \
-            '''This container describes list of IPv6
-                reachability information in multi-topology
-                environment.
-                    ISIS reference is TLV 237.'''
+            make_prefixes(6)
+            description '''This container describes list of IPv6
+                            reachability information in multi-topology
+                            environment.
+                            ''' + isis_ref(237)
         }
 
         container "ipv6-reachability", {
-             list "prefixes", {
-                key "ip-prefix"
-                uses "prefix-ipv6-extended"
-                description \
-                "List of prefixes."
-            }
-            description \
-            '''This container describes list of IPv6
-                reachability information.
-                    ISIS reference is TLV 236.'''
+            make_prefixes(6, false)
+            description '''This container describes list of IPv6
+                            reachability information.
+                         ''' + isis_ref(236)
         }
 
         container "router-capabilities", {
-            leaf "binary", {
-                type "binary"
-                description \
-                '''This leaf describes the capability of the node.
-                    Format is binary according to the protocol encoding.'''
-            }
-            description \
-            '''This container describes the capabilities of the node.
-                This container may be extended with detailed
-                information.
-                    ISIS reference is TLV 242.'''
+            leaf "binary", type: "binary", description: '''This leaf describes the capability of the node.
+                                                           Format is binary according to the protocol encoding.'''
+            description '''This container describes the capabilities of the node.
+                           This container may be extended with detailed
+                           information.
+                           ''' + isis_ref(242)
         }
     }
 
-
-
-
-
     augment "/rt:routing/rt:routing-instance/rt:routing-protocols/" + "rt:routing-protocol", {
-        when "rt:type = 'isis:isis'", {
-            description \
-            '''This augment is only valid when routing protocol
-                instance type is isis.'''
-        }
-        description \
-        '''This augments a routing protocol instance with ISIS
-            specific parameters.'''
+        when "rt:type = 'isis:isis'", description: '''This augment is only valid when routing protocol
+                                                       instance type is isis.'''
+        description '''This augments a routing protocol instance with ISIS
+                        specific parameters.'''
+
         container "isis", {
 
              list "instance", {
