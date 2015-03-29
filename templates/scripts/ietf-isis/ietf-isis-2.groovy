@@ -596,384 +596,166 @@ builder.module(moduleName) {
                         specific parameters.'''
 
         container "isis", {
+            list "instance", key: "routing-instance", {
+                must "count(area-address) > 0", description: "Enforce configuration of at least one area.",
+                    error_message: '''At least one area-address
+                                     must be configured.'''
 
-             list "instance", {
-                must "count(area-address) > 0", {
-                    error_message '''At least one area-address
-                        must be configured.'''
-                    description \
-                    "Enforce configuration of at least one area."
-                }
+                leaf "routing-instance", type: "rt:routing-instance-ref",
+                    description: '''Reference routing instance.
+                                    For protocol centric model, which is
+                                    supported in
+                                    default-instance only, this could reference
+                                    any VRF routing-instance.
+                                    For VRF centric model, must reference the
+                                    enclosing routing-instance.'''
 
-                key "routing-instance"
+                leaf "level-type", type: "level", default_: "level-all",
+                    description: '''This leaf describes the type of ISIS node.
+                                    A node can be level-1-only, level-2-only
+                                    or level-1-2.'''
 
-                leaf "routing-instance", {
-                    type "rt:routing-instance-ref"
-                    description \
-                    '''Reference routing instance.
-                        For protocol centric model, which is
-                        supported in
-                        default-instance only, this could reference
-                        any VRF routing-instance.
-                        For VRF centric model, must reference the
-                        enclosing routing-instance.'''
-                }
+                leaf "system-id", type: "system-id", description: "This leaf defines the system-id of the node."
 
-                leaf "level-type", {
-                    type "level"
-                    default_ "level-all"
-                    description \
-                    '''This leaf describes the type of ISIS node.
-                        A node can be level-1-only, level-2-only
-                        or level-1-2.
-                            '''
-                }
+                leaf "maximum-area-addresses", if_feature: "maximum-area-addresses", type: "uint8", default_: 3,
+                    description: "Defines the maximum areas supported."
 
-                leaf "system-id", {
-                    type "system-id"
-                    description \
-                    "This leaf defines the system-id of the node."
-                }
+                leaf_list "area-address", type: "area-address", description: '''List of areas supported by the
+                                                                                 protocol instance.'''
 
-
-                leaf "maximum-area-addresses", {
-                    if_feature "maximum-area-addresses"
-                    type "uint8"
-                    default_ 3
-                    description \
-                    "Defines the maximum areas supported."
-                }
-
-                leaf_list "area-address", {
-                    type "area-address"
-                    description \
-                    '''List of areas supported by the
-                        protocol instance.'''
-                }
-
-                container "mpls-te", {
-                    leaf "ipv4-router-id", {
-                        if_feature "ipv4-router-id"
-                        type "inet:ipv4-address"
-                        description \
-                        '''Router ID value that would be used in
-                            TLV 134.'''
+                container "mpls-te", description: "This container handles mpls te config.", {
+                    [4, 6].each { afi ->
+                        leaf "ipv${afi}-router-id", if_feature: "ipv${afi}-router-id", type: "inet:ipv${afi}-address",
+                            description: '''Router ID value that would be used in
+                                            ''' + "TLV ${afi == 4 ? 134 : 140}."
                     }
-                    leaf "ipv6-router-id", {
-                        if_feature "ipv6-router-id"
-                        type "inet:ipv6-address"
-                        description \
-                        '''Router ID value that would be used in
-                            TLV 140.'''
-                    }
-                    description \
-                    "This container handles mpls te config."
                 }
-                leaf "reference-bandwidth", {
-                    if_feature "reference-bandwidth"
-                    type "uint32"
-                    units "bps"
-                    description \
-                    '''This leaf defines the bandwidth for calculating
-                        metric.'''
-                }
+                leaf "reference-bandwidth", if_feature: "reference-bandwidth", type: "uint32", units: "bps",
+                    description: '''This leaf defines the bandwidth for calculating
+                                    metric.'''
 
-                leaf "lsp-mtu", {
-                    type "uint16"
-                    units "bytes"
-                    default_ 1492
-                    description \
-                    '''This leaf describes the maximum size of a
-                        LSP PDU in bytes.'''
-                }
-                leaf "lsp-lifetime", {
-                    type "uint16"
-                    units "seconds"
-                    description \
-                    '''This leaf describes the lifetime of the router
-                        LSP in seconds.'''
-                }
-                leaf "lsp-refresh", {
-                    if_feature "lsp-refresh"
-                    type "uint16"
-                    units "seconds"
-                    description \
-                    '''This leaf describes the refresh interval of the
-                        router LSP in seconds.'''
-                }
-
-                container "graceful-restart", {
-                    if_feature "graceful-restart"
-                    leaf "enabled", {
-                        type "boolean"
-                        description \
-                        "Control enabling the feature."
-                    }
-                    description \
-                    "This container activates graceful restart."
-                }
-
-                container "fast-reroute", {
-                    description \
-                    '''This container needs to be
-                        augmented with global parameters
-                        for IPFRR.'''
-                }
-                container "segment-routing", {
-                    if_feature "segment-routing"
-                    leaf "transport-type", {
-                       type "enumeration", {
-                            enum_ "mpls"
+                ["mtu", "lifetime", "refresh"].each { type ->
+                    def unts = type == "mtu" ? "bytes" : "seconds"
+                    def descr = "lifetime of the router\nLSP in seconds."
+                    leaf "lsp-${type}", type: "uint16", units: unts, {
+                        if (type == "mtu") {
+                            descr = "maximum size of a\nLSP PDU in bytes."
+                            default_ 1492
                         }
-                        description "Dataplane to be used."
-                    }
-                     list "srgb", {
-                        key "lower-bound upper-bound"
-                        leaf "lower-bound", {
-                            type "uint32"
-                            description \
-                            "Lower value in the block."
+                        if (type == "refresh") {
+                            descr = "refresh interval of the\nrouter LSP in seconds."
+                            if_feature "lsp-refresh"
                         }
-                        leaf "upper-bound", {
-                            type "uint32"
-                            description \
-                            "Upper value in the block."
-                        }
-                        description \
-                        '''List of global blocks to be
-                            advertised.'''
+                        description "This leaf describes the " + descr
                     }
-                    description \
-                    "segment routing global config."
                 }
-                 list "authentication", {
-                    key "level"
 
-                    leaf "key", {
-                        type "string"
-                        description \
-                        '''This leaf describes the
-                            authentication key.'''
+                container "graceful-restart", if_feature: "graceful-restart", description: "This container activates graceful restart.", {
+                    leaf "enabled", type: "boolean", description: "Control enabling the feature."
+                }
+
+                container "fast-reroute",
+                    description: '''This container needs to be
+                                    augmented with global parameters
+                                    for IPFRR.'''
+
+                container "segment-routing", if_feature: "segment-routing", description: "segment routing global config.", {
+                    leaf "transport-type", description: "Dataplane to be used.", {
+                        type "enumeration", enums: ["mpls"] //enums without description can be put into array
                     }
-                    leaf "type", {
-                        type "authentication-type"
-                        description \
-                        '''This leaf describes the authentication
-                            type to be used.'''
+                    list "srgb", key: "lower-bound upper-bound", description: "List of global blocks to be advertised.", {
+                        ["lower", "upper"].each { bnd ->
+                            leaf "${bnd}-bound", type: "uint32", description: "${bnd.capitalize()} value in the block."
+                        }
                     }
-                    leaf "level", {
-                        type "level"
-                        description \
-                        "Level applicability."
-                    }
-                    description \
-                    '''Container for ISIS authentication.
-                        It covers both LSPs and SNPs.'''
+                }
+                def leaf_level = { kind = null -> leaf "level", type: "level", description: "Level applicability${kind == "metric" ? " of the metric" : ""}." }
+                list "authentication", key: "level", description: '''Container for ISIS authentication.
+                                                                     It covers both LSPs and SNPs.''', {
+
+                    leaf "key", type: "string", description: '''This leaf describes the
+                                                                authentication key.'''
+                    leaf "type", type: "authentication-type", description: '''This leaf describes the authentication
+                                                                                type to be used.'''
+                    leaf_level()
                 }
 
 
-
-                list "metric-type", {
-                    key "level"
-
+                list "metric-type", key: "level", description: "Metric style list.", {
                     leaf "value", {
-                       type "enumeration", {
-                            enum_ "wide-only", {
-                                description \
-                                '''Advertise new metric style only
-                                    (RFC5305)'''
-                            }
-                            enum_ "old-only", {
-                                description \
-                                '''Advertise old metric style only
-                                    (RFC1195)'''
-                            }
-                            enum_ "both", {
-                                description '''Advertise both metric
-                                    styles'''
-                            }
+                        type "enumeration", {
+                            enum_ "wide-only", description: '''Advertise new metric style only
+                                                                (RFC5305)'''
+                            enum_ "old-only", description: '''Advertise old metric style only
+                                                               (RFC1195)'''
+                            enum_ "both", description: '''Advertise both metric
+                                                           styles'''
                         }
-                        description \
-                        '''This leaf describes the type of metric
-                            to be generated.
-                            Wide-only means only new metric style
-                            is generated,
-                                old-only means that only old style metric
-                            is generated,
-                                and both means that both are advertised.
-                                This leaf is only affecting IPv4 metrics.'''
+                        description '''This leaf describes the type of metric
+                                       to be generated.
+                                       Wide-only means only new metric style
+                                       is generated,
+                                       old-only means that only old style metric
+                                       is generated,
+                                       and both means that both are advertised.
+                                       This leaf is only affecting IPv4 metrics.'''
                     }
-                    leaf "level", {
-                        type "level"
-                        description \
-                        "Level applicability."
-                    }
-                    description \
-                    "Metric style container."
+                    leaf_level()
                 }
-                 list "preference", {
-                    key "level"
-
-                    choice "granularity", {
+                list "preference", key: "level", description: "This list defines the protocol preference.", {
+                    def pref_leaf = { kind ->
+                        leaf kind, type: "uint8", description: '''This leaf defines the protocol
+                                                                  preference for ''' + "${kind == "default" ? "all ISIS" : kind} routes."
+                    }
+                    choice "granularity", description: "Choice for implementation of route preference.", {
                         case_ "detail", {
-                            leaf "internal", {
-                                type "uint8"
-                                description \
-                                '''This leaf defines the protocol
-                                    preference for internal routes.'''
-                            }
-                            leaf "external", {
-                                type "uint8"
-                                description \
-                                '''This leaf defines the protocol
-                                    preference for external routes.'''
-                            }
+                            pref_leaf("internal")
+                            pref_leaf("external")
                         }
                         case_ "coarse", {
-                            leaf "default", {
-                                type "uint8"
-                                description \
-                                '''This leaf defines the protocol
-                                    preference for all ISIS routes.'''
-                            }
+                            pref_leaf("default")
                         }
-                        description \
-                        "Choice for implementation of route preference."
                     }
-
-                    leaf "level", {
-                        type "level"
-                        description \
-                        "Level applicability."
-                    }
-                    description \
-                    "This leaf defines the protocol preference."
+                    leaf_level()
                 }
 
-                list "default-metric", {
-                    key "level"
-
-                    leaf "value", {
-                        type "wide-metric"
-                        description \
-                        "Value of the metric"
+                def default_metric_list = {
+                    list "default-metric", key: "level", description: "Defines the metric to be used by default.", {
+                        leaf "value", type: "wide-metric", description: "Value of the metric"
+                        leaf_level("metric")
                     }
-                    leaf "level", {
-                        type "level"
-                        description \
-                        "Level applicability of the metric."
-                    }
-                    description \
-                    "Defines the metric to be used by default."
                 }
-                list "af", {
-                    if_feature "nlpid-control"
-                    key "af"
-                    leaf "af", {
-                        type "string"
-                        description \
-                        "Address-family"
-                    }
-
-                    leaf "enabled", {
-                        type "boolean"
-                        description \
-                        '''Describes the activation state of the
-                            AF.'''
-                    }
-                    description \
-                    '''This list permits activation
-                        of new address families.'''
-
+                default_metric_list()
+                def leaf_enabled = {
+                    leaf "enabled", type: "boolean", description: '''Describes the activation state of the
+                                                                      AF.'''
+                }
+                list "af", if_feature: "nlpid-control", key: "af", {
+                    leaf "af", type: "string", description: "Address-family"
+                    leaf_enabled()
+                    description '''This list permits activation
+                                    of new address families.'''
                 }
 
+                list "topologies", if_feature: "multi-topology", key: "name", description: "List of topologies", {
+                    leaf_enabled()
+                    leaf "name", type: "rt:rib-ref", description: "RIB"
+                    default_metric_list()
+                }
 
-                 list "topologies", {
-                    if_feature "multi-topology"
-
-                    key "name"
-                    leaf "enabled", {
-                        type "boolean"
-                        description \
-                        '''Describes the activation state of the
-                            AF.'''
-                    }
-                    leaf "name", {
-                        type "rt:rib-ref"
-                        description "RIB"
-                    }
-                    list "default-metric", {
-                        key "level"
-
-                        leaf "value", {
-                            type "wide-metric"
-                            description \
-                            "Value of the metric"
+                ["overload", "overload-max-metric"].each { kind ->
+                    list kind, key: "level", {
+                        if (kind != "overload") {
+                            if_feature kind
                         }
-                        leaf "level", {
-                            type "level"
-                            description \
-                            "Level applicability of the metric."
-                        }
-                        description \
-                        "Defines the metric to be used by default."
+                        leaf "status", type: "boolean", description: "This leaf defines the overload status."
+                        leaf "timeout", type: "uint16", units: "seconds",
+                            description: '''This leaf defines the timeout in seconds
+                                             of the overload condition.'''
+                        leaf_level("metric")
+                        description '''This leaf describes if the router is
+                                        set to overload state.'''
                     }
-                    description \
-                    "List of topologies"
-                }
-
-
-                 list "overload", {
-                    key "level"
-
-                    leaf "status", {
-                        type "boolean"
-                        description \
-                        "This leaf defines the overload status."
-                    }
-
-                    leaf "timeout", {
-                        type "uint16"
-                        units "seconds"
-                        description \
-                        '''This leaf defines the timeout in seconds
-                            of the overload condition.'''
-                    }
-                    leaf "level", {
-                        type "level"
-                        description \
-                        "Level applicability of the metric."
-                    }
-                    description \
-                    '''This leaf describes if the router is
-                        set to overload state.'''
-                }
-
-                list "overload-max-metric", {
-                    if_feature "overload-max-metric"
-                    key "level"
-
-                    leaf "status", {
-                        type "boolean"
-                        description \
-                        "This leaf defines the overload status."
-                    }
-
-                    leaf "timeout", {
-                        type "uint16"
-                        units "seconds"
-                        description \
-                        '''This leaf defines the timeout in seconds
-                            of the overload condition.'''
-                    }
-                    leaf "level", {
-                        type "level"
-                        description \
-                        "Level applicability of the metric."
-                    }
-                    description \
-                    '''This leaf describes if the router is
-                        set to overload state.'''
                 }
 
                 container "interfaces", {
