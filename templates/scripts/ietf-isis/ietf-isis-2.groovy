@@ -589,14 +589,23 @@ builder.module(moduleName) {
         }
     }
 
+    def leaf_boolean = { name, descr, defv = null ->
+        leaf name, type: "boolean", description: descr, {
+            if (defv != null) {default_ defv}
+        }
+    }
+    def leaf_enabled = {descr, tr = null ->
+        leaf_boolean("eanbled", descr, tr)
+    }
     augment "/rt:routing/rt:routing-instance/rt:routing-protocols/" + "rt:routing-protocol", {
         when "rt:type = 'isis:isis'", description: '''This augment is only valid when routing protocol
                                                        instance type is isis.'''
         description '''This augments a routing protocol instance with ISIS
                         specific parameters.'''
 
-        container "isis", {
-            list "instance", key: "routing-instance", {
+        container "isis", description: '''This container defines ISIS specific configuration
+                                          objects.''', {
+            list "instance", key: "routing-instance", description: "List of ISIS instances.", {
                 must "count(area-address) > 0", description: "Enforce configuration of at least one area.",
                     error_message: '''At least one area-address
                                      must be configured.'''
@@ -651,7 +660,7 @@ builder.module(moduleName) {
                 }
 
                 container "graceful-restart", if_feature: "graceful-restart", description: "This container activates graceful restart.", {
-                    leaf "enabled", type: "boolean", description: "Control enabling the feature."
+                    leaf_enabled "Control enabling the feature."
                 }
 
                 container "fast-reroute",
@@ -726,19 +735,20 @@ builder.module(moduleName) {
                     }
                 }
                 default_metric_list()
-                def leaf_enabled = {
-                    leaf "enabled", type: "boolean", description: '''Describes the activation state of the
-                                                                      AF.'''
+                def leaf_af = { leaf "af", type: "string", description: "Address-family" }
+                def leaf_enabled_af = {
+                    leaf_enabled '''Describes the activation state of the
+                                   AF.'''
                 }
                 list "af", if_feature: "nlpid-control", key: "af", {
-                    leaf "af", type: "string", description: "Address-family"
-                    leaf_enabled()
+                    leaf_af()
+                    leaf_enabled_af()
                     description '''This list permits activation
                                     of new address families.'''
                 }
 
                 list "topologies", if_feature: "multi-topology", key: "name", description: "List of topologies", {
-                    leaf_enabled()
+                    leaf_enabled_af()
                     leaf "name", type: "rt:rib-ref", description: "RIB"
                     default_metric_list()
                 }
@@ -748,7 +758,8 @@ builder.module(moduleName) {
                         if (kind != "overload") {
                             if_feature kind
                         }
-                        leaf "status", type: "boolean", description: "This leaf defines the overload status."
+
+                        leaf_boolean "status", "This leaf defines the overload status."
                         leaf "timeout", type: "uint16", units: "seconds",
                             description: '''This leaf defines the timeout in seconds
                                              of the overload condition.'''
@@ -758,382 +769,163 @@ builder.module(moduleName) {
                     }
                 }
 
-                container "interfaces", {
-                    list "interface", {
-                        key "name"
-                        leaf "name", {
-                            type "string"
+                container "interfaces", description: '''This container defines ISIS interface specific
+                                   configuration objects.''', {
+                    list "interface", key: "name", description: "List of ISIS interfaces.", {
+                        leaf "name", type: "string", description: '''Reference to the interface within
+                                                                        the routing-instance.'''
+                        leaf "level-type", type: "level", default_: "level-all",
+                            description: '''This leaf defines the associated ISIS
+                                            level of the interface.'''
+                        leaf_interval = { kind, unts, descr ->
+                            leaf "${kind}-interval", type: "uint16", units: unts,
+                                description: "This leaf defines the interval " + descr
+                        }
+                        leaf_interval "lsp-pacing", "miliseconds", '''between
+                                                        LSP transmissions in milli-seconds'''
 
-                            description \
-                            '''Reference to the interface within
-                                the routing-instance.'''
-                        }
-                        leaf "level-type", {
-                            type "level"
-                            default_ "level-all"
-                            description \
-                            '''This leaf defines the associated ISIS
-                                level of the interface.'''
-                        }
-                        leaf "lsp-pacing-interval", {
-                            type "uint16"
-                            units "milliseconds"
-                            description \
-                            '''This leaf defines the interval between
-                                LSP transmissions in milli-seconds'''
-                        }
-                        leaf "lsp-retransmit-interval", {
-                            type "uint16"
-                            units "seconds"
-                            description \
-                            '''This leaf defines the interval between
-                                retransmission of LSP'''
-                        }
-                        leaf "passive", {
-                            type "boolean"
-                            default_ "false"
-                            description \
-                            '''This leaf defines if interface is in
-                                passive mode (ISIS not running,
-                                    but network is advertised).'''
-                        }
-                        leaf "csnp-interval", {
-                            type "uint16"
-                            units "seconds"
-                            description \
-                            '''This leaf defines the interval of CSNP
-                                messages.'''
-                        }
+                        leaf_interval "lsp-retransmit", "seconds", '''between
+                                                                     retransmission of LSP'''
+                        leaf_boolean "passive", ''''This leaf defines if interface is in
+                                                     passive mode (ISIS not running,
+                                                     but network is advertised).''', false
 
-                        container "hello-padding", {
-                            leaf "enabled", {
-                                type "boolean"
-                                default_ "true"
-                                description \
-                                '''Status of Hello-padding activation.
-                                    By default, the implementation shall
-                                    pad HELLOs.'''
-                            }
-
-                            description \
-                            '''This container handles ISIS hello padding
-                                configuration.'''
-                        }
-
-                        leaf "mesh-group-enabled", {
-                            type "mesh-group-state"
-                            description \
-                            '''Describes the mesh group state of
-                                the interface.'''
-                        }
+                        leaf_interval "csnp", "seconds", "of CSNP  messages."
 
 
-                        leaf "mesh-group", {
-                            when "../mesh-group-enabled = meshSet", {
-                                description \
-                                '''Only valid when mesh-group-enabled
-                                    equals meshSet'''
-                            }
-                            type "uint8"
-                            description \
-                            '''Describes the mesh group ID of
-                                the interface.'''
-                        }
-
-                        leaf "interface-type", {
-                            type "interface-type"
-                            description \
-                            '''This leaf defines the type of adjacency
-                                to be established on the interface.
-                                This is affecting the type of hello
-                                message that would be used.'''
-                        }
-
-                        leaf "enabled", {
-                            type "boolean"
-                            default_ "true"
-                            description \
-                            '''This leaf describes the administrative
-                                status of the ISIS interface.'''
+                        container "hello-padding", description: '''This container handles ISIS hello padding
+                                                                    configuration.''', {
+                            leaf_enabled '''Status of Hello-padding activation.
+                                             By default, the implementation shall
+                                             pad HELLOs.''', true
 
                         }
 
-                        leaf_list "tag", {
-                            if_feature "prefix-tag"
+                        leaf "mesh-group-enabled", type: "mesh-group-state",
+                            description: '''Describes the mesh group state of
+                                            the interface.'''
 
-                            type "uint32"
-                            description \
-                            '''This leaf defines list of tags associated
-                                with the interface.'''
+                        leaf "mesh-group", type: "uint8", description: '''Describes the mesh group ID of
+                                                                         the interface.''', {
+                            when "../mesh-group-enabled = meshSet",
+                                description: '''Only valid when mesh-group-enabled
+                                                 equals meshSet'''
                         }
 
-                        leaf_list "tag64", {
-                            if_feature "prefix-tag64"
+                        leaf "interface-type", type: "interface-type",
+                            description: '''This leaf defines the type of adjacency
+                                            to be established on the interface.
+                                            This is affecting the type of hello
+                                            message that would be used.'''
 
-                            type "uint64"
-                            description \
-                            '''This leaf defines list of 64bits tags
-                                associated with the interface.'''
+                        leaf_enabled '''This leaf describes the administrative
+                                      status of the ISIS interface.''', true
+
+                        [32, 64].each { t ->
+                            leaf_list "tag${t == 32 ? "" : 64}", if_feature: "prefix-tag${t == 32 ? "" : 64}", type: "uint${t}",
+                                description: "This leaf defines list of ${t == 32 ? "" : "64bits "}" + '''tags associated
+                                                with the interface.'''
+
                         }
 
-                        list "hello-authentication", {
-                            key "level"
-
-                            leaf "type", {
-                                type "authentication-type"
-
-                                description \
-                                '''This leaf describes the authentication
-                                    type to be used in hello messages.'''
-                            }
-                            leaf "key", {
-                                type "string"
-                                description \
-                                '''This leaf describes the
-                                    authentication key
-                                    to be used in hello messages.
-                                        For security reason, the
-                                    authentication key MUST
-                                    NOT be presented
-                                    in plaintext format upon a
-                                    get-config reply.
-                                        Authors recommends
-                                    to use MD5 hash to present the
-                                    authentication-key'''
-                            }
-                            leaf "level", {
-                                type "level"
-                                description \
-                                "Level applicability."
-                            }
-                            description \
-                            '''This leaf describes the authentication type
-                                to be used in hello messages.'''
+                        list "hello-authentication", key: "level", {
+                            leaf "type", type: "authentication-type",
+                                description: '''This leaf describes the authentication
+                                                 type to be used in hello messages.'''
+                            leaf "key", type: "string", description: '''This leaf describes the
+                                                                          authentication key
+                                                                          to be used in hello messages.
+                                                                          For security reason, the
+                                                                          authentication key MUST
+                                                                          NOT be presented
+                                                                          in plaintext format upon a
+                                                                          get-config reply.
+                                                                          Authors recommends
+                                                                          to use MD5 hash to present the
+                                                                          authentication-key'''
+                            leaf_level()
+                            description '''This list describes the authentication type
+                                            to be used in hello messages.'''
                         }
 
-                        list "hello-interval", {
-                            key "level"
+                        list "hello-interval", key: "level", {
+                            leaf "value", type: "uint16", units: "seconds",
+                                description: '''This leaf defines the interval of
+                                                hello messages.'''
+                            leaf_level()
+                            descriptionS '''This list defines the interval of
+                                            hello messages.'''
+                        }
+                        list "hello-multiplier", key: "level", {
 
+                            leaf "value", type: "uint16", description: '''This leaf defines the number of
+                                                                         hello failed to be received before
+                                                                         declaring the adjacency down.'''
+                            leaf_level()
+                            description ''''This list defines the number of
+                                            hello failed to be received before
+                                            declaring the adjacency down.'''
+                        }
+                        list "priority", must: 'interface-type = "broadcast"', key: "level", {
                             leaf "value", {
-                                type "uint16"
-                                units "seconds"
-                                description \
-                                '''This leaf defines the interval of
-                                    hello messages.'''
+                                type "uint8", range: "0..127"
+                                description ''''This leaf describes the priority of
+                                                the interface
+                                                for DIS election.'''
                             }
-                            leaf "level", {
-                                type "level"
-                                description \
-                                "Level applicability."
-                            }
-                            description \
-                            '''This leaf defines the interval of
-                                hello messages.'''
+                            leaf_level()
+                            description '''This list describes the priority of
+                                            the interface
+                                            for DIS election.'''
                         }
-                        list "hello-multiplier", {
-                            key "level"
-
-                            leaf "value", {
-                                type "uint16"
-                                description \
-                                '''This leaf defines the number of
-                                    hello failed to be received before
-                                    declaring the adjacency down.'''
+                        def list_metric = {
+                            list "metric", key: "level", description: "Container for interface metric", {
+                                leaf "value", type: "wide-metric", description: "Metric value."
+                                leaf_level()
                             }
-                            leaf "level", {
-                                type "level"
-                                description \
-                                "Level applicability."
-                            }
-                            description \
-                            '''This leaf defines the number of
-                                hello failed to be received before
-                                declaring the adjacency down.'''
                         }
-
-
-                         list "priority", {
-                            must 'interface-type = "broadcast"'
-                            key "level"
-                            leaf "value", {
-                                type "uint8", {
-                                    range "0..127"
+                        list_metric()
+                        list "af", key: "af", description: "List of AFs.", {
+                            leaf_af()
+                            container "segment-routing", if_feature: "segment-routing",
+                                description: "Segment routing interface configuration.", {
+                                list "prefix-sid", key: "index", {
+                                    leaf "index", type: "uint32", description: '''Index associated with
+                                                                                    prefix.'''
+                                    leaf_boolean "node-flag", '''Set prefix as a node
+                                                                  representative prefix.''', true
+                                    leaf_boolean "explicit-null", '''Force explicit NULL
+                                                                     forwarding for this SID.'''
+                                    leaf_boolean "php", '''Activates PHP for this
+                                                           SID.'''
+                                    description '''List of prefix-SID associated with
+                                                    the interface.'''
                                 }
-
-                                description \
-                                '''This leaf describes the priority of
-                                    the interface
-                                    for DIS election.'''
                             }
-                            leaf "level", {
-                                type "level"
-                                description \
-                                "Level applicability."
+                            container "bfd", if_feature: "bfd", description: '''The container describes
+                                                                                BFD config.''', {
+                                leaf_enabled "This leaf enables BFD.", false
                             }
-                            description \
-                            '''This leaf describes the priority of
-                                the interface
-                                for DIS election.'''
                         }
-                         list "metric", {
-                            key "level"
-
-                            leaf "value", {
-                                type "wide-metric"
-                                description \
-                                "Metric value."
-                            }
-                            leaf "level", {
-                                type "level"
-                                description \
-                                "Level applicability."
-                            }
-                            description \
-                            "Container for interface metric"
+                        list "topologies", key: "name", description: "List of topologies.", {
+                            leaf "name", type: "rt:rib-ref", description: "Name of RIB."
+                            list_metric()
                         }
-                        list "af", {
-                            key "af"
-
-                            leaf "af", {
-                                type "string"
-                                description \
-                                "Address-family"
-                            }
-                            container "segment-routing", {
-                                if_feature "segment-routing"
-                                list "prefix-sid", {
-                                    key "index"
-                                    leaf "index", {
-                                        type "uint32"
-                                        description \
-                                        '''Index associated with
-                                            prefix.'''
-
-                                    }
-                                    leaf "node-flag", {
-                                        type "boolean"
-                                        default_ true
-                                        description \
-                                        '''Set prefix as a node
-                                            representative prefix.'''
-                                    }
-                                    leaf "explicit-null", {
-                                        type "boolean"
-                                        description \
-                                        '''Force explicit NULL
-                                            forwarding for this SID.'''
-                                    }
-                                    leaf "php", {
-                                        type "boolean"
-                                        description \
-                                        '''Activates PHP for this
-                                            SID.'''
-                                    }
-                                    description \
-                                    '''List of prefix-SID associated with
-                                        the interface.'''
+                        container "fast-reroute", description: "Fast-reroute configuration.", {
+                            container "lfa", if_feature: "lfa", description: "LFA configuration.", {
+                                leaf_boolean "candidate-disabled", "Prevent the interface to be used as backup."
+                                leaf_enabled "Activates LFA."
+                                container "remote-lfa", if_feature: "remote-lfa", description: "remote LFA configuration.", {
+                                    leaf_enabled "Activates rLFA."
                                 }
-                                description \
-                                "Segment routing interface configuration."
                             }
-                            container "bfd", {
-                                if_feature "bfd"
-                                leaf "enabled", {
-                                    type "boolean"
-                                    default_ false
-                                    description \
-                                    "This leaf enables BFD."
-                                }
-
-                                description \
-                                '''The container describes
-                                    BFD config.'''
-                            }
-
-                            description \
-                            "List of AFs."
                         }
-
-                         list "topologies", {
-                            key "name"
-
-                            leaf "name", {
-                                type "rt:rib-ref"
-                                description \
-                                "Name of RIB."
-                            }
-                             list "metric", {
-                                key "level"
-
-                                leaf "value", {
-                                    type "wide-metric"
-                                    description \
-                                    "Metric value."
-                                }
-                                leaf "level", {
-                                    type "level"
-                                    description \
-                                    "Level applicability."
-                                }
-                                description \
-                                "Container for interface metric"
-                            }
-                            description \
-                            "List of topologies."
-                        }
-                        container "fast-reroute", {
-                            container "lfa", {
-                                if_feature "lfa"
-                                leaf "candidate-disabled", {
-                                    type "boolean"
-                                    description \
-                                    "Prevent the interface to be used as backup."
-                                }
-                                leaf "enabled", {
-                                    type "boolean"
-                                    description \
-                                    "Activates LFA."
-                                }
-                                container "remote-lfa", {
-                                    if_feature "remote-lfa"
-                                    leaf "enabled", {
-                                        type "boolean"
-                                        description \
-                                        "Activates rLFA."
-                                    }
-                                    description \
-                                    "remote LFA configuration."
-                                }
-                                description \
-                                "LFA configuration."
-                            }
-                            description \
-                            "Fast-reroute configuration."
-                        }
-                        description \
-                        "List of ISIS interfaces."
                     }
-                    container "igp-ldp-sync", {
-                        if_feature "igp-ldp-sync"
-                        leaf "holdtime", {
-                            type "uint16"
-                            description \
-                            "Time to wait in sec for LDP session setup."
-                        }
-                        description \
-                        "IGP-LDP sync configuration."
+                    container "igp-ldp-sync", if_feature: "igp-ldp-sync", description: "IGP-LDP sync configuration.", {
+                        leaf "holdtime", type: "uint16", description: "Time to wait in sec for LDP session setup."
                     }
-
-                    description \
-                    '''This container defines ISIS interface specific
-                        configuration objects.'''
                 }
-                description \
-                "List of ISIS instances."
             }
-            description \
-            '''This container defines ISIS specific configuration
-                objects.'''
         }
     }
 
