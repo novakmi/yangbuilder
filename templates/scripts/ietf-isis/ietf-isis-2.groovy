@@ -929,371 +929,123 @@ builder.module(moduleName) {
         }
     }
 
-    augment "/rt:routing-state/rt:routing-instance/" + "rt:routing-protocols/rt:routing-protocol", {
-        when "rt:type = 'isis:isis'", {
-            description \
-            '''This augment is only valid when routing protocol
-                instance type is isis.'''
-        }
-        description \
-        '''This augments routing protocol instance states with ISIS
-            specific parameters.'''
-        container "isis", {
-            config false
-             list "instance", {
+    augment "/rt:routing-state/rt:routing-instance/rt:routing-protocols/rt:routing-protocol", {
+        when "rt:type = 'isis:isis'", description: '''This augment is only valid when routing protocol
+                                                       instance type is isis.'''
 
-                key "routing-instance"
-
-                leaf "routing-instance", {
-                    type "rt:routing-instance-ref"
-                    description \
-                    '''Reference routing instance.
-                        For protocol centric model, which is
-                        supported in
-                        default-instance only, this could reference
-                        any VRF routing-instance.
-                            For VRF centric model, must reference the
-                        enclosing routing-instance.'''
+        description '''This augments routing protocol instance states with ISIS
+                        specific parameters.'''
+        container "isis", config: false, {
+            list "instance", key: "routing-instance", {
+                leaf "routing-instance", type: "rt:routing-instance-ref", {
+                    description '''Reference routing instance.
+                                    For protocol centric model, which is
+                                    supported in
+                                    default-instance only, this could reference
+                                    any VRF routing-instance.
+                                    For VRF centric model, must reference the
+                                    enclosing routing-instance.'''
                 }
-                container "system-counters", {
-                     list "level", {
-                        key "level"
-
-                        leaf "level", {
-                            type "level-number"
-                            description \
-                            "This leaf describes the ISIS level."
-                        }
-                        leaf "corrupted-lsps", {
-                            type "uint32"
-                            description \
-                            '''Number of corrupted in-memory LSPs detected.
-                                LSPs received from the wire with a bad
-                                checksum are silently dropped and not counted.
-                                LSPs received from the wire with parse errors
-                                are counted by lsp-errors.'''
-                        }
-                        leaf "authentication-type-fails", {
-                            type "uint32"
-                            description \
-                            "Number of authentication type mismatches."
-                        }
-                        leaf "authentication-fails", {
-                            type "uint32"
-                            description \
-                            "Number of authentication key failures."
-                        }
-                        leaf "database-overload", {
-                            type "uint32"
-                            description \
-                            '''Number of times the database has become
-                                overloaded.'''
-                        }
-                        leaf "own-lsp-purge", {
-                            type "uint32"
-                            description \
-                            '''Number of times a zero-aged copy of the
-                                system's own LSP is received from some
-                                other node.'''
-                        }
-                        leaf "manual-address-drop-from-area", {
-                            type "uint32"
-                            description \
-                            '''Number of times a manual address
-                                has been dropped from the area.'''
-                        }
-                        leaf "max-sequence", {
-                            type "uint32"
-                            description \
-                            '''Number of times the system has attempted
-                                to exceed the maximum sequence number.'''
-                        }
-                        leaf "sequence-number-skipped", {
-                            type "uint32"
-                            description \
-                            '''Number of times a sequence number skip has
-                                occured.'''
-                        }
-                        leaf "id-len-mismatch", {
-                            type "uint32"
-                            description \
-                            '''Number of times a PDU is received with
-                                a different value for ID field length
-                                from that of the receiving system.'''
-                        }
-                        leaf "partition-changes", {
-                            type "uint32"
-                            description \
-                            "Number of partition changes detected."
-                        }
-                        leaf "lsp-errors", {
-                            type "uint32"
-                            description \
-                            '''Number of LSPs with errors we have
-                                received.'''
-                        }
-                        leaf "spf-runs", {
-                            type "uint32"
-                            description \
-                            "Number of times we ran SPF at this level."
-                        }
-                        description \
-                        "List of supported levels."
+                def leaf_uint32 = { name, descr -> leaf name, type: "uint32", description: descr }
+                def level_isis = {
+                    leaf "level", type: "level-number", description: "This leaf describes the ISIS level."
+                }
+                container "system-counters", description: '''The container defines a list of counters
+                                                             for the IS.''', {
+                    list "level", key: "level", description: "List of supported levels.", {
+                        level_isis()
+                        leaf_uint32 "corrupted-lsps", '''Number of corrupted in-memory LSPs detected.
+                                                          LSPs received from the wire with a bad
+                                                          checksum are silently dropped and not counted.
+                                                          LSPs received from the wire with parse errors
+                                                          are counted by lsp-errors.'''
+                        leaf_uint32 "authentication-type-fails", "Number of authentication type mismatches."
+                        leaf_uint32 "authentication-fails", "Number of authentication key failures."
+                        leaf_uint32 "database-overload", '''Number of times the database has become
+                                                            overloaded.'''
+                        leaf_uint32 "own-lsp-purge", '''Number of times a zero-aged copy of the
+                                                        system's own LSP is received from some
+                                                        other node.'''
+                        leaf_uint32 "manual-address-drop-from-area", '''Number of times a manual address
+                                                                        has been dropped from the area.'''
+                        leaf_uint32 "max-sequence", '''Number of times the system has attempted
+                                                to exceed the maximum sequence number.'''
+                        leaf_uint32 "sequence-number-skipped", '''Number of times a sequence number skip has
+                                                                    occured.'''
+                        leaf_uint32 "id-len-mismatch", '''Number of times a PDU is received with
+                                                          a different value for ID field length
+                                                          from that of the receiving system.'''
+                        leaf_uint32 "partition-changes", "Number of partition changes detected."
+                        leaf_uint32 "lsp-errors", '''Number of LSPs with errors we have
+                                                      received.'''
+                        leaf_uint32 "spf-runs", "Number of times we ran SPF at this level."
                     }
-                    description \
-                    '''The container defines a list of counters
-                        for the IS.'''
                 }
-                container "interface-counters", {
-                    list "interface", {
-                        key "interface"
-
-                        leaf "interface", {
-                            type "string"
-                            description \
-                            '''This leaf describes the name
-                                of the interface.'''
-                        }
-
-                        leaf "adjacency-changes", {
-                            type "uint32"
-                            description \
-                            '''The number of times an adjacency state
-                                change has occured on this interface.'''
-                        }
-                        leaf "adjacency-number", {
-                            type "uint32"
-                            description \
-                            '''The number of adjacencies on this
-                                interface.'''
-                        }
-                        leaf "init-fails", {
-                            type "uint32"
-                            description \
-                            '''The number of times initialization of
-                                this interface has failed. This counts
-                                events such as PPP NCP failures.
-                                    Failures to form an adjacency are counted
-                                by adjacency-rejects.'''
-                        }
-                        leaf "adjacency-rejects", {
-                            type "uint32"
-                            description \
-                            '''The number of times an adjacency has been
-                                rejected on this interface.'''
-                        }
-                        leaf "id-len-mismatch", {
-                            type "uint32"
-                            description \
-                            '''The number of times an IS-IS PDU with an ID
-                                field length different from that for this
-                                system has been received on this interface.'''
-                        }
-                        leaf "max-area-addresses-mismatch", {
-                            type "uint32"
-                            description \
-                            '''The number of times an IS-IS PDU with
-                                according max area address field
-                                differs from that for
-                                this system has been received on this
-                                interface.'''
-                        }
-                        leaf "authentication-type-fails", {
-                            type "uint32"
-                            description \
-                            "Number of authentication type mismatches."
-                        }
-                        leaf "authentication-fails", {
-                            type "uint32"
-                            description \
-                            "Number of authentication key failures."
-                        }
-                        leaf "lan-dis-changes", {
-                            type "uint32"
-                            description \
-                            '''The number of times the DIS has changed
-                                on this interface at this level.
-                                    If the interface type is point to point,
-                                    the count is zero.'''
-                        }
-                        description \
-                        "List of interfaces."
+                def leaf_interface = {
+                    leaf "interface", type: "string", description: '''This leaf describes the name
+                                                                           of the interface.'''
+                }
+                container "interface-counters", description: '''The container defines a list of counters
+                                                                for interfaces.''', {
+                    list "interface", key: "interface", description: "List of interfaces.", {
+                        leaf_interface()
+                        leaf_uint32 "adjacency-changes", '''The number of times an adjacency state
+                                                             change has occured on this interface.'''
+                        leaf_uint32 "adjacency-number", '''The number of adjacencies on this
+                                                            interface.'''
+                        leaf_uint32 "init-fails", '''The number of times initialization of
+                                                     this interface has failed. This counts
+                                                     events such as PPP NCP failures.
+                                                     Failures to form an adjacency are counted
+                                                     by adjacency-rejects.'''
+                        leaf_uint32 "adjacency-rejects", '''The number of times an adjacency has been
+                                                           rejected on this interface.'''
+                        leaf_uint32 "id-len-mismatch", '''The number of times an IS-IS PDU with an ID
+                                                   field length different from that for this
+                                                   system has been received on this interface.'''
+                        leaf_uint32 "max-area-addresses-mismatch", '''The number of times an IS-IS PDU with
+                                                                        according max area address field
+                                                                        differs from that for
+                                                                        this system has been received on this
+                                                                        interface.'''
+                        leaf_uint32 "authentication-type-fails", "Number of authentication type mismatches."
+                        leaf_uint32 "authentication-fails", "Number of authentication key failures."
+                        leaf_uint32 "lan-dis-changes", '''The number of times the DIS has changed
+                                                    on this interface at this level.
+                                                    If the interface type is point to point,
+                                                    the count is zero.'''
                     }
-                    description \
-                    '''The container defines a list of counters
-                        for interfaces.'''
                 }
-                container "packet-counters", {
-                     list "level", {
-                        key "level"
-
-                        leaf "level", {
-                            type "level-number"
-                            description \
-                            "This leaf describes the ISIS level."
+                container "packet-counters", description: "The container defines a list of PDU counters.", {
+                    list "level", key: "level", description: "List of supported levels.", {
+                        level_isis()
+                        ["iih", "ish", "esh", "lsp", "psnp", "csnp", "unknown"].each { c ->
+                            container c, {
+                                leaf_uint32 "in", "Received PDUs."
+                                leaf_uint32 "out", "Sent PDUs."
+                                description "The number of ${c != "unknown" ? c.toUpperCase() : c} PDUs received/sent."
+                            }
                         }
-
-                        container "iih", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of IIH PDUs received/sent."
-                        }
-                        container "ish", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of ISH PDUs received/sent."
-                        }
-                        container "esh", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of ESH PDUs received/sent."
-                        }
-                        container "lsp", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of LSP PDUs received/sent."
-                        }
-                        container "psnp", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of PSNP PDUs received/sent."
-                        }
-                        container "csnp", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of CSNP PDUs received/sent."
-                        }
-                        container "unknown", {
-                            leaf "in", {
-                                type "uint32"
-                                description \
-                                "Received PDUs."
-                            }
-                            leaf "out", {
-                                type "uint32"
-                                description \
-                                "Sent PDUs."
-                            }
-                            description \
-                            "The number of unknown PDUs received/sent."
-                        }
-                        description \
-                        "List of supported levels."
                     }
-                    description \
-                    "The container defines a list of PDU counters."
                 }
-                container "interfaces", {
-                     list "interfaces", {
-                        key "interface"
-
-                        leaf "interface", {
-                            type "string"
-                            description \
-                            '''This leaf describes the name
-                                of the interface.'''
-                        }
-                        leaf "circuit-id", {
-                            type "circuit-id"
-                            description \
-                            '''This leaf describes the circuit-id
-                                associated with the interface.'''
-                        }
-                        leaf "admin-state", {
-                            type "admin-state"
-                            description \
-                            '''This leaf describes the admin state
-                                of the interface.'''
-                        }
-                        leaf "oper-state", {
-                            type "oper-state"
-                            description \
-                            '''This leaf describes the operational state
-                                of the interface.'''
-                        }
-                        leaf "interface-type", {
-                            type "interface-type"
-                            description \
-                            "Type of interface to be used."
-                        }
-                        leaf "level", {
-                            type "level"
-                            description \
-                            "Level associated with the interface."
-                        }
-                        leaf "passive", {
-                            type "empty"
-                            description \
-                            '''The interface is included in LSP, but
-                                does not run ISIS protocol.'''
-                        }
-                        leaf "three-way-handshake", {
-                            type "empty"
-                            description \
-                            "The interface uses 3-way handshake."
-                        }
-                        description \
-                        "List of interfaces."
+                container "interfaces", description: '''The container defines operational parameters
+                                                        of interfaces.''', {
+                    list "interfaces", key: "interface", description: "List of interfaces.", {
+                        leaf_interface()
+                        leaf "circuit-id", type: "circuit-id", description: '''This leaf describes the circuit-id
+                                                                                associated with the interface.'''
+                        leaf "admin-state", type: "admin-state", description: '''This leaf describes the admin state
+                                                                                 of the interface.'''
+                        leaf "oper-state", type: "oper-state", description: '''This leaf describes the operational state
+                                                                               of the interface.'''
+                        leaf "interface-type", type: "interface-type", description: "Type of interface to be used."
+                        leaf "level", type: "level", description: "Level associated with the interface."
+                        leaf "passive", type: "empty", description: '''The interface is included in LSP, but
+                                                                         does not run ISIS protocol.'''
+                        leaf "three-way-handshake", type: "empty", description: "The interface uses 3-way handshake."
                     }
-                    description \
-                    '''The container defines operational parameters
-                        of interfaces.'''
                 }
-                container "adjacencies", {
+                 container "adjacencies", {
                      list "adjacency", {
                         leaf "interface", {
                             type "string"
