@@ -222,11 +222,12 @@ builder.module(moduleName) {
                        an ISIS protocol instance.'''
     }
 
+    def enum_descr = {e, descr -> enum_ e, description:  descr}
     def state_typedef = {state ->
         typedef "${state}-state",description: "${state=="admin"?"Administrative":"Operational"} state of a component.", {
             type "enumeration", {
-                enum_ "up", description:  "Up state"
-                enum_ "down", description:  "Down state"
+                enum_descr "up", "Up state"
+                enum_descr "down", "Down state"
             }
         }
     }
@@ -242,30 +243,29 @@ builder.module(moduleName) {
 
     typedef "interface-type", {
        type "enumeration", {
-            enum_ "broadcast",  description: '''Broadcast interface type.
-                                                Would result in DIS election.'''
-            enum_ "point-to-point",  description: "Point to point interface type."
+            enum_descr "broadcast", '''Broadcast interface type.
+                                       Would result in DIS election.'''
+            enum_descr "point-to-point", "Point to point interface type."
         }
         description '''This type defines the type of adjacency
                         to be established on the interface.
                         This is affecting the type of hello
                         message that would be used.'''
-
     }
 
     typedef "authentication-type",  description: "This type defines available authentication types.", {
        type "enumeration", {
-            enum_ "none", description: "No authentication used."
-            enum_ "plaintext", description: "Plain text password used."
-            enum_ "message-digest", description: "MD5 digest used."
+            enum_descr "none", "No authentication used."
+            enum_descr "plaintext", "Plain text password used."
+            enum_descr "message-digest", "MD5 digest used."
         }
     }
 
     typedef "level", default_: "level-all", description: "This type defines ISIS level of an object.", {
-       type "enumeration", {
-            enum_ "level-1", description: "This enum describes L1 only capability."
-            enum_ "level-2", description: "This enum describes L2 only capability."
-            enum_ "level-all", description: "This enum describes both levels capability."
+        type "enumeration", {
+            enum_descr "level-1", "This enum describes L1 only capability."
+            enum_descr "level-2", "This enum describes L2 only capability."
+            enum_descr "level-all", "This enum describes both levels capability."
         }
     }
 
@@ -306,10 +306,10 @@ builder.module(moduleName) {
     }
 
     typedef "mesh-group-state", description: "This type describes meshgroup state of an interface", {
-       type "enumeration", {
-            enum_ "meshInactive", description: "Interface is not part of a mesh group."
-            enum_ "meshSet",description: "Interface is part of a mesh group."
-            enum_ "meshBlocked",description: "LSPs must not be flooded over that interface."
+        type "enumeration", {
+            enum_descr "meshInactive", "Interface is not part of a mesh group."
+            enum_descr "meshSet", "Interface is part of a mesh group."
+            enum_descr "meshBlocked", "LSPs must not be flooded over that interface."
         }
     }
 
@@ -335,22 +335,22 @@ builder.module(moduleName) {
                                                           32bits and 64bits tags.'''
         leaf "route-type", description: "This leaf describes the type of ISIS route.", {
            type "enumeration", {
-                enum_ "l2-up-internal", description: '''Level 2 internal route
-                                                        and not leaked to a lower level'''
-                enum_ "l1-up-internal", description: '''Level 1 internal route
-                                                        and not leaked to a lower level'''
-                enum_ "l2-up-external", description: '''Level 2 external route
-                                                        and not leaked to a lower level'''
-                enum_ "l1-up-external", description: '''Level 1 external route
-                                                        and not leaked to a lower level'''
-                enum_ "l2-down-internal", description: '''Level 2 internal route
-                                                         and leaked to a lower level'''
-                enum_ "l1-down-internal", description: '''Level 1 internal route
-                                                         and leaked to a lower level'''
-                enum_ "l2-down-external", description: '''Level 2 external route
-                                                          and leaked to a lower level'''
-                enum_ "l1-down-external", description: '''Level 1 external route
-                                                          and leaked to a lower level'''
+               enum_descr "l2-up-internal", '''Level 2 internal route
+                                               and not leaked to a lower level'''
+               enum_descr "l1-up-internal", '''Level 1 internal route
+                                               and not leaked to a lower level'''
+               enum_descr "l2-up-external", '''Level 2 external route
+                                               and not leaked to a lower level'''
+               enum_descr "l1-up-external", '''Level 1 external route
+                                               and not leaked to a lower level'''
+               enum_descr "l2-down-internal", '''Level 2 internal route
+                                                 and leaked to a lower level'''
+               enum_descr "l1-down-internal", '''Level 1 internal route
+                                                 and leaked to a lower level'''
+               enum_descr "l2-down-external", '''Level 2 external route
+                                                 and leaked to a lower level'''
+               enum_descr "l1-down-external", '''Level 1 external route
+                                                 and leaked to a lower level'''
             }
         }
     }
@@ -594,9 +594,10 @@ builder.module(moduleName) {
             if (defv != null) {default_ defv}
         }
     }
-    def leaf_enabled = {descr, tr = null ->
-        leaf_boolean("eanbled", descr, tr)
-    }
+    def leaf_enabled = {descr, tr = null ->  leaf_boolean("eanbled", descr, tr) }
+    def leaf_level = {descr->  leaf "level", type: "level", description: descr}
+    def leaf_level_num = {descr->  leaf "level", type: "level-number", description: descr}
+    def leaf_level_appl = { kind = null -> leaf_level "Level applicability${kind == "metric" ? " of the metric" : ""}." }
     augment "/rt:routing/rt:routing-instance/rt:routing-protocols/" + "rt:routing-protocol", {
         when "rt:type = 'isis:isis'", description: '''This augment is only valid when routing protocol
                                                        instance type is isis.'''
@@ -678,7 +679,6 @@ builder.module(moduleName) {
                         }
                     }
                 }
-                def leaf_level = { kind = null -> leaf "level", type: "level", description: "Level applicability${kind == "metric" ? " of the metric" : ""}." }
                 list "authentication", key: "level", description: '''Container for ISIS authentication.
                                                                      It covers both LSPs and SNPs.''', {
 
@@ -686,19 +686,19 @@ builder.module(moduleName) {
                                                                 authentication key.'''
                     leaf "type", type: "authentication-type", description: '''This leaf describes the authentication
                                                                                 type to be used.'''
-                    leaf_level()
+                    leaf_level_appl()
                 }
 
 
                 list "metric-type", key: "level", description: "Metric style list.", {
                     leaf "value", {
                         type "enumeration", {
-                            enum_ "wide-only", description: '''Advertise new metric style only
-                                                                (RFC5305)'''
-                            enum_ "old-only", description: '''Advertise old metric style only
-                                                               (RFC1195)'''
-                            enum_ "both", description: '''Advertise both metric
-                                                           styles'''
+                            enum_descr "wide-only", ''''Advertise new metric style only
+                                                        (RFC5305)'''
+                            enum_descr "old-only", '''Advertise old metric style only
+                                                      (RFC1195)'''
+                            enum_descr "both", '''Advertise both metric
+                                                  styles'''
                         }
                         description '''This leaf describes the type of metric
                                        to be generated.
@@ -709,7 +709,7 @@ builder.module(moduleName) {
                                        and both means that both are advertised.
                                        This leaf is only affecting IPv4 metrics.'''
                     }
-                    leaf_level()
+                    leaf_level_appl()
                 }
                 list "preference", key: "level", description: "This list defines the protocol preference.", {
                     def pref_leaf = { kind ->
@@ -725,13 +725,13 @@ builder.module(moduleName) {
                             pref_leaf("default")
                         }
                     }
-                    leaf_level()
+                    leaf_level_appl()
                 }
 
                 def default_metric_list = {
                     list "default-metric", key: "level", description: "Defines the metric to be used by default.", {
                         leaf "value", type: "wide-metric", description: "Value of the metric"
-                        leaf_level("metric")
+                        leaf_level_appl("metric")
                     }
                 }
                 default_metric_list()
@@ -763,7 +763,7 @@ builder.module(moduleName) {
                         leaf "timeout", type: "uint16", units: "seconds",
                             description: '''This leaf defines the timeout in seconds
                                              of the overload condition.'''
-                        leaf_level("metric")
+                        leaf_level_appl("metric")
                         description '''This leaf describes if the router is
                                         set to overload state.'''
                     }
@@ -843,7 +843,7 @@ builder.module(moduleName) {
                                                                           Authors recommends
                                                                           to use MD5 hash to present the
                                                                           authentication-key'''
-                            leaf_level()
+                            leaf_level_appl()
                             description '''This list describes the authentication type
                                             to be used in hello messages.'''
                         }
@@ -852,7 +852,7 @@ builder.module(moduleName) {
                             leaf "value", type: "uint16", units: "seconds",
                                 description: '''This leaf defines the interval of
                                                 hello messages.'''
-                            leaf_level()
+                            leaf_level_appl()
                             descriptionS '''This list defines the interval of
                                             hello messages.'''
                         }
@@ -861,7 +861,7 @@ builder.module(moduleName) {
                             leaf "value", type: "uint16", description: '''This leaf defines the number of
                                                                          hello failed to be received before
                                                                          declaring the adjacency down.'''
-                            leaf_level()
+                            leaf_level_appl()
                             description ''''This list defines the number of
                                             hello failed to be received before
                                             declaring the adjacency down.'''
@@ -873,7 +873,7 @@ builder.module(moduleName) {
                                                 the interface
                                                 for DIS election.'''
                             }
-                            leaf_level()
+                            leaf_level_appl()
                             description '''This list describes the priority of
                                             the interface
                                             for DIS election.'''
@@ -881,7 +881,7 @@ builder.module(moduleName) {
                         def list_metric = {
                             list "metric", key: "level", description: "Container for interface metric", {
                                 leaf "value", type: "wide-metric", description: "Metric value."
-                                leaf_level()
+                                leaf_level_appl()
                             }
                         }
                         list_metric()
@@ -935,8 +935,8 @@ builder.module(moduleName) {
 
         description '''This augments routing protocol instance states with ISIS
                         specific parameters.'''
-        container "isis", config: false, {
-            list "instance", key: "routing-instance", {
+        container "isis", config: false, description: "This container defines various ISIS states objects.", {
+            list "instance", key: "routing-instance", description: "List of ISIS instances.", {
                 leaf "routing-instance", type: "rt:routing-instance-ref", {
                     description '''Reference routing instance.
                                     For protocol centric model, which is
@@ -947,9 +947,8 @@ builder.module(moduleName) {
                                     enclosing routing-instance.'''
                 }
                 def leaf_uint32 = { name, descr -> leaf name, type: "uint32", description: descr }
-                def level_isis = {
-                    leaf "level", type: "level-number", description: "This leaf describes the ISIS level."
-                }
+                def level_isis = { leaf_level_num "This leaf describes the ISIS level." }
+                def leaf_timestamp = {name, descr -> leaf name, type: "yang:timestamp", description: descr }
                 container "system-counters", description: '''The container defines a list of counters
                                                              for the IS.''', {
                     list "level", key: "level", description: "List of supported levels.", {
@@ -1039,424 +1038,205 @@ builder.module(moduleName) {
                         leaf "oper-state", type: "oper-state", description: '''This leaf describes the operational state
                                                                                of the interface.'''
                         leaf "interface-type", type: "interface-type", description: "Type of interface to be used."
-                        leaf "level", type: "level", description: "Level associated with the interface."
+                        leaf_level "Level associated with the interface."
                         leaf "passive", type: "empty", description: '''The interface is included in LSP, but
                                                                          does not run ISIS protocol.'''
                         leaf "three-way-handshake", type: "empty", description: "The interface uses 3-way handshake."
                     }
                 }
-                 container "adjacencies", {
-                     list "adjacency", {
-                        leaf "interface", {
-                            type "string"
-                            description \
-                            '''This leaf describes the name
-                                of the interface.'''
-                        }
-                        leaf "level", {
-                            type "level"
-                            description \
-                            '''This leaf describes the associated
-                                ISIS level of the interface.
-                                '''
-                        }
-                        leaf "neighbor-sysid", {
-                            type "system-id"
-                            description \
-                            "The system-id of the neighbor"
-
-                        }
-                        leaf "neighbor-extended-circuit-id", {
-                            type "extended-circuit-id"
-                            description \
-                            "Circuit ID of the neighbor"
-                        }
-                        leaf "neighbor-snpa", {
-                            type "snpa"
-                            description \
-                            "SNPA of the neighbor"
-                        }
-                        leaf "neighbor-level", {
-                            type "level"
-                            description \
-                            "The type of the neighboring system."
-                        }
-                        leaf "hold-timer", {
-                            type "uint16"
-                            description \
-                            '''The holding time in seconds for this
-                                adjacency. This value is based on
-                                received hello PDUs and the elapsed
-                                time since receipt.'''
-                        }
+                 container "adjacencies", description: '''This container lists the adjacencies of
+                                                          the local node.''', {
+                     list "adjacency", description: "List of operational adjacencies.", {  //TODO key element??
+                        leaf_interface()
+                        leaf_level '''This leaf describes the associated
+                                      ISIS level of the interface.'''
+                        leaf "neighbor-sysid", type:"system-id",  description: "The system-id of the neighbor"
+                        leaf "neighbor-extended-circuit-id", type: "extended-circuit-id", description: "Circuit ID of the neighbor"
+                        leaf "neighbor-snpa", type: "snpa",description:  "SNPA of the neighbor"
+                        leaf "neighbor-level", type: "level", description: "The type of the neighboring system."
+                         leaf "hold-timer", type: "uint16", description: '''The holding time in seconds for this
+                                                                            adjacency. This value is based on
+                                                                            received hello PDUs and the elapsed
+                                                                            time since receipt.'''
                         leaf "neighbor-priority", {
-                            type "uint8", {
-                                range "0..127"
-                            }
-                            description \
-                            '''Priority of the neighboring IS for becoming
-                                the DIS.'''
+                            type "uint8", range: "0..127"
+                            description '''Priority of the neighboring IS for becoming
+                                           the DIS.'''
                         }
-                        leaf "lastuptime", {
-                            type "yang:timestamp"
-                            description \
-                            '''When the adjacency most recently entered
-                                state 'up', measured in hundredths of a
-                                second since the last reinitialization of
-                                the network management subsystem.
-                                    The value is 0 if the adjacency has never
-                                been in state 'up'.'''
+                        leaf_timestamp "lastuptime", '''When the adjacency most recently entered
+                                                        state 'up', measured in hundredths of a
+                                                        second since the last reinitialization of
+                                                        the network management subsystem.
+                                                        The value is 0 if the adjacency has never
+                                                        been in state 'up'.'''
 
-                        }
-                        leaf "state", {
+                        leaf "state",  description: '''This leaf describes the state of the
+                                                        interface.''', {
                            type "enumeration", {
-                                enum_ "Up", {
-                                    description \
-                                    '''This state describes that
-                                        adjacency is established.'''
-                                }
-                                enum_ "Down", {
-                                    description \
-                                    '''This state describes that
-                                        adjacency is NOT established.'''
-                                }
-                                enum_ "Init", {
-                                    description \
-                                    '''This state describes that
-                                        adjacency is establishing.'''
-                                }
+                               ["Up", "Down", "Init"].each {e->
+                                   enum_descr e, '''This state describes that
+                                                    adjacency is ''' + "${e=="Down"?"NOT ":""}establish${e == "Init"?"ing":"ed"}."
+                               }
                             }
-                            description \
-                            '''This leaf describes the state of the
-                                interface.'''
                         }
-                        description \
-                        "List of operational adjacencies."
                     }
-                    description \
-                    '''This container lists the adjacencies of
-                        the local node.'''
                 }
-                container "spf-log", {
-                     list "event", {
-                        key "id"
-
-                        leaf "id", {
-                            type "uint32"
-                            description \
-                            '''This leaf defines the event identifier.
-                                This is a purely internal value.'''
-                        }
-                        leaf "spf-type", {
-                           type "enumeration", {
-                                enum_ "full", {
-                                    description \
-                                    "Computation done is a Full SPF."
-                                }
-                                enum_ "incremental", {
-                                    description \
-                                    '''Computation done is an
-                                        incremental SPF.'''
-                                }
-                                enum_ "route-only", {
-                                    description \
-                                    '''Computation done is a
-                                        reachability computation
-                                        only.'''
-                                }
+                container "spf-log", description: "This container lists the SPF computation events.", {
+                    list "event", key: "id", description: "List of computation events.", {
+                        leaf_uint32 "id", '''This leaf defines the event identifier.
+                                             This is a purely internal value.'''
+                        leaf "spf-type", description: '''This leaf describes the type of computation
+                                                         used.''', {
+                            type "enumeration", {
+                                enum_descr "full", "Computation done is a Full SPF."
+                                enum_descr "incremental", '''Computation done is an
+                                                       incremental SPF.'''
+                                enum_descr "route-only", '''Computation done is a
+                                                            reachability computation
+                                                            only.'''
                             }
-                            description \
-                            '''This leaf describes the type of computation
-                                used.'''
                         }
-                        leaf "level", {
-                            type "level-number"
-                            description \
-                            '''This leaf describes the level affected by the
-                                the computation.'''
+                        leaf_level_num '''This leaf describes the level affected by the
+                                          the computation.'''
+                        leaf "spf-delay", type: "uint32", units: "milliseconds",
+                            description: '''This leaf describes the SPF delay that
+                                             was used for this event.'''
+                        leaf_timestamp "schedule-timestamp", '''This leaf describes the timestamp
+                                                                 when the computation was scheduled.'''
+                        leaf_timestamp "start-timestamp", '''This leaf describes the timestamp
+                                                             when the computation was started.'''
+                        leaf_timestamp "end-timestamp", '''This leaf describes the timestamp
+                                                            when the computation was ended.'''
+                        list "trigger-lsp", key: "lsp", description: '''This leaf describes list of LSPs
+                                                                        that triggered the computation.''', {
+                            leaf "lsp", type: "lsp-id", description: '''This leaf describes the LSPID
+                                                                        of the LSP.'''
+                            leaf_uint32 "sequence", '''This leaf describes the sequence
+                                                        number of the LSP.'''
                         }
-                        leaf "spf-delay", {
-                            type "uint32"
-                            units "milliseconds"
-                            description \
-                            '''This leaf describes the SPF delay that
-                                was used for this event.'''
-                        }
-                        leaf "schedule-timestamp", {
-                            type "yang:timestamp"
-                            description \
-                            '''This leaf describes the timestamp
-                                when the computation was scheduled.'''
-                        }
-                        leaf "start-timestamp", {
-                            type "yang:timestamp"
-                            description \
-                            '''This leaf describes the timestamp
-                                when the computation was started.'''
-                        }
-                        leaf "end-timestamp", {
-                            type "yang:timestamp"
-                            description \
-                            '''This leaf describes the timestamp
-                                when the computation was ended.'''
-                        }
-                        list "trigger-lsp", {
-                            key "lsp"
-                            leaf "lsp", {
-                                type "lsp-id"
-                                description \
-                                '''This leaf describes the LSPID
-                                    of the LSP.'''
-                            }
-                            leaf "sequence", {
-                                type "uint32"
-                                description \
-                                '''This leaf describes the sequence
-                                    number of the LSP.'''
-                            }
-                            description \
-                            '''This leaf describes list of LSPs
-                                that triggered the computation.'''
-                        }
-                        description \
-                        "List of computation events."
                     }
-
-                    description \
-                    "This container lists the SPF computation events."
                 }
-                container "lsp-log", {
-                     list "event", {
-                        key "id"
-
-                        leaf "id", {
-                            type "uint32"
-                            description \
-                            '''This leaf defines the event identifier.
-                                This is a purely internal value.'''
+                container "lsp-log", description: '''This container lists the LSP reception events.
+                                                     Local LSP modification are also contained in the
+                                                     list.''', {
+                    list "event", key: "id", description: "List of LSP events.", {
+                        leaf_uint32 "id", '''This leaf defines the event identifier.
+                                             This is a purely internal value.'''
+                        leaf_level_num '''This leaf describes the level affected by the
+                                          the computation.'''
+                        container "lsp", description: '''This container describes the received LSP
+                                                              , in case of local LSP update the local
+                                                                LSP ID is referenced.''', {
+                            leaf "lsp", type: "lsp-id", description: '''This leaf describes the LSPID
+                                                                        of the LSP.'''
+                            leaf_uint32 "sequence", '''This leaf describes the sequence
+                                                        number of the LSP.'''
                         }
-                        leaf "level", {
-                            type "level-number"
-                            description \
-                            '''This leaf describes the level affected by the
-                                the computation.'''
-                        }
-                        container "lsp", {
-                            leaf "lsp", {
-
-                                type "lsp-id"
-                                description \
-                                '''This leaf describes the LSPID
-                                    of the LSP.'''
-                            }
-                            leaf "sequence", {
-                                type "uint32"
-                                description \
-                                '''This leaf describes the sequence
-                                    number of the LSP.'''
-                            }
-                            description \
-                            '''This container describes the received LSP
-                                , in case of local LSP update the local
-                                LSP ID is referenced.'''
-                        }
-
-                        leaf "received-timestamp", {
-                            type "yang:timestamp"
-
-                            description \
-                            '''This leaf describes the timestamp
-                                when the LSP was received. In case of
-                                local LSP update, the timestamp refers
-                                to the local LSP update time.'''
-                        }
-
-                        description \
-                        "List of LSP events."
+                        leaf_timestamp "received-timestamp", '''This leaf describes the timestamp
+                                                                  when the LSP was received. In case of
+                                                                  local LSP update, the timestamp refers
+                                                                  to the local LSP update time.'''
                     }
-
-                    description \
-                    '''This container lists the LSP reception events.
-                        Local LSP modification are also contained in the
-                        list.'''
                 }
-                container "database", {
-                    list "level-db", {
-                        key "level"
-
-                        leaf "level", {
-                            type "level-number"
-                            description \
-                            "Current level number"
-                        }
-                         list "lsp", {
-                            key "lsp-id"
-
-                            uses "database"
-                            description \
-                            "List of LSPs in LSDB."
-                        }
-
-                        description \
-                        '''This container describes the list of LSPs
-                            in the level x database.'''
+                container "database", description: '''This container describes ISIS Link State
+                                                      databases.''', {
+                    list "level-db", key: "level", {
+                        leaf_level_num "Current level number"
+                        list "lsp", key: "lsp-id", uses: "database", description: "List of LSPs in LSDB."
                     }
-
-                    description \
-                    '''This container describes ISIS Link State
-                        databases.'''
                 }
-                container "hostnames", {
-
-                     list "hostname", {
-                        key "system-id"
-                        leaf "system-id", {
-                            type "system-id"
-                            description \
-                            '''This leaf describes the system-id
-                                associated with the hostname.'''
-                        }
-                        leaf "hostname", {
-
-                            type "string"
-                            description \
-                            '''This leaf describes the hostname
-                                associated with the system ID.'''
-                        }
-                        description \
-                        "List of system-id/hostname associations"
+                container "hostnames",  description: '''This container describes the list
+                                                        of binding between system-id and
+                                                        hostnames.''', {
+                     list "hostname",  key: "system-id", description:  "List of system-id/hostname associations", {
+                        leaf "system-id", type: "system-id", description:  '''This leaf describes the system-id
+                                                                              associated with the hostname.'''
+                        leaf "hostname", type: "string", description: '''This leaf describes the hostname
+                                                                         associated with the system ID.'''
                     }
-
-                    description \
-                    '''This container describes the list
-                        of binding between system-id and
-                        hostnames.'''
                 }
-
-                description \
-                "List of ISIS instances."
             }
-            description \
-            "This container defines various ISIS states objects."
         }
     }
 
     cmt("RPC methods", inline: false)
-    rpc "clear-adjacency", {
-        description '''This RPC request clears a particular
-            set of ISIS adjacencies. If the operation
-            fails for ISIS internal reason, then
-            error-tag and error-app-tag should be set
-            to a meaningful value.'''
-
+    rpc "clear-adjacency", description: '''This RPC request clears a particular
+                                            set of ISIS adjacencies. If the operation
+                                            fails for ISIS internal reason, then
+                                            error-tag and error-app-tag should be set
+                                            to a meaningful value.''', {
         input "", {
-            leaf "routing-instance-name", {
-                type "rt:routing-instance-state-ref"
-                mandatory "true"
-                description \
-                '''Name of the routing instance whose ISIS
-                    information is being queried.
+            leaf "routing-instance-name", type: "rt:routing-instance-state-ref", mandatory: "true",
+                description: '''Name of the routing instance whose ISIS
+                                information is being queried.
 
-                        If the routing instance with name equal to the
-                    value of this parameter doesn't exist, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag 'routing-instance-not-found'.'''
+                                If the routing instance with name equal to the
+                                value of this parameter doesn't exist, then this
+                                operation SHALL fail with error-tag 'data-missing'
+                                and error-app-tag 'routing-instance-not-found'.'''
+            leaf "routing-protocol-instance-name",  type: "instance-state-ref", mandatory: "true",
+                description: '''Name of the ISIS protocol instance whose ISIS
+                                information is being queried.
 
+                                If the ISIS instance with name equal to the
+                                value of this parameter doesn't exist, then this
+                                operation SHALL fail with error-tag 'data-missing'
+                                and error-app-tag
+                                'routing-protocol-instance-not-found'.'''
+            leaf_level '''ISIS level of the adjacency to be cleared.
+                          If ISIS level is level-1-2, both level 1 and level 2
+                          adjacencies would be cleared.
 
-            }
-            leaf "routing-protocol-instance-name", {
-                type "instance-state-ref"
-                mandatory "true"
-                description \
-                '''Name of the ISIS protocol instance whose ISIS
-                    information is being queried.
+                          If the value provided is different from the one
+                          authorized in the enum type, then this
+                          operation SHALL fail with error-tag 'data-missing'
+                          and error-app-tag
+                          'bad-isis-level'.'''
+            leaf "interface", type: "string", description: '''Name of the ISIS interface.
 
-                        If the ISIS instance with name equal to the
-                    value of this parameter doesn't exist, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag
-                    'routing-protocol-instance-not-found'.'''
-            }
-            leaf "level", {
-                type "level"
-                description \
-                '''ISIS level of the adjacency to be cleared.
-                    If ISIS level is level-1-2, both level 1 and level 2
-                    adjacencies would be cleared.
-
-                        If the value provided is different from the one
-                    authorized in the enum type, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag
-                    'bad-isis-level'.
-                        '''
-            }
-            leaf "interface", {
-                type "string"
-                description \
-                '''Name of the ISIS interface.
-
-                    If the ISIS interface with name equal to the
-                    value of this parameter doesn't exist, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag
-                    'isis-interface-not-found'.'''
-            }
+                                                              If the ISIS interface with name equal to the
+                                                              value of this parameter doesn't exist, then this
+                                                              operation SHALL fail with error-tag 'data-missing'
+                                                              and error-app-tag
+                                                              'isis-interface-not-found'.'''
         }
     }
 
-    rpc "clear-database", {
-        description \
-        '''This RPC request clears a particular
-            ISIS database. If the operation
-            fails for ISIS internal reason, then
-            error-tag and error-app-tag should be set
-            to a meaningful value.'''
+    rpc "clear-database", description: '''This RPC request clears a particular
+                                          ISIS database. If the operation
+                                          fails for ISIS internal reason, then
+                                          error-tag and error-app-tag should be set
+                                          to a meaningful value.''', {
         input "", {
-            leaf "routing-instance-name", {
-                type "rt:routing-instance-state-ref"
-                mandatory "true"
-                description \
-                '''Name of the routing instance whose ISIS
-                    information is being queried.
+            leaf "routing-instance-name", type: "rt:routing-instance-state-ref", mandatory: "true",
+                description: '''Name of the routing instance whose ISIS
+                                information is being queried.
 
-                        If the routing instance with name equal to the
-                    value of this parameter doesn't exist, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag 'routing-instance-not-found'.'''
+                                If the routing instance with name equal to the
+                                value of this parameter doesn't exist, then this
+                                operation SHALL fail with error-tag 'data-missing'
+                                and error-app-tag 'routing-instance-not-found'.'''
+            leaf "routing-protocol-instance-name", type: "instance-state-ref", mandatory: "true",
+                description: '''Name of the ISIS protocol instance whose ISIS
+                                information is being queried.
 
+                                If the ISIS instance with name equal to the
+                                value of this parameter doesn't exist, then this
+                                operation SHALL fail with error-tag 'data-missing'
+                                and error-app-tag
+                                'routing-protocol-instance-not-found'.'''
+            leaf_level '''ISIS level of the adjacency to be cleared.
+                          If ISIS level is level-1-2, both level 1 and level 2
+                          adjacencies would be cleared.
 
-            }
-            leaf "routing-protocol-instance-name", {
-                type "instance-state-ref"
-                mandatory "true"
-                description \
-                '''Name of the ISIS protocol instance whose ISIS
-                    information is being queried.
-
-                        If the ISIS instance with name equal to the
-                    value of this parameter doesn't exist, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag
-                    'routing-protocol-instance-not-found'.'''
-            }
-            leaf "level", {
-                type "level"
-                description \
-                '''ISIS level of the adjacency to be cleared.
-                    If ISIS level is level-1-2, both level 1 and level 2
-                    adjacencies would be cleared.
-
-                        If the value provided is different from the one
-                    authorized in the enum type, then this
-                    operation SHALL fail with error-tag 'data-missing'
-                    and error-app-tag
-                    'bad-isis-level'.
-                        '''
-            }
+                          If the value provided is different from the one
+                          authorized in the enum type, then this
+                          operation SHALL fail with error-tag 'data-missing'
+                          and error-app-tag
+                          'bad-isis-level'.'''
         }
-
     }
+
 
     cmt("Notifications", inline: false)
     notification "database-overload", {
