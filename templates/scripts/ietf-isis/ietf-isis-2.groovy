@@ -25,7 +25,7 @@ builder.module(moduleName) {
 
     organization "IETF ISIS Working Group"
 
-    contact'''WG List:	&lt;mailto:isis-wg@ietf.org&gt;
+    contact '''WG List:	&lt;mailto:isis-wg@ietf.org&gt;
 
         Editor:		Stephane Litkowski
         &lt;mailto:stephane.litkowski@orange.com&gt;
@@ -48,7 +48,7 @@ builder.module(moduleName) {
         &lt;mailto:yiqu@cisco.com&gt;''';
 
     description '''The YANG module defines a generic configuration model for
-                    ISIS common across all of the vendor implementations.'''
+                   ISIS common across all of the vendor implementations.'''
 
     def isis_revision = { date, descr, ref = null ->
         revision "$date", {
@@ -62,16 +62,16 @@ builder.module(moduleName) {
         }
     }
 
-    isis_revision("2014-12-15",'''Adding IPFRR
-                                  Adding igp-ldp sync
-                                  Adding segment routing
-                                  Adding instance reference to operational states.''')
+    isis_revision("2014-12-15", '''Adding IPFRR
+                                   Adding igp-ldp sync
+                                   Adding segment routing
+                                   Adding instance reference to operational states.''')
 
-    isis_revision("2014-10-24",'''Change hello-padding to container
-                                  Change bfd to container
-                                  Make BFD a feature
-                                  Creates mpls-te container and put router-id inside
-                                  Remove GR helper disable and timers''',  "draft-ietf-isis-yang-isis-cfg-01")
+    isis_revision("2014-10-24", '''Change hello-padding to container
+                                   Change bfd to container
+                                   Make BFD a feature
+                                   Creates mpls-te container and put router-id inside
+                                   Remove GR helper disable and timers''', "draft-ietf-isis-yang-isis-cfg-01")
 
     revision "2014-10-21", {
         description '''
@@ -88,7 +88,7 @@ builder.module(moduleName) {
                     * overload-max-metric is in a separate container
                     '''
 
-         reference '""'
+        reference '""'
     }
 
     revision "2014-10-07", {
@@ -103,21 +103,20 @@ builder.module(moduleName) {
         reference "draft-ietf-isis-yang-isis-00"
     }
     revision "2014-09-26", {
-        description \
-        '''
+        description             \
+                    '''
             * Add BFD support
             * remove max-elements to max-area-addresses
             '''
         reference '""'
     }
     revision "2014-09-11", {
-        description \
-        '''
-            * Add level parameter to ispf and spf delay
-            * Add LSP generation as a feature
-            * Make lsp-refresh a feature
-            * Change parameter container to list
-            '''
+        description '''
+                    * Add level parameter to ispf and spf delay
+                    * Add LSP generation as a feature
+                    * Make lsp-refresh a feature
+                    * Change parameter container to list
+                    '''
         reference '""'
     }
     revision "2014-09-05", {
@@ -125,35 +124,33 @@ builder.module(moduleName) {
         reference '""'
     }
     revision "2014-08-06", {
-        description \
-        '''
-            * isis-state renamed to isis.
-            * Add GR support
-            * Add meshgroup support
-            * Add CLNS support
-            * Add 64bits tags
-            * Add notifications to be aligned with MIB4444
-            * Add packet-counters, interface-counters, system-counters
-            states
-            * Add 3-way handshake support
-            * Rename isis-adjacency-updown to adjacency-change
-            * Add notification for LSP reception
-            * Use feature for reference BW
-            * Add lsp-retransmit-interval on interfaces
-            * Rename lsp-interval to lsp-pacing-interval
-            * Add ispf support as feature
-            * Add spf delay support as feature (2step & exp backoff)
-            * Add maximum-area-addresses
-            * Add default-metric
-            '''
+        description '''
+                    * isis-state renamed to isis.
+                    * Add GR support
+                    * Add meshgroup support
+                    * Add CLNS support
+                    * Add 64bits tags
+                    * Add notifications to be aligned with MIB4444
+                    * Add packet-counters, interface-counters, system-counters
+                      states
+                    * Add 3-way handshake support
+                    * Rename isis-adjacency-updown to adjacency-change
+                    * Add notification for LSP reception
+                    * Use feature for reference BW
+                    * Add lsp-retransmit-interval on interfaces
+                    * Rename lsp-interval to lsp-pacing-interval
+                    * Add ispf support as feature
+                    * Add spf delay support as feature (2step & exp backoff)
+                    * Add maximum-area-addresses
+                    * Add default-metric
+                    '''
         reference "RFC XXXX: YANG Data Model for ISIS Protocol"
     }
     revision "2014-06-25", {
-        description \
-            '''
-            * isis-cfg renamed to isis.
-            * Add precisions on authentication-keys in description
-            '''
+        description '''
+                    * isis-cfg renamed to isis.
+                    * Add precisions on authentication-keys in description
+                    '''
         reference "draft-litkowski-isis-yang-isis-01"
     }
 
@@ -184,7 +181,7 @@ builder.module(moduleName) {
         reference "draft-litkowski-isis-yang-isis-00"
     }
 
-    revision "2014-06-11",  description: "Initial revision.",  reference: "draft-litkowski-netmod-isis-cfg-00"
+    revision "2014-06-11", description: "Initial revision.", reference: "draft-litkowski-netmod-isis-cfg-00"
 
     identity "isis", base: "rt:routing-protocol", description: "Identity for the ISIS routing protocol."
 
@@ -213,7 +210,7 @@ builder.module(moduleName) {
     feature "nlpid-control", description: '''This feature controls the advertisement
                                              of support NLPID within ISIS configuration.'''
     feature "graceful-restart", description: "Graceful restart support as per RFC5306."
-    feature "lsp-refresh", description:  "Configuration of LSP refresh interval."
+    feature "lsp-refresh", description: "Configuration of LSP refresh interval."
     feature "maximum-area-addresses", description: "Support of maximum-area-addresses config."
 
     typedef "instance-state-ref", {
@@ -224,9 +221,9 @@ builder.module(moduleName) {
 
     def leaf_uint32 = { name, descr -> leaf name, type: "uint32", description: descr }
     def leaf_timestamp = { name, descr -> leaf name, type: "yang:timestamp", description: descr }
-    def enum_descr = {e, descr -> enum_ e, description:  descr}
-    def state_typedef = {state ->
-        typedef "${state}-state",description: "${state=="admin"?"Administrative":"Operational"} state of a component.", {
+    def enum_descr = { e, descr -> enum_ e, description: descr }
+    def state_typedef = { state ->
+        typedef "${state}-state", description: "${state == "admin" ? "Administrative" : "Operational"} state of a component.", {
             type "enumeration", {
                 enum_descr "up", "Up state"
                 enum_descr "down", "Down state"
@@ -237,26 +234,26 @@ builder.module(moduleName) {
     state_typedef("admin")
     state_typedef("oper")
 
-    typedef "circuit-id",  type: "uint8",  description:  '''This type defines the circuit ID
-                                                            associated with an interface.'''
+    typedef "circuit-id", type: "uint8", description: '''This type defines the circuit ID
+                                                         associated with an interface.'''
 
-    typedef "extended-circuit-id", type: "uint32",description: '''This type defines the extended circuit ID
+    typedef "extended-circuit-id", type: "uint32", description: '''This type defines the extended circuit ID
                                                                    associated with an interface.'''
 
     typedef "interface-type", {
-       type "enumeration", {
+        type "enumeration", {
             enum_descr "broadcast", '''Broadcast interface type.
                                        Would result in DIS election.'''
             enum_descr "point-to-point", "Point to point interface type."
         }
         description '''This type defines the type of adjacency
-                        to be established on the interface.
-                        This is affecting the type of hello
-                        message that would be used.'''
+                       to be established on the interface.
+                       This is affecting the type of hello
+                       message that would be used.'''
     }
 
-    typedef "authentication-type",  description: "This type defines available authentication types.", {
-       type "enumeration", {
+    typedef "authentication-type", description: "This type defines available authentication types.", {
+        type "enumeration", {
             enum_descr "none", "No authentication used."
             enum_descr "plaintext", "Plain text password used."
             enum_descr "message-digest", "MD5 digest used."
@@ -272,13 +269,13 @@ builder.module(moduleName) {
     }
 
     typedef "level-number", description: "This type defines a current ISIS level.", {
-        type "uint8",range: "1..2"
+        type "uint8", range: "1..2"
     }
 
     typedef "lsp-id", {
         type "string", pattern: "[0-9A-Fa-f],{4}\\.[0-9A-Fa-f],{4}\\.[0-9A-Fa-f],{4}\\.[0-9][0-9]-[0-9][0-9]"
         description '''This type defines ISIS LSP ID using pattern,
-                        system id looks like : 0143.0438.AeF0.02-01'''
+                       system id looks like : 0143.0438.AeF0.02-01'''
     }
 
     typedef "area-address", description: "This type defines the area address.", {
@@ -292,7 +289,7 @@ builder.module(moduleName) {
     typedef "system-id", {
         type "string", pattern: "[0-9A-Fa-f],{4}\\.[0-9A-Fa-f],{4}\\.[0-9A-Fa-f],{4}\\.00"
         description '''This type defines ISIS system id using pattern,
-                        system id looks like : 0143.0438.AeF0.00'''
+                       system id looks like : 0143.0438.AeF0.00'''
     }
 
     typedef "wide-metric", {
@@ -303,8 +300,8 @@ builder.module(moduleName) {
 
     typedef "std-metric", {
         type "uint8", range: "0..63"
-        description: '''This type defines old style format
-                        of ISIS metric.'''
+        description '''This type defines old style format
+                       of ISIS metric.'''
     }
 
     typedef "mesh-group-state", description: "This type describes meshgroup state of an interface", {
@@ -315,9 +312,9 @@ builder.module(moduleName) {
         }
     }
 
-    def grouping_if_inst = {kind -> //closure reuse
+    def grouping_if_inst = { kind -> //closure reuse
         grouping "notification-${kind}-hdr", {
-            description "This group describes common ${kind} "+ '''specific
+            description "This group describes common ${kind} " + '''specific
                          data for notifications.'''
             leaf "${kind}-name", type: "string", description: "Describes the name of the ISIS ${kind}."
             leaf "${kind}-level", type: "level", description: "Describes the ISIS level of the ${kind}."
@@ -331,27 +328,27 @@ builder.module(moduleName) {
     grouping_if_inst("interface")
 
     grouping "route-content", description: "This group add isis-specific route properties.", {
-        leaf_uint32 "metric","This leaf describes ISIS metric of a route."
+        leaf_uint32 "metric", "This leaf describes ISIS metric of a route."
         leaf_list "tag", type: "uint64", description: '''This leaf describes list of tags associated
-                                                          with the route. The leaf describes both
-                                                          32bits and 64bits tags.'''
+                                                         with the route. The leaf describes both
+                                                         32bits and 64bits tags.'''
         leaf "route-type", description: "This leaf describes the type of ISIS route.", {
-           type "enumeration", {
-               enum_descr "l2-up-internal", '''Level 2 internal route
+            type "enumeration", {
+                enum_descr "l2-up-internal", '''Level 2 internal route
                                                and not leaked to a lower level'''
-               enum_descr "l1-up-internal", '''Level 1 internal route
+                enum_descr "l1-up-internal", '''Level 1 internal route
                                                and not leaked to a lower level'''
-               enum_descr "l2-up-external", '''Level 2 external route
+                enum_descr "l2-up-external", '''Level 2 external route
                                                and not leaked to a lower level'''
-               enum_descr "l1-up-external", '''Level 1 external route
+                enum_descr "l1-up-external", '''Level 1 external route
                                                and not leaked to a lower level'''
-               enum_descr "l2-down-internal", '''Level 2 internal route
+                enum_descr "l2-down-internal", '''Level 2 internal route
                                                  and leaked to a lower level'''
-               enum_descr "l1-down-internal", '''Level 1 internal route
+                enum_descr "l1-down-internal", '''Level 1 internal route
                                                  and leaked to a lower level'''
-               enum_descr "l2-down-external", '''Level 2 external route
+                enum_descr "l2-down-external", '''Level 2 external route
                                                  and leaked to a lower level'''
-               enum_descr "l1-down-external", '''Level 1 external route
+                enum_descr "l1-down-external", '''Level 1 external route
                                                  and leaked to a lower level'''
             }
         }
@@ -366,13 +363,15 @@ builder.module(moduleName) {
 
     augment "/rt:active-route/rt:output/rt:route", uses: "route-content", description: "ISIS-specific route attributes."
 
-    def leaf_up_down = {leaf "up-down", type: "boolean", description: "This leaf expresses the value of up/down bit."}
-    def ip_prefix_len = {afi = 4 ->
+    def leaf_up_down = { leaf "up-down", type: "boolean", description: "This leaf expresses the value of up/down bit." }
+    def ip_prefix_len = { afi = 4 ->
         leaf "ip-prefix", type: "inet:ipv${afi}-address", description: "This leaf describes the IPv${afi} prefix"
         leaf "prefix-len", type: "uint8", description: "This leaf describes the IPv${afi} prefix len in bits"
     }
-    def leaf_metric = { kind = "default" -> leaf "${kind == "default" ? "default-" : ""}metric", type: "${kind == "wide" ? kind : "std"}-metric",
-        description: "This leaf describes the ISIS ${kind != "wide" ? "${kind} " : ""}metric value" }
+    def leaf_metric = { kind = "default" ->
+        leaf "${kind == "default" ? "default-" : ""}metric", type: "${kind == "wide" ? kind : "std"}-metric",
+            description: "This leaf describes the ISIS ${kind != "wide" ? "${kind} " : ""}metric value"
+    }
 
     def ie_and_metrics = {
         leaf "i-e", type: "boolean", description: "This leaf expresses the value of I/E bit."
@@ -386,24 +385,21 @@ builder.module(moduleName) {
         }
     }
 
-    grouping "prefix-ipv4-std", {
-        description '''This group defines attributes of an
-                        IPv4 standard prefix.'''
+    grouping "prefix-ipv4-std", description: '''This group defines attributes of an
+                                                IPv4 standard prefix.''', {
         leaf_up_down()
         ip_prefix_len()
         ie_and_metrics()
     }
 
     def leaf_tag = { bits = 32 ->
-        leaf_list "tag${bits == 64 ? "64" : ""}", type: "uint${bits}", {
-            description "This leaf describes a list of ${bits == 64 ? "64-bit" : ""} tags " + '''associated with
-                            the prefix.'''
-        }
+        leaf_list "tag${bits == 64 ? "64" : ""}", type: "uint${bits}",
+            description: "This leaf describes a list of ${bits == 64 ? "64-bit" : ""} tags " + '''associated with
+                         the prefix.'''
     }
     [4, 6].each { afi ->
-        grouping "prefix-ipv${afi}-extended", {
-            description '''This group defines attributes of an
-                        IPv4 extended prefix.'''
+        grouping "prefix-ipv${afi}-extended", description: '''This group defines attributes of an
+                           IPv4 extended prefix.''', {
             leaf_up_down()
             ip_prefix_len(afi)
             leaf_metric("wide")
@@ -413,39 +409,39 @@ builder.module(moduleName) {
     }
 
     grouping "neighbor-extended", {
-        description  '''This group defines attributes of an
-                        ISIS extended neighbor.'''
+        description '''This group defines attributes of an
+                       ISIS extended neighbor.'''
         leaf "neighbor-id", type: "system-id", description: "This leaf describes the system-id of the neighbor."
         leaf_metric("wide")
     }
 
     grouping "neighbor", {
         description '''This group defines attributes of an
-                        ISIS standard neighbor.'''
+                       ISIS standard neighbor.'''
         leaf "neighbor-id", type: "system-id", description: "This leaf describes the system-id of the neighbor."
         ie_and_metrics()
     }
 
     grouping "database", {
-        def make_bit = {name, descr ->
-            bit name,  description: "If set, the originator " + descr
+        def make_bit = { name, descr ->
+            bit name, description: "If set, the originator " + descr
         }
         def make_bit_overload = {
             make_bit "OVERLOAD", '''is overloaded,
-                                        and must be avoided in path calculation.'''
+                                    and must be avoided in path calculation.'''
         }
-        description  '''This group defines attributes of an
+        description '''This group defines attributes of an
                         ISIS database (Link State DB).'''
         leaf "lsp-id", type: "lsp-id", description: "This leaf describes the LSP ID of the LSP."
         leaf "checksum", type: "uint16", description: "This leaf describes the checksum of the LSP."
-        leaf "remaining-lifetime", type: "uint16",  units: "seconds", description: '''This leaf describes the remaining lifetime
-                                                                                      in seconds before the LSP expiration.'''
+        leaf "remaining-lifetime", type: "uint16", units: "seconds", description: '''This leaf describes the remaining lifetime
+                                                                                     in seconds before the LSP expiration.'''
         leaf_uint32 "sequence", "This leaf describes the sequence number of the LSP."
-        leaf "attributes",  description: "This leaf describes attributes of the LSP.", {
+        leaf "attributes", description: "This leaf describes attributes of the LSP.", {
             type "bits", {
                 make_bit "PARTITIONNED", '''supports partition
                                             repair.'''
-                ["ATTACHED-ERROR", "ATTACHED-EXPENSE", "ATTACHED-DELAY", "ATTACHED-DEFAULT"].each {name ->
+                ["ATTACHED-ERROR", "ATTACHED-EXPENSE", "ATTACHED-DELAY", "ATTACHED-DEFAULT"].each { name ->
                     make_bit name, '''is attached to
                                       another area using the referred metric.'''
                 }
@@ -453,7 +449,7 @@ builder.module(moduleName) {
             }
         }
 
-        def isis_ref = {ref ->"ISIS reference is TLV ${ref}."}
+        def isis_ref = { ref -> "ISIS reference is TLV ${ref}." }
         def leaf_mt = {
             leaf "MT-ID", {
                 type "uint16", range: "0..4095"
@@ -462,9 +458,9 @@ builder.module(moduleName) {
             }
         }
 
-        def neighbors_container = {kind = null, ref = 2 ->
-            container "${kind?"${kind}-":""}is-neighbor", {
-                def uses = kind?"-${kind}":""
+        def neighbors_container = { kind = null, ref = 2 ->
+            container "${kind ? "${kind}-" : ""}is-neighbor", {
+                def uses = kind ? "-${kind}" : ""
                 def descr = kind ? "${kind} " : ""
                 if (kind == "mt") {
                     uses = "-extended"
@@ -480,61 +476,61 @@ builder.module(moduleName) {
         neighbors_container()
 
         container "authentication", {
-            leaf "authentication-type", type: "authentication-type", description:  '''This leaf describes the authentication type
+            leaf "authentication-type", type: "authentication-type", description: '''This leaf describes the authentication type
                                                                                        to be used.'''
-            leaf "authentication-key", type: "string", description:  '''This leaf describes the authentication key
-                                                                        to be used. For security reason, the
-                                                                        authentication key MUST NOT be presented
-                                                                        in plaintext format. Authors recommends
-                                                                        to use MD5 hash to present the authentication-key.'''
-            description ''' This container describes authentication
-                            information of the node. ''' + isis_ref(10)
+            leaf "authentication-key", type: "string", description: '''This leaf describes the authentication key
+                                                                       to be used. For security reason, the
+                                                                       authentication key MUST NOT be presented
+                                                                       in plaintext format. Authors recommends
+                                                                       to use MD5 hash to present the authentication-key.'''
+            description '''This container describes authentication
+                           information of the node. ''' + isis_ref(10)
         }
         neighbors_container("extended", 22)
 
-        def reachability = {kind, ref ->
-            container "${kind == "extended"?"${kind}-":""}ipv4${kind != "extended"?"-${kind}":""}-reachability", {
-                list "prefixes", key: "ip-prefix", uses: "prefix-ipv4-${kind == "extended"?"${kind}":"std"}", description: "List of prefixes."
-                description "This container describes list of IPv4 ${kind}"+'''
-                           reachability information.
-                            ''' + isis_ref(ref)
+        def reachability = { kind, ref ->
+            container "${kind == "extended" ? "${kind}-" : ""}ipv4${kind != "extended" ? "-${kind}" : ""}-reachability", {
+                list "prefixes", key: "ip-prefix", uses: "prefix-ipv4-${kind == "extended" ? "${kind}" : "std"}", description: "List of prefixes."
+                description "This container describes list of IPv4 ${kind}" + '''
+                             reachability information.
+                             ''' + isis_ref(ref)
             }
         }
 
         reachability "internal", 128
 
-        leaf_list "protocol-supported",  type: "uint8", {
-            description  '''This leaf describes the list of
-                            supported protocols.
-                            ''' + isis_ref(129)
+        leaf_list "protocol-supported", type: "uint8", {
+            description '''This leaf describes the list of
+                           supported protocols.
+                           ''' + isis_ref(129)
         }
 
         reachability "external", 130
         def make_ip_address = { afi, ref ->
             leaf_list "ipv${afi}-addresses", type: "inet:ipv${afi}-address", {
                 description "This leaf describes the IPv${afi} " + '''addresses of the node.
-                           ''' + isis_ref(ref)
+                             ''' + isis_ref(ref)
             }
         }
         make_ip_address 4, 132
 
-        def router_id = { afi, ref  ->
+        def router_id = { afi, ref ->
             leaf "ipv${afi}-te-routerid", type: "inet:ipv${afi}-address", {
-                description "This leaf describes the IPv${afi} "+ '''Traffic Engineering
-                            router ID of the node.
-                            ''' + isis_ref(ref)
+                description "This leaf describes the IPv${afi} " + '''Traffic Engineering
+                             router ID of the node.
+                             ''' + isis_ref(ref)
             }
         }
         router_id(4, 134)
         reachability "extended", 135
 
         leaf "dynamic-hostname", type: "string", description: '''This leaf describes the name of the node.
-                                                                ''' + isis_ref(137)
+                                                                 ''' + isis_ref(137)
         router_id(6, 140)
         neighbors_container "mt", 223
 
         container "mt-entries", {
-             list "topology",  key: "MT-ID", description: "List of topologies supported.",{
+            list "topology", key: "MT-ID", description: "List of topologies supported.", {
                 leaf_mt()
                 leaf "attributes", {
                     type "bits", {
@@ -543,7 +539,7 @@ builder.module(moduleName) {
                                                 another area using the referred metric.'''
                     }
                     description '''This leaf describes attributes of the LSP
-                                    for the associated topology.'''
+                                   for the associated topology.'''
                 }
             }
             description '''This container describes the topology supported.
@@ -552,7 +548,7 @@ builder.module(moduleName) {
 
         make_ip_address 6, 232
 
-        def make_prefixes = {afi = 4, mt = true ->
+        def make_prefixes = { afi = 4, mt = true ->
             list "prefixes", key: "ip-prefix", uses: "prefix-ipv${afi}-extended", description: "List of prefixes.", {
                 if (mt) leaf_mt()
             }
@@ -561,24 +557,24 @@ builder.module(moduleName) {
         container "mt-extended-ipv4-reachability", {
             make_prefixes()
             description '''This container describes list of IPv4
-                            reachability information in multi-topology
-                            environment.
-                            ''' + isis_ref(235)
+                           reachability information in multi-topology
+                           environment.
+                           ''' + isis_ref(235)
         }
 
         container "mt-ipv6-reachability", {
             make_prefixes(6)
             description '''This container describes list of IPv6
-                            reachability information in multi-topology
-                            environment.
-                            ''' + isis_ref(237)
+                           reachability information in multi-topology
+                           environment.
+                           ''' + isis_ref(237)
         }
 
         container "ipv6-reachability", {
             make_prefixes(6, false)
             description '''This container describes list of IPv6
-                            reachability information.
-                         ''' + isis_ref(236)
+                           reachability information.
+                           ''' + isis_ref(236)
         }
 
         container "router-capabilities", {
@@ -593,25 +589,26 @@ builder.module(moduleName) {
 
     def leaf_boolean = { name, descr, defv = null ->
         leaf name, type: "boolean", description: descr, {
-            if (defv != null) {default_ defv}
+            if (defv != null) {
+                default_ defv
+            }
         }
     }
-    def leaf_enabled = {descr, tr = null ->  leaf_boolean("eanbled", descr, tr) }
-    def leaf_level = {descr->  leaf "level", type: "level", description: descr}
-    def leaf_level_num = {descr->  leaf "level", type: "level-number", description: descr}
+    def leaf_enabled = { descr, tr = null -> leaf_boolean("enabled", descr, tr) }
+    def leaf_level = { descr -> leaf "level", type: "level", description: descr }
+    def leaf_level_num = { descr -> leaf "level", type: "level-number", description: descr }
     def leaf_level_appl = { kind = null -> leaf_level "Level applicability${kind == "metric" ? " of the metric" : ""}." }
     augment "/rt:routing/rt:routing-instance/rt:routing-protocols/" + "rt:routing-protocol", {
         when "rt:type = 'isis:isis'", description: '''This augment is only valid when routing protocol
-                                                       instance type is isis.'''
+                                                      instance type is isis.'''
         description '''This augments a routing protocol instance with ISIS
-                        specific parameters.'''
-
+                       specific parameters.'''
         container "isis", description: '''This container defines ISIS specific configuration
                                           objects.''', {
             list "instance", key: "routing-instance", description: "List of ISIS instances.", {
                 must "count(area-address) > 0", description: "Enforce configuration of at least one area.",
                     error_message: '''At least one area-address
-                                     must be configured.'''
+                                      must be configured.'''
 
                 leaf "routing-instance", type: "rt:routing-instance-ref",
                     description: '''Reference routing instance.
@@ -685,9 +682,9 @@ builder.module(moduleName) {
                                                                      It covers both LSPs and SNPs.''', {
 
                     leaf "key", type: "string", description: '''This leaf describes the
-                                                                authentication key.'''
+                                                                 authentication key.'''
                     leaf "type", type: "authentication-type", description: '''This leaf describes the authentication
-                                                                                type to be used.'''
+                                                                              type to be used.'''
                     leaf_level_appl()
                 }
 
@@ -695,7 +692,7 @@ builder.module(moduleName) {
                 list "metric-type", key: "level", description: "Metric style list.", {
                     leaf "value", {
                         type "enumeration", {
-                            enum_descr "wide-only", ''''Advertise new metric style only
+                            enum_descr "wide-only", '''Advertise new metric style only
                                                         (RFC5305)'''
                             enum_descr "old-only", '''Advertise old metric style only
                                                       (RFC1195)'''
@@ -740,13 +737,13 @@ builder.module(moduleName) {
                 def leaf_af = { leaf "af", type: "string", description: "Address-family" }
                 def leaf_enabled_af = {
                     leaf_enabled '''Describes the activation state of the
-                                   AF.'''
+                                    AF.'''
                 }
                 list "af", if_feature: "nlpid-control", key: "af", {
                     leaf_af()
                     leaf_enabled_af()
                     description '''This list permits activation
-                                    of new address families.'''
+                                   of new address families.'''
                 }
 
                 list "topologies", if_feature: "multi-topology", key: "name", description: "List of topologies", {
@@ -760,14 +757,13 @@ builder.module(moduleName) {
                         if (kind != "overload") {
                             if_feature kind
                         }
-
                         leaf_boolean "status", "This leaf defines the overload status."
                         leaf "timeout", type: "uint16", units: "seconds",
                             description: '''This leaf defines the timeout in seconds
-                                             of the overload condition.'''
+                                            of the overload condition.'''
                         leaf_level_appl("metric")
                         description '''This leaf describes if the router is
-                                        set to overload state.'''
+                                       set to overload state.'''
                     }
                 }
 
@@ -775,7 +771,7 @@ builder.module(moduleName) {
                                    configuration objects.''', {
                     list "interface", key: "name", description: "List of ISIS interfaces.", {
                         leaf "name", type: "string", description: '''Reference to the interface within
-                                                                        the routing-instance.'''
+                                                                     the routing-instance.'''
                         leaf "level-type", type: "level", default_: "level-all",
                             description: '''This leaf defines the associated ISIS
                                             level of the interface.'''
@@ -784,7 +780,7 @@ builder.module(moduleName) {
                                 description: "This leaf defines the interval " + descr
                         }
                         leaf_interval "lsp-pacing", "miliseconds", '''between
-                                                        LSP transmissions in milli-seconds'''
+                                                                      LSP transmissions in milli-seconds'''
 
                         leaf_interval "lsp-retransmit", "seconds", '''between
                                                                      retransmission of LSP'''
@@ -794,13 +790,11 @@ builder.module(moduleName) {
 
                         leaf_interval "csnp", "seconds", "of CSNP  messages."
 
-
                         container "hello-padding", description: '''This container handles ISIS hello padding
-                                                                    configuration.''', {
+                                                                   configuration.''', {
                             leaf_enabled '''Status of Hello-padding activation.
                                              By default, the implementation shall
                                              pad HELLOs.''', true
-
                         }
 
                         leaf "mesh-group-enabled", type: "mesh-group-state",
@@ -811,7 +805,7 @@ builder.module(moduleName) {
                                                                          the interface.''', {
                             when "../mesh-group-enabled = meshSet",
                                 description: '''Only valid when mesh-group-enabled
-                                                 equals meshSet'''
+                                                equals meshSet'''
                         }
 
                         leaf "interface-type", type: "interface-type",
@@ -821,12 +815,12 @@ builder.module(moduleName) {
                                             message that would be used.'''
 
                         leaf_enabled '''This leaf describes the administrative
-                                      status of the ISIS interface.''', true
+                                        status of the ISIS interface.''', true
 
                         [32, 64].each { t ->
                             leaf_list "tag${t == 32 ? "" : 64}", if_feature: "prefix-tag${t == 32 ? "" : 64}", type: "uint${t}",
                                 description: "This leaf defines list of ${t == 32 ? "" : "64bits "}" + '''tags associated
-                                                with the interface.'''
+                                               with the interface.'''
 
                         }
 
@@ -835,16 +829,16 @@ builder.module(moduleName) {
                                 description: '''This leaf describes the authentication
                                                  type to be used in hello messages.'''
                             leaf "key", type: "string", description: '''This leaf describes the
-                                                                          authentication key
-                                                                          to be used in hello messages.
-                                                                          For security reason, the
-                                                                          authentication key MUST
-                                                                          NOT be presented
-                                                                          in plaintext format upon a
-                                                                          get-config reply.
-                                                                          Authors recommends
-                                                                          to use MD5 hash to present the
-                                                                          authentication-key'''
+                                                                        authentication key
+                                                                        to be used in hello messages.
+                                                                        For security reason, the
+                                                                        authentication key MUST
+                                                                        NOT be presented
+                                                                        in plaintext format upon a
+                                                                        get-config reply.
+                                                                        Authors recommends
+                                                                        to use MD5 hash to present the
+                                                                        authentication-key'''
                             leaf_level_appl()
                             description '''This list describes the authentication type
                                             to be used in hello messages.'''
@@ -855,14 +849,14 @@ builder.module(moduleName) {
                                 description: '''This leaf defines the interval of
                                                 hello messages.'''
                             leaf_level_appl()
-                            descriptionS '''This list defines the interval of
-                                            hello messages.'''
+                            description '''This list defines the interval of
+                                           hello messages.'''
                         }
                         list "hello-multiplier", key: "level", {
 
                             leaf "value", type: "uint16", description: '''This leaf defines the number of
-                                                                         hello failed to be received before
-                                                                         declaring the adjacency down.'''
+                                                                          hello failed to be received before
+                                                                          declaring the adjacency down.'''
                             leaf_level_appl()
                             description ''''This list defines the number of
                                             hello failed to be received before
@@ -877,8 +871,8 @@ builder.module(moduleName) {
                             }
                             leaf_level_appl()
                             description '''This list describes the priority of
-                                            the interface
-                                            for DIS election.'''
+                                           the interface
+                                           for DIS election.'''
                         }
                         def list_metric = {
                             list "metric", key: "level", description: "Container for interface metric", {
@@ -892,16 +886,16 @@ builder.module(moduleName) {
                             container "segment-routing", if_feature: "segment-routing",
                                 description: "Segment routing interface configuration.", {
                                 list "prefix-sid", key: "index", {
-                                    leaf_uint32 "index",'''Index associated with
-                                                           prefix.'''
+                                    leaf_uint32 "index", '''Index associated with
+                                                            prefix.'''
                                     leaf_boolean "node-flag", '''Set prefix as a node
-                                                                  representative prefix.''', true
+                                                                 representative prefix.''', true
                                     leaf_boolean "explicit-null", '''Force explicit NULL
                                                                      forwarding for this SID.'''
                                     leaf_boolean "php", '''Activates PHP for this
                                                            SID.'''
                                     description '''List of prefix-SID associated with
-                                                    the interface.'''
+                                                   the interface.'''
                                 }
                             }
                             container "bfd", if_feature: "bfd", description: '''The container describes
@@ -933,20 +927,19 @@ builder.module(moduleName) {
 
     augment "/rt:routing-state/rt:routing-instance/rt:routing-protocols/rt:routing-protocol", {
         when "rt:type = 'isis:isis'", description: '''This augment is only valid when routing protocol
-                                                       instance type is isis.'''
-
+                                                      instance type is isis.'''
         description '''This augments routing protocol instance states with ISIS
-                        specific parameters.'''
+                       specific parameters.'''
         container "isis", config: false, description: "This container defines various ISIS states objects.", {
             list "instance", key: "routing-instance", description: "List of ISIS instances.", {
                 leaf "routing-instance", type: "rt:routing-instance-ref", {
                     description '''Reference routing instance.
-                                    For protocol centric model, which is
-                                    supported in
-                                    default-instance only, this could reference
-                                    any VRF routing-instance.
-                                    For VRF centric model, must reference the
-                                    enclosing routing-instance.'''
+                                   For protocol centric model, which is
+                                   supported in
+                                   default-instance only, this could reference
+                                   any VRF routing-instance.
+                                   For VRF centric model, must reference the
+                                   enclosing routing-instance.'''
                 }
                 def level_isis = { leaf_level_num "This leaf describes the ISIS level." }
                 container "system-counters", description: '''The container defines a list of counters
@@ -954,10 +947,10 @@ builder.module(moduleName) {
                     list "level", key: "level", description: "List of supported levels.", {
                         level_isis()
                         leaf_uint32 "corrupted-lsps", '''Number of corrupted in-memory LSPs detected.
-                                                          LSPs received from the wire with a bad
-                                                          checksum are silently dropped and not counted.
-                                                          LSPs received from the wire with parse errors
-                                                          are counted by lsp-errors.'''
+                                                         LSPs received from the wire with a bad
+                                                         checksum are silently dropped and not counted.
+                                                         LSPs received from the wire with parse errors
+                                                         are counted by lsp-errors.'''
                         leaf_uint32 "authentication-type-fails", "Number of authentication type mismatches."
                         leaf_uint32 "authentication-fails", "Number of authentication key failures."
                         leaf_uint32 "database-overload", '''Number of times the database has become
@@ -968,21 +961,21 @@ builder.module(moduleName) {
                         leaf_uint32 "manual-address-drop-from-area", '''Number of times a manual address
                                                                         has been dropped from the area.'''
                         leaf_uint32 "max-sequence", '''Number of times the system has attempted
-                                                to exceed the maximum sequence number.'''
+                                                       to exceed the maximum sequence number.'''
                         leaf_uint32 "sequence-number-skipped", '''Number of times a sequence number skip has
-                                                                    occured.'''
+                                                                  occured.'''
                         leaf_uint32 "id-len-mismatch", '''Number of times a PDU is received with
                                                           a different value for ID field length
                                                           from that of the receiving system.'''
                         leaf_uint32 "partition-changes", "Number of partition changes detected."
                         leaf_uint32 "lsp-errors", '''Number of LSPs with errors we have
-                                                      received.'''
+                                                     received.'''
                         leaf_uint32 "spf-runs", "Number of times we ran SPF at this level."
                     }
                 }
                 def leaf_interface = {
                     leaf "interface", type: "string", description: '''This leaf describes the name
-                                                                           of the interface.'''
+                                                                      of the interface.'''
                 }
                 container "interface-counters", description: '''The container defines a list of counters
                                                                 for interfaces.''', {
@@ -991,28 +984,28 @@ builder.module(moduleName) {
                         leaf_uint32 "adjacency-changes", '''The number of times an adjacency state
                                                              change has occured on this interface.'''
                         leaf_uint32 "adjacency-number", '''The number of adjacencies on this
-                                                            interface.'''
+                                                           interface.'''
                         leaf_uint32 "init-fails", '''The number of times initialization of
                                                      this interface has failed. This counts
                                                      events such as PPP NCP failures.
                                                      Failures to form an adjacency are counted
                                                      by adjacency-rejects.'''
                         leaf_uint32 "adjacency-rejects", '''The number of times an adjacency has been
-                                                           rejected on this interface.'''
+                                                            rejected on this interface.'''
                         leaf_uint32 "id-len-mismatch", '''The number of times an IS-IS PDU with an ID
-                                                   field length different from that for this
-                                                   system has been received on this interface.'''
+                                                          field length different from that for this
+                                                          system has been received on this interface.'''
                         leaf_uint32 "max-area-addresses-mismatch", '''The number of times an IS-IS PDU with
-                                                                        according max area address field
-                                                                        differs from that for
-                                                                        this system has been received on this
-                                                                        interface.'''
+                                                                      according max area address field
+                                                                      differs from that for
+                                                                      this system has been received on this
+                                                                      interface.'''
                         leaf_uint32 "authentication-type-fails", "Number of authentication type mismatches."
                         leaf_uint32 "authentication-fails", "Number of authentication key failures."
                         leaf_uint32 "lan-dis-changes", '''The number of times the DIS has changed
-                                                    on this interface at this level.
-                                                    If the interface type is point to point,
-                                                    the count is zero.'''
+                                                          on this interface at this level.
+                                                          If the interface type is point to point,
+                                                          the count is zero.'''
                     }
                 }
                 container "packet-counters", description: "The container defines a list of PDU counters.", {
@@ -1040,24 +1033,24 @@ builder.module(moduleName) {
                         leaf "interface-type", type: "interface-type", description: "Type of interface to be used."
                         leaf_level "Level associated with the interface."
                         leaf "passive", type: "empty", description: '''The interface is included in LSP, but
-                                                                         does not run ISIS protocol.'''
+                                                                       does not run ISIS protocol.'''
                         leaf "three-way-handshake", type: "empty", description: "The interface uses 3-way handshake."
                     }
                 }
-                 container "adjacencies", description: '''This container lists the adjacencies of
-                                                          the local node.''', {
-                     list "adjacency", description: "List of operational adjacencies.", {  //TODO key element??
+                container "adjacencies", description: '''This container lists the adjacencies of
+                                                         the local node.''', {
+                    list "adjacency", description: "List of operational adjacencies.", {  //TODO key element??
                         leaf_interface()
                         leaf_level '''This leaf describes the associated
                                       ISIS level of the interface.'''
-                        leaf "neighbor-sysid", type:"system-id",  description: "The system-id of the neighbor"
+                        leaf "neighbor-sysid", type: "system-id", description: "The system-id of the neighbor"
                         leaf "neighbor-extended-circuit-id", type: "extended-circuit-id", description: "Circuit ID of the neighbor"
-                        leaf "neighbor-snpa", type: "snpa",description:  "SNPA of the neighbor"
+                        leaf "neighbor-snpa", type: "snpa", description: "SNPA of the neighbor"
                         leaf "neighbor-level", type: "level", description: "The type of the neighboring system."
-                         leaf "hold-timer", type: "uint16", description: '''The holding time in seconds for this
-                                                                            adjacency. This value is based on
-                                                                            received hello PDUs and the elapsed
-                                                                            time since receipt.'''
+                        leaf "hold-timer", type: "uint16", description: '''The holding time in seconds for this
+                                                                           adjacency. This value is based on
+                                                                           received hello PDUs and the elapsed
+                                                                           time since receipt.'''
                         leaf "neighbor-priority", {
                             type "uint8", range: "0..127"
                             description '''Priority of the neighboring IS for becoming
@@ -1070,13 +1063,13 @@ builder.module(moduleName) {
                                                         The value is 0 if the adjacency has never
                                                         been in state 'up'.'''
 
-                        leaf "state",  description: '''This leaf describes the state of the
-                                                        interface.''', {
-                           type "enumeration", {
-                               ["Up", "Down", "Init"].each {e->
-                                   enum_descr e, '''This state describes that
-                                                    adjacency is ''' + "${e=="Down"?"NOT ":""}establish${e == "Init"?"ing":"ed"}."
-                               }
+                        leaf "state", description: '''This leaf describes the state of the
+                                                      interface.''', {
+                            type "enumeration", {
+                                ["Up", "Down", "Init"].each { e ->
+                                    enum_descr e, '''This state describes that
+                                                     adjacency is ''' + "${e == "Down" ? "NOT " : ""}establish${e == "Init" ? "ing" : "ed"}."
+                                }
                             }
                         }
                     }
@@ -1112,7 +1105,7 @@ builder.module(moduleName) {
                             leaf "lsp", type: "lsp-id", description: '''This leaf describes the LSPID
                                                                         of the LSP.'''
                             leaf_uint32 "sequence", '''This leaf describes the sequence
-                                                        number of the LSP.'''
+                                                       number of the LSP.'''
                         }
                     }
                 }
@@ -1125,17 +1118,17 @@ builder.module(moduleName) {
                         leaf_level_num '''This leaf describes the level affected by the
                                           the computation.'''
                         container "lsp", description: '''This container describes the received LSP
-                                                              , in case of local LSP update the local
-                                                                LSP ID is referenced.''', {
+                                                         , in case of local LSP update the local
+                                                         LSP ID is referenced.''', {
                             leaf "lsp", type: "lsp-id", description: '''This leaf describes the LSPID
                                                                         of the LSP.'''
                             leaf_uint32 "sequence", '''This leaf describes the sequence
                                                         number of the LSP.'''
                         }
                         leaf_timestamp "received-timestamp", '''This leaf describes the timestamp
-                                                                  when the LSP was received. In case of
-                                                                  local LSP update, the timestamp refers
-                                                                  to the local LSP update time.'''
+                                                                when the LSP was received. In case of
+                                                                local LSP update, the timestamp refers
+                                                                to the local LSP update time.'''
                     }
                 }
                 container "database", description: '''This container describes ISIS Link State
@@ -1145,11 +1138,11 @@ builder.module(moduleName) {
                         list "lsp", key: "lsp-id", uses: "database", description: "List of LSPs in LSDB."
                     }
                 }
-                container "hostnames",  description: '''This container describes the list
+                container "hostnames", description: '''This container describes the list
                                                         of binding between system-id and
                                                         hostnames.''', {
-                     list "hostname",  key: "system-id", description:  "List of system-id/hostname associations", {
-                        leaf "system-id", type: "system-id", description:  '''This leaf describes the system-id
+                    list "hostname", key: "system-id", description: "List of system-id/hostname associations", {
+                        leaf "system-id", type: "system-id", description: '''This leaf describes the system-id
                                                                               associated with the hostname.'''
                         leaf "hostname", type: "string", description: '''This leaf describes the hostname
                                                                          associated with the system ID.'''
@@ -1174,7 +1167,7 @@ builder.module(moduleName) {
                                 value of this parameter doesn't exist, then this
                                 operation SHALL fail with error-tag 'data-missing'
                                 and error-app-tag 'routing-instance-not-found'.'''
-            leaf "routing-protocol-instance-name",  type: "instance-state-ref", mandatory: "true",
+            leaf "routing-protocol-instance-name", type: "instance-state-ref", mandatory: "true",
                 description: '''Name of the ISIS protocol instance whose ISIS
                                 information is being queried.
 
@@ -1240,49 +1233,49 @@ builder.module(moduleName) {
 
     cmt("Notifications", inline: false)
 
-    leaf_lspid = {leaf "lsp-id", type: "lsp-id", description: "LSP ID."}
-    leaf_rawpdu = {leaf "raw-pdu", type: "binary", description: "Received raw PDU."}
-    def notif = {name, cl, descr ->
+    leaf_lspid = { leaf "lsp-id", type: "lsp-id", description: "LSP ID." }
+    leaf_rawpdu = { leaf "raw-pdu", type: "binary", description: "Received raw PDU." }
+    def notif = { name, cl, descr ->
         notification name, {
             cl()
             description "This notification is sent " + descr
         }
     }
 
-    def notif_inst = {name, cl, descr ->
+    def notif_inst = { name, cl, descr ->
         notif name, {
             uses "notification-instance-hdr"
             cl()
         }, descr
     }
 
-    def notif_inst_intf = {name, cl, descr ->
+    def notif_inst_intf = { name, cl, descr ->
         notif_inst name, {
             uses "notification-interface-hdr"
             cl()
         }, descr
     }
 
-    def notif_inst_intf_5gap = {name, cl, descr ->
+    def notif_inst_intf_5gap = { name, cl, descr ->
         notif_inst_intf name, cl, descr + '''
                                             The notification generation must be throttled with
                                             at least a 5 second gap.'''
     }
 
     notif_inst "database-overload", {
-        leaf "overload", description:  "Describes the new overload state of the instance.", {
+        leaf "overload", description: "Describes the new overload state of the instance.", {
             type "enumeration", {
                 enum_descr "off", "The system has left overload condition."
-                enum_descr "on",  "The system is in overload condition."
+                enum_descr "on", "The system is in overload condition."
             }
         }
     }, '''when an ISIS instance
           overload condition changes.'''
 
     notif_inst_intf_5gap "lsp-too-large", {
-        leaf_uint32 "pdu-size",  "Size of the PDU"
+        leaf_uint32 "pdu-size", "Size of the PDU"
         leaf_lspid()
-    },'''when we attempt
+    }, '''when we attempt
          to propagate an LSP that is larger than the
          dataLinkBlockSize for the circuit.'''
 
@@ -1290,7 +1283,7 @@ builder.module(moduleName) {
                                                         that an LSP that was stored in memory has
                                                         become corrupted.'''
 
-    notif_inst "attempt-to-exceed-max-sequence", leaf_lspid,'''when the system
+    notif_inst "attempt-to-exceed-max-sequence", leaf_lspid, '''when the system
                                                                 wraps the 32-bit sequence counter of an LSP.'''
 
     notif_inst_intf_5gap "id-len-mismatch", {
@@ -1300,7 +1293,7 @@ builder.module(moduleName) {
           with a different value for the System ID length.'''
 
     notif_inst_intf_5gap "max-area-addresses-mismatch", {
-        leaf "max-area-addresses", type: "uint8",  description: "Received number of supported areas"
+        leaf "max-area-addresses", type: "uint8", description: "Received number of supported areas"
         leaf_rawpdu()
     }, '''when we receive a PDU
           with a different value for the Maximum Area Addresses.'''
@@ -1324,13 +1317,13 @@ builder.module(moduleName) {
     notif_inst_intf_5gap "version-skew", {
         leaf "protocol-version", type: "uint8", description: "Protocol version received in the PDU."
         leaf_rawpdu()
-        },'''when the system
+    }, '''when the system
              receives a PDU with a different protocol version
              number.'''
 
     notif_inst_intf_5gap "area-mismatch", leaf_rawpdu, '''when the system
-                                                     receives a Hello PDU from an IS that does
-                                                     not share any area address.'''
+                                                          receives a Hello PDU from an IS that does
+                                                          not share any area address.'''
 
     notif_inst_intf_5gap "rejected-adjacency", {
         leaf_rawpdu()
@@ -1377,12 +1370,11 @@ builder.module(moduleName) {
                                       adjacency is no more established.'''
             }
         }
-        leaf "reason", type: "string", description:
-            '''If the adjacency is going to DOWN,
-                                                      this leaf provides a reason for the adjacency
-                                                      going down. The reason is provided as a text.
-                                                      If the adjacency is going to UP, no reason is
-                                                      provided.'''
+        leaf "reason", type: "string", description: '''If the adjacency is going to DOWN,
+                                                       this leaf provides a reason for the adjacency
+                                                       going down. The reason is provided as a text.
+                                                       If the adjacency is going to UP, no reason is
+                                                       provided.'''
     }, '''when an ISIS adjacency
               moves to Up state or to Down state.'''
 
@@ -1401,7 +1393,7 @@ builder.module(moduleName) {
         leaf_uint32 "sequence", "Sequence number of the received LSP."
         leaf_timestamp "send-timestamp", '''This leaf describes the timestamp
                                             when our LSP was regenerated. '''
-    },'''when a LSP
+    }, '''when a LSP
          is regenerated.
          The notification generation must be throttled with at least
          a 5 second gap.'''
