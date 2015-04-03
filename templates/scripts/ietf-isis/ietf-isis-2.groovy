@@ -222,6 +222,8 @@ builder.module(moduleName) {
                        an ISIS protocol instance.'''
     }
 
+    def leaf_uint32 = { name, descr -> leaf name, type: "uint32", description: descr }
+    def leaf_timestamp = { name, descr -> leaf name, type: "yang:timestamp", description: descr }
     def enum_descr = {e, descr -> enum_ e, description:  descr}
     def state_typedef = {state ->
         typedef "${state}-state",description: "${state=="admin"?"Administrative":"Operational"} state of a component.", {
@@ -329,7 +331,7 @@ builder.module(moduleName) {
     grouping_if_inst("interface")
 
     grouping "route-content", description: "This group add isis-specific route properties.", {
-        leaf "metric", type: "uint32",description: "This leaf describes ISIS metric of a route."
+        leaf_uint32 "metric","This leaf describes ISIS metric of a route."
         leaf_list "tag", type: "uint64", description: '''This leaf describes list of tags associated
                                                           with the route. The leaf describes both
                                                           32bits and 64bits tags.'''
@@ -438,7 +440,7 @@ builder.module(moduleName) {
         leaf "checksum", type: "uint16", description: "This leaf describes the checksum of the LSP."
         leaf "remaining-lifetime", type: "uint16",  units: "seconds", description: '''This leaf describes the remaining lifetime
                                                                                       in seconds before the LSP expiration.'''
-        leaf "sequence", type: "uint32", description: "This leaf describes the sequence number of the LSP."
+        leaf_uint32 "sequence", "This leaf describes the sequence number of the LSP."
         leaf "attributes",  description: "This leaf describes attributes of the LSP.", {
             type "bits", {
                 make_bit "PARTITIONNED", '''supports partition
@@ -675,7 +677,7 @@ builder.module(moduleName) {
                     }
                     list "srgb", key: "lower-bound upper-bound", description: "List of global blocks to be advertised.", {
                         ["lower", "upper"].each { bnd ->
-                            leaf "${bnd}-bound", type: "uint32", description: "${bnd.capitalize()} value in the block."
+                            leaf_uint32 "${bnd}-bound", "${bnd.capitalize()} value in the block."
                         }
                     }
                 }
@@ -890,8 +892,8 @@ builder.module(moduleName) {
                             container "segment-routing", if_feature: "segment-routing",
                                 description: "Segment routing interface configuration.", {
                                 list "prefix-sid", key: "index", {
-                                    leaf "index", type: "uint32", description: '''Index associated with
-                                                                                    prefix.'''
+                                    leaf_uint32 "index",'''Index associated with
+                                                           prefix.'''
                                     leaf_boolean "node-flag", '''Set prefix as a node
                                                                   representative prefix.''', true
                                     leaf_boolean "explicit-null", '''Force explicit NULL
@@ -946,9 +948,7 @@ builder.module(moduleName) {
                                     For VRF centric model, must reference the
                                     enclosing routing-instance.'''
                 }
-                def leaf_uint32 = { name, descr -> leaf name, type: "uint32", description: descr }
                 def level_isis = { leaf_level_num "This leaf describes the ISIS level." }
-                def leaf_timestamp = {name, descr -> leaf name, type: "yang:timestamp", description: descr }
                 container "system-counters", description: '''The container defines a list of counters
                                                              for the IS.''', {
                     list "level", key: "level", description: "List of supported levels.", {
@@ -1239,422 +1239,172 @@ builder.module(moduleName) {
 
 
     cmt("Notifications", inline: false)
-    notification "database-overload", {
-        uses "notification-instance-hdr"
 
-        leaf "overload", {
-           type "enumeration", {
-                enum_ "off", {
-                    description \
-                    "The system has left overload condition."
-                }
-                enum_ "on", {
-                    description \
-                    "The system is in overload condition."
-                }
+    leaf_lspid = {leaf "lsp-id", type: "lsp-id", description: "LSP ID."}
+    leaf_rawpdu = {leaf "raw-pdu", type: "binary", description: "Received raw PDU."}
+    def notif = {name, cl, descr ->
+        notification name, {
+            cl()
+            description "This notification is sent " + descr
+        }
+    }
 
+    def notif_inst = {name, cl, descr ->
+        notif name, {
+            uses "notification-instance-hdr"
+            cl()
+        }, descr
+    }
+
+    def notif_inst_intf = {name, cl, descr ->
+        notif_inst name, {
+            uses "notification-interface-hdr"
+            cl()
+        }, descr
+    }
+
+    def notif_inst_intf_5gap = {name, cl, descr ->
+        notif_inst_intf name, cl, descr + '''
+                                            The notification generation must be throttled with
+                                            at least a 5 second gap.'''
+    }
+
+    notif_inst "database-overload", {
+        leaf "overload", description:  "Describes the new overload state of the instance.", {
+            type "enumeration", {
+                enum_descr "off", "The system has left overload condition."
+                enum_descr "on",  "The system is in overload condition."
             }
-            description \
-            "Describes the new overload state of the instance."
         }
-        description \
-        '''This notification is sent when an ISIS instance
-            overload condition changes.'''
-    }
+    }, '''when an ISIS instance
+          overload condition changes.'''
 
-    notification "lsp-too-large", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
+    notif_inst_intf_5gap "lsp-too-large", {
+        leaf_uint32 "pdu-size",  "Size of the PDU"
+        leaf_lspid()
+    },'''when we attempt
+         to propagate an LSP that is larger than the
+         dataLinkBlockSize for the circuit.'''
 
-        leaf "pdu-size", {
-            type "uint32"
-            description \
-            "Size of the PDU"
-        }
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        description \
-        '''This notification is sent when we attempt
-            to propagate an LSP that is larger than the
-            dataLinkBlockSize for the circuit.
-                The notification generation must be throttled
-            with at least a 5 second gap.
-            '''
-    }
+    notif_inst "corrupted-lsp-detected", leaf_lspid, '''when we find
+                                                        that an LSP that was stored in memory has
+                                                        become corrupted.'''
 
-    notification "corrupted-lsp-detected", {
-        uses "notification-instance-hdr"
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        description \
-        '''This notification is sent when we find
-            that an LSP that was stored in memory has
-            become corrupted.
-                '''
-    }
+    notif_inst "attempt-to-exceed-max-sequence", leaf_lspid,'''when the system
+                                                                wraps the 32-bit sequence counter of an LSP.'''
 
-    notification "attempt-to-exceed-max-sequence", {
-        uses "notification-instance-hdr"
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        description \
-        '''This notification is sent when the system
-            wraps the 32-bit sequence counter of an LSP.
-            '''
-    }
+    notif_inst_intf_5gap "id-len-mismatch", {
+        leaf "pdu-field-len", type: "uint8", description: "Size of the ID length in the received PDU"
+        leaf_rawpdu()
+    }, '''when we receive a PDU
+          with a different value for the System ID length.'''
 
-    notification "id-len-mismatch", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
+    notif_inst_intf_5gap "max-area-addresses-mismatch", {
+        leaf "max-area-addresses", type: "uint8",  description: "Received number of supported areas"
+        leaf_rawpdu()
+    }, '''when we receive a PDU
+          with a different value for the Maximum Area Addresses.'''
 
-        leaf "pdu-field-len", {
-            type "uint8"
-            description \
-            "Size of the ID length in the received PDU"
-        }
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        description \
-        '''This notification is sent when we receive a PDU
-            with a different value for the System ID length.
-                The notification generation must be throttled
-            with at least a 5 second gap.
-            '''
-    }
+    notif_inst_intf "own-lsp-purge", leaf_lspid, '''when the system
+                                                    receives a PDU with its own system ID and zero age.'''
 
-    notification "max-area-addresses-mismatch", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
+    notif_inst_intf "sequence-number-skipped", leaf_lspid, '''when the system
+                                                              receives a PDU with its own system ID and
+                                                              different contents. The system has to reissue
+                                                              the LSP with a higher sequence number.'''
 
-        leaf "max-area-addresses", {
-            type "uint8"
-            description \
-            "Received number of supported areas"
-        }
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        description \
-        '''This notification is sent when we receive a PDU
-            with a different value for the Maximum Area Addresses.
-                The notification generation must be throttled
-            with at least a 5 second gap.
-            '''
-    }
+    notif_inst_intf_5gap "authentication-type-failure", leaf_rawpdu, '''when the system
+                                                                   receives a PDU with the wrong authentication type
+                                                                   field.'''
 
-    notification "own-lsp-purge", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        description \
-        '''This notification is sent when the system
-            receives a PDU with its own system ID and zero age.
-            '''
-    }
+    notif_inst_intf_5gap "authentication-failure", leaf_rawpdu, '''when the system
+                                                              receives a PDU with the wrong authentication
+                                                              information.'''
 
-    notification "sequence-number-skipped", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        description \
-        '''This notification is sent when the system
-            receives a PDU with its own system ID and
-            different contents. The system has to reissue
-            the LSP with a higher sequence number.
-            '''
-    }
+    notif_inst_intf_5gap "version-skew", {
+        leaf "protocol-version", type: "uint8", description: "Protocol version received in the PDU."
+        leaf_rawpdu()
+        },'''when the system
+             receives a PDU with a different protocol version
+             number.'''
 
-    notification "authentication-type-failure", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        description \
-        '''This notification is sent when the system
-            receives a PDU with the wrong authentication type
-            field.
-                The notification generation must be throttled with
-            at least a 5 second gap.
-                '''
-    }
+    notif_inst_intf_5gap "area-mismatch", leaf_rawpdu, '''when the system
+                                                     receives a Hello PDU from an IS that does
+                                                     not share any area address.'''
 
-    notification "authentication-failure", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        description \
-        '''This notification is sent when the system
-            receives a PDU with the wrong authentication
-            information.
-                The notification generation must be throttled with
-            at least a 5 second gap.
-                '''
-    }
+    notif_inst_intf_5gap "rejected-adjacency", {
+        leaf_rawpdu()
+        leaf "reason", type: "string", description: '''The system may provide a reason to reject the
+                                                        adjacency. If the reason is not available,
+                                                        the system use an empty string.'''
+    }, '''when the system
+          receives a Hello PDU from an IS but does not
+          establish an adjacency for some reason.'''
 
-    notification "version-skew", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "protocol-version", {
-            type "uint8"
-            description \
-            "Protocol version received in the PDU."
-        }
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        description \
-        '''This notification is sent when the system
-            receives a PDU with a different protocol version
-            number.
-                The notification generation must be throttled with at least
-            a 5 second gap.
-                '''
-    }
+    notif_inst_intf_5gap "protocols-supported-mismatch", {
+        leaf_rawpdu()
+        leaf_list "protocols", type: "uint8", description: '''The list of protocols supported by the
+                                                              remote system.'''
+    }, '''when the system
+          receives a non pseudonode LSP that has no matching
+          protocol supported.'''
 
-    notification "area-mismatch", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        description \
-        '''This notification is sent when the system
-            receives a Hello PDU from an IS that does
-            not share any area address.
-            The notification generation must be throttled with at least
-            a 5 second gap.
-                '''
-    }
+    notif_inst_intf_5gap "lsp-error-detected", {
+        leaf_lspid()
+        leaf_rawpdu()
+        leaf_uint32 "error-offset", '''If the problem is a malformed TLV,
+                                        the error-offset points to the start of the TLV.
+                                        If the problem is with the LSP header,
+                                        the error-offset points to the suspicious byte'''
+        leaf "tlv-type", type: "uint8", description: '''if the problem is a malformed TLV, the tlv-type is set
+                                                       to the type value of the suspicious TLV.
+                                                       Otherwise this leaf is not present.'''
+    }, '''when the system
+          receives a  LSP with a parse error.'''
 
-    notification "rejected-adjacency", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        leaf "reason", {
-            type "string"
-            description \
-            '''The system may provide a reason to reject the
-                adjacency. If the reason is not available,
-                    the system use an empty string.'''
-        }
-        description \
-        '''This notification is sent when the system
-            receives a Hello PDU from an IS but does not
-            establish an adjacency for some reason.
-                The notification generation must be throttled with at least
-            a 5 second gap.
-                '''
-    }
-
-
-    notification "protocols-supported-mismatch", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        leaf_list "protocols", {
-            type "uint8"
-            description \
-            '''The list of protocols supported by the
-                remote system.'''
-        }
-        description \
-        '''This notification is sent when the system
-            receives a non pseudonode LSP that has no matching
-            protocol supported.
-                The notification generation must be throttled with at least
-            a 5 second gap.
-                '''
-    }
-
-    notification "lsp-error-detected", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        leaf "raw-pdu", {
-            type "binary"
-            description \
-            "Received raw PDU."
-        }
-        leaf "error-offset", {
-            type "uint32"
-            description \
-            '''If the problem is a malformed TLV,
-                the error-offset points to the start of the TLV.
-                If the problem is with the LSP header,
-                    the error-offset points to the suspicious byte'''
-        }
-        leaf "tlv-type", {
-            type "uint8"
-            description \
-            '''if the problem is a malformed TLV, the tlv-type is set
-                to the type value of the suspicious TLV.
-                    Otherwise this leaf is not present.'''
-        }
-        description \
-        '''This notification is sent when the system
-            receives a  LSP with a parse error.
-            The notification generation must be throttled with at least
-            a 5 second gap.
-                '''
-    }
-
-    notification "adjacency-change", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
-        leaf "neighbor", {
-            type "string"
-            description \
-            '''Describes the name of the neighbor. If the
-                name of the neighbor is not available, the
-                field would be empty.'''
-        }
-        leaf "neighbor-system-id", {
-            type "system-id"
-            description \
-            "Describes the system-id of the neighbor."
-        }
-        leaf "level", {
-            type "level"
-            description \
-            "Describes the ISIS level of the adjacency."
-        }
-        leaf "state", {
-           type "enumeration", {
-                enum_ "Up", {
-                    description \
-                    '''This state describes that
-                        adjacency is established.'''
-                }
-                enum_ "Down", {
-                    description \
-                    '''This state describes that
-                        adjacency is no more established.'''
-                }
+    notif_inst_intf "adjacency-change", {
+        leaf "neighbor", type: "string", description: '''Describes the name of the neighbor. If the
+                                                         name of the neighbor is not available, the
+                                                         field would be empty.'''
+        leaf "neighbor-system-id", type: "system-id", description: "Describes the system-id of the neighbor."
+        leaf_level "Describes the ISIS level of the adjacency."
+        leaf "state", description: '''This leaf describes the new state of the
+                                        ISIS adjacency.''', {
+            type "enumeration", {
+                enum_descr "Up", '''This state describes that
+                                    adjacency is established.'''
+                enum_descr "Down", '''This state describes that
+                                      adjacency is no more established.'''
             }
-            description \
-            '''This leaf describes the new state of the
-                ISIS adjacency.'''
         }
-        leaf "reason", {
-            type "string"
-            description \
+        leaf "reason", type: "string", description:
             '''If the adjacency is going to DOWN,
-                this leaf provides a reason for the adjacency
-                going down. The reason is provided as a text.
-                    If the adjacency is going to UP, no reason is
-                provided.'''
-        }
-        description \
-        '''This notification is sent when an ISIS adjacency
-            moves to Up state or to Down state.'''
-    }
+                                                      this leaf provides a reason for the adjacency
+                                                      going down. The reason is provided as a text.
+                                                      If the adjacency is going to UP, no reason is
+                                                      provided.'''
+    }, '''when an ISIS adjacency
+              moves to Up state or to Down state.'''
 
-    notification "lsp-received", {
-        uses "notification-instance-hdr"
-        uses "notification-interface-hdr"
+    notif_inst_intf_5gap "lsp-received", {
+        leaf_lspid()
+        leaf_uint32 "sequence", "Sequence number of the received LSP."
+        leaf_timestamp "received-timestamp", '''This leaf describes the timestamp
+                                                when the LSP was received. '''
+        leaf "neighbor-system-id", type: "system-id", description: '''Describes the system-id of the neighbor
+                                                                     that sent the LSP.'''
+    }, '''when a LSP
+               is received.'''
 
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        leaf "sequence", {
-            type "uint32"
-            description \
-            "Sequence number of the received LSP."
-        }
-        leaf "received-timestamp", {
-            type "yang:timestamp"
-
-            description \
-            '''This leaf describes the timestamp
-                when the LSP was received. '''
-        }
-        leaf "neighbor-system-id", {
-            type "system-id"
-            description \
-            '''Describes the system-id of the neighbor
-                that sent the LSP.'''
-        }
-        description \
-        '''This notification is sent when a LSP
-            is received.
-                The notification generation must be throttled with at least
-            a 5 second gap. '''
-    }
-
-    notification "lsp-generation", {
-        uses "notification-instance-hdr"
-
-        leaf "lsp-id", {
-            type "lsp-id"
-            description \
-            "LSP ID."
-        }
-        leaf "sequence", {
-            type "uint32"
-            description \
-            "Sequence number of the received LSP."
-        }
-        leaf "send-timestamp", {
-            type "yang:timestamp"
-
-            description \
-            '''This leaf describes the timestamp
-                when our LSP was regenerated. '''
-        }
-        description \
-        '''This notification is sent when a LSP
-            is regenerated.
-                The notification generation must be throttled with at least
-            a 5 second gap.'''
-    }
-
+    notif_inst "lsp-generation", {
+        leaf_lspid()
+        leaf_uint32 "sequence", "Sequence number of the received LSP."
+        leaf_timestamp "send-timestamp", '''This leaf describes the timestamp
+                                            when our LSP was regenerated. '''
+    },'''when a LSP
+         is regenerated.
+         The notification generation must be throttled with at least
+         a 5 second gap.'''
 }
 
 println builder.getText()
