@@ -62,16 +62,16 @@ builder.module(moduleName) {
         }
     }
 
-    isis_revision("2014-12-15", '''Adding IPFRR
+    isis_revision "2014-12-15", '''Adding IPFRR
                                    Adding igp-ldp sync
                                    Adding segment routing
-                                   Adding instance reference to operational states.''')
+                                   Adding instance reference to operational states.'''
 
-    isis_revision("2014-10-24", '''Change hello-padding to container
+    isis_revision "2014-10-24", '''Change hello-padding to container
                                    Change bfd to container
                                    Make BFD a feature
                                    Creates mpls-te container and put router-id inside
-                                   Remove GR helper disable and timers''', "draft-ietf-isis-yang-isis-cfg-01")
+                                   Remove GR helper disable and timers''', "draft-ietf-isis-yang-isis-cfg-01"
 
     revision "2014-10-21", {
         description '''
@@ -87,8 +87,6 @@ builder.module(moduleName) {
                     * Added overload-max-metric feature
                     * overload-max-metric is in a separate container
                     '''
-
-        reference '""'
     }
 
     revision "2014-10-07", {
@@ -102,27 +100,19 @@ builder.module(moduleName) {
                     '''
         reference "draft-ietf-isis-yang-isis-00"
     }
-    revision "2014-09-26", {
-        description             \
-                    '''
-            * Add BFD support
-            * remove max-elements to max-area-addresses
-            '''
-        reference '""'
-    }
-    revision "2014-09-11", {
-        description '''
-                    * Add level parameter to ispf and spf delay
-                    * Add LSP generation as a feature
-                    * Make lsp-refresh a feature
-                    * Change parameter container to list
-                    '''
-        reference '""'
-    }
+
+    isis_revision "2014-09-26", '''Add BFD support
+                                   remove max-elements to max-area-addresses'''
+
+    isis_revision "2014-09-11", '''Add level parameter to ispf and spf delay
+                                   Add LSP generation as a feature
+                                   Make lsp-refresh a feature
+                                   Change parameter container to list'''
+
     revision "2014-09-05", {
         description " Rewrite of the global hierarchy."
-        reference '""'
     }
+
     revision "2014-08-06", {
         description '''
                     * isis-state renamed to isis.
@@ -146,13 +136,10 @@ builder.module(moduleName) {
                     '''
         reference "RFC XXXX: YANG Data Model for ISIS Protocol"
     }
-    revision "2014-06-25", {
-        description '''
-                    * isis-cfg renamed to isis.
-                    * Add precisions on authentication-keys in description
-                    '''
-        reference "draft-litkowski-isis-yang-isis-01"
-    }
+
+    isis_revision "2014-06-25", '''isis-cfg renamed to isis.
+                                    Add precisions on authentication-keys in description''',
+                                    "draft-litkowski-isis-yang-isis-01"
 
     revision "2014-06-20", {
         description '''
