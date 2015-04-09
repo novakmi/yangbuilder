@@ -1,7 +1,6 @@
 #Yangbuilder change log
 
-* 1.1.0 2015-03-14 preparation
-
+* 1.1.0 2015-04-10
     * updated dependencies
     * updated copyright
     * examples updated to the new jcenter repository

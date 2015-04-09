@@ -10,7 +10,7 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //Update nodebuilder, yangbuilder version numbers as needed
 //adoc-begin - documentation purpose comment
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
 // This script template represents example of usage with Compact yang plugin
 // (syntax is more different from yang, but more compact)

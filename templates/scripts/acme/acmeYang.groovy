@@ -7,8 +7,8 @@
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 
-//@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
-//@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
 //This script template represents example of usage without any plugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
