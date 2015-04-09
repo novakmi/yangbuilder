@@ -11,6 +11,11 @@ Use [groovy][groovy_id] version 2.0.0 and later.
 
 See `changelog.txt`.
 
+Quick examples:
+
+See `templates\scripts\ietf-interfaces`
+
+
 Michal Novak (<it.novakmi@gmail.com>)
 
 [gradle_id]: http://www.gradle.org/  "Gradle"

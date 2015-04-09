@@ -16,6 +16,10 @@ moduleName = "ietf-isis-1"
 
 
 builder.module(moduleName) {
+    geninfo file: "${moduleName}.groovy", time: true,
+        cmt: '''Example implementation of the Internet-Draft for the ISIS routing protocol in the yangbuilder
+                with the syntax most similar to the Yang.
+                See https://github.com/igp-yang/isis-yang/blob/master/ietf-isis.yang/ for original file'''
     namespace "urn:ietf:params:xml:ns:yang:ietf-isis", nlLevel: true;
 
     prefix "isis";

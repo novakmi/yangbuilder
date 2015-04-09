@@ -58,7 +58,7 @@ builder.module(moduleName, pnl_namespace:'http://bitbucket.org/novakmi/yangbuild
                 uses 'addressPort'  // yang grouping reuse
         }
 
-        ['bgp', 'ospf', 'isis', 'rip'].each {k -> // create 3 containers in loop, not possible in yang
+        ['bgp', 'ospf', 'isis', 'rip'].each {k -> // create 4 containers in loop, not possible in yang
                 yngbuild("/* ${k} neighbor */", indent: true)
                 container("${k}-neighbor", description: "${k}-neighbor container", nl: 1) {
                         // as if content of function is written here, yangbuilder reuse (not possible in yang)
