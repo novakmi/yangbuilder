@@ -4,11 +4,12 @@
 // This class is related to ospf-module.yang file
 class YangOspf {
 
-        static def name = "ospf-module" // groovy makes automatically getName(), setName()
+        static def yangName = "ospf-module" // groovy makes automatically getYangName(), setYangName()
 
         static def buildYang(builder) {
                 def protocol = 'ospf'
                 builder.module(getName()) {
+                        geninfo file: "${this.name}.groovy"
                         YangCommon.buildHeader(builder, protocol)
 
                         yngbuild("/* ${protocol} neighbor */", indent: true)

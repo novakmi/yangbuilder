@@ -4,10 +4,11 @@
 // This class is related to bgp-module.yang file
 class YangBgp {
 
-        static def name = "bgp-module" // groovy makes automatically getName(), setName()
+        static def yangName = "bgp-module" // groovy makes automatically getYangName(), setYangName()
 
         static def buildYang(builder) {
                 builder.module(getName()) {
+                        geninfo file: "${this.name}.groovy"
                         YangCommon.buildHeader(builder, 'bgp')
 
                         include YangBgpSubmodule.getName()

@@ -6,7 +6,7 @@
 //if you have internet connection, use groovy grab to get dependencies (may take some time for the first time to download jars)
 //run as ordinary groovy script with command 'groovy <scriptname>.groovy' (or as linux executable script './<scriptname>.groovy')
 //update nodebuilder, yangbuilder version numbers as needed
-@GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2compatible = true)
+//@GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2Compatible = true)
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
@@ -35,8 +35,8 @@ def yangs = [
 for (y in yangs) { // one can also use yangs.each {y ->
         builder.reset() // empty builder
         y.buildYang(builder)
-        print("Processing ${y.getName()} ...")
-        builder.writeToFile("${y.getName()}.yang")
+        print("Processing ${y.getYangName()} ...")
+        builder.writeToFile("${y.getYangName()}.yang")
         //new File("${y.getName()}.yang").write(builder.getText()) //write to file
         println("done")
 }

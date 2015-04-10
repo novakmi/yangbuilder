@@ -4,10 +4,11 @@
 // This class is related to bgp-submodule.yang file
 class YangBgpSubmodule {
 
-        static def name = "bgp-submodule" // groovy makes automatically getName(), setName()
+        static def yangName = "bgp-submodule" // groovy makes automatically getYangName(), setYangName()
 
         static def buildYang(builder) {
                 builder.yangroot { //yangroot is used only because comment is above 'submodule'
+                        geninfo file: "${this.name}.groovy"
                         yngbuild("/* Example of submodule */")
                         submodule(getName()) {
                                 'belongs-to'(YangBgp.getName()) {
