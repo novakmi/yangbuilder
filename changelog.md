@@ -1,10 +1,10 @@
 #Yangbuilder change log
 
-* 1.1.0 2015-04-10
+* 1.1.0 2015-04-10    
+    * updated documentation
     * updated dependencies
     * updated copyright
-    * examples updated to the new jcenter repository
-    * documentation cleaned during `clean` gradle task
+    * examples updated to the new jcenter repository    
     * Issue #1 - `CompactYangPlugin` - support for more attributes
     * Issue #3 - `CompactYangPlugin` - `error-message` added to default quote keyword
     * Issue #4 - `CompactYangPlugin` - support for `elems` attribute (value is list of strings which are turned directly into the yang child elements)
@@ -15,7 +15,7 @@
     * `YangBuilder` - nodes with attribute `_ygn` and attributes with prefix `_ygn_` are ignored from processing
     * `CompactYangPluging` - support for `autoPnlLevel` and `autoNlLevel` attributes
     * better handling of multiline 'quoted' elements (indentation, trim)
-    * added examples -  RFC 7223  `ietf-interfaces` - 3 variants
+    * added examples -  RFC 7223  `ietf-interfaces` - 3 variants, `ietf-isis` - 2 variants
 
 * 1.0.0 2013-03-08
     * updated dependencies to groovy 2.1.1, nodebuilder-0.8.0
