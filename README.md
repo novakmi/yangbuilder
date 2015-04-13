@@ -1,12 +1,12 @@
 #Yangbuilder
-`yangbuilder` is Groovy builder for the Yang Modeling Lanuguage.
+`yangbuilder` is Groovy builder for the Yang Modeling Language.
 
 The Groovy `yang` model written in the `yangbuilder` can be very similar to the original `yang` syntax.
-On the orther hand, it can use power of a programming language (Groovy) - loops, conditions, functions with parameters, closures.
+On the other hand, it can use power of a programming language (Groovy) - loops, conditions, functions with parameters, closures.
 The Groovy support in development environments (`Eclipse`, `Intellij Idea`) makes data model editing faster (syntax
 highlighting, formatting, navigation).
 
-In addtion, there is a plugin for compact yang syntax, which can reduce the data model size. 
+In addition, there is a plugin for compact yang syntax, which can reduce the data model size. 
 Example (from the Yang tutorial):
  
     container timeout {                                             
@@ -20,7 +20,7 @@ Example (from the Yang tutorial):
        }
     }
 
-can be writen as:
+can be written as:
 
     container "timeout", {
         leaf "access-timeout", type: uint32, description: "Maximum time without server response"
