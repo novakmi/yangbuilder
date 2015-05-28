@@ -6,7 +6,6 @@ package org.bitbucket.novakmi.yangbuilder
 import org.bitbucket.novakmi.nodebuilder.BuilderException
 import org.bitbucket.novakmi.nodebuilder.BuilderNode
 import org.bitbucket.novakmi.nodebuilder.TextPluginTreeNodeBuilder
-import org.bitbucket.novakmi.nodebuilder.TreeNodeBuilder
 
 class YangBuilder extends TextPluginTreeNodeBuilder {
 
@@ -54,41 +53,25 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          * @see  http://www.yang-central.org/twiki/pub/Main/YangDocuments/rfc6020.html#rfc.section.6.1.3
          */
 
-        private def getQuotes(txt) {
-                def retVal = ''
-                while (1) {
-                        if (((txt instanceof String) || (txt instanceof GString)) && txt?.size() > 1) {
-                                if ((txt[0] == '"') && txt[-1] == '"') { // enclosed with "
-                                        break
-                                }
-                                if ((txt[0] == "'") && txt[-1] == "'") { // enclosed with '
-                                        break
-                                }
-                                if (
-                                        txt.contains(' ') || txt.contains('\t')
-                                                || txt.contains(';') || txt.contains('{') || txt.contains('}')
-                                                || txt.contains('//') || txt.contains('/*') || txt.contains('*/')
-                                ) {
-                                        retVal = '"'
+        private static def encloseStrings = [" ", "\t", ";", "{", "}", "//", "/*", "*/"]
+        private static def qouteStrings = ['"', "'"]
+        private static def getMyQuotes(txt) {
+                def retVal = TextPluginTreeNodeBuilder.getQuotes(txt, qouteStrings, encloseStrings)
+                if (retVal == '"') {
+                        if (txt.contains('"')) { // already contains double quotes, try single quotes
+                                if (txt.contains("'")) { // contains also single quotes, do nothing
+                                        retVal = ''
                                 } else {
-                                        break
-                                }
-                                if (txt.contains('"')) { // already contains double quotes, try single quotes
-                                        if (txt.contains("'")) { // contains also single quotes, do nothing
-                                                retVal = ''
-                                                break
-                                        }
                                         retVal = "'" // use single quotes instead
                                 }
                         }
-                        break
                 }
                 return retVal
         }
 
         @Override
         protected void processNode(BuilderNode node, Object opaque) throws BuilderException {
-                def quotes = node.attributes.quotes ?: ''
+                def quoteString = node.attributes.quotes ?: ''
                 switch (node.name) {
                         case YANG_ROOT:
                                 if (root == node) {
@@ -186,42 +169,30 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 //*************************
                                 //quotes - force quotes
                                 //noAutoQuotes - no quotes handling
-                                def quotesFill = ''
-                                if (quotes == '' && node.name in quoteKeywords /*&& (node.value instanceof String || node.value instanceof GString)*/) {
+                                if (quoteString == '' && node.name in quoteKeywords /*&& (node.value instanceof String || node.value instanceof GString)*/) {
                                         //if quote Keyword and quotes not disabled
                                         if (!node.attributes.noAutoQuotes) {
-                                                quotes = getQuotes(node.value)
-                                                quotesFill = ' '
+                                                quoteString = getMyQuotes(node.value)
                                         }
                                 }
                                 if (node.value instanceof String || node.value instanceof GString) {
-                                        quotesFill *= quotes.size()
                                         def lines = splitString(node?.value)
                                         if (lines.size() == 1) {
-                                                opaque.print(" ${quotes}${lines[0]}${quotes}")
+                                                opaque.print(" ${quoteString}${lines[0]}${quoteString}")
                                         } else {
-                                                opaque.println("")
-                                                lines.eachWithIndex { l, i ->
+                                                lines = TextPluginTreeNodeBuilder.trimAndQuoteLines(lines, quoteString)
+                                                lines.each { l->
+                                                        opaque.println("")
                                                         indentIfNeeded(node, opaque)
                                                         if (isIndent(node)) {
                                                                 opaque.print("${opaque.indent}") //TODO indent private
                                                         }
-                                                        if (i == 0) {
-                                                                opaque.print("${quotes}")
-                                                        } else {
-                                                                opaque.print("${quotesFill}")
-                                                        }
-                                                        opaque.print("${l.trim()}")
-                                                        if (i == lines.size() - 1) {
-                                                                opaque.print("${quotes}")
-                                                        } else {
-                                                                opaque.println("")
-                                                        }
+                                                        opaque.print(l)
                                                 }
                                         }
                                 }  else {
                                         if (node.value != null) {
-                                                opaque.print(" ${quotes}${node.value}${quotes}")
+                                                opaque.print(" ${quoteString}${node.value}${quoteString}")
                                         }
                                 }
                                 if (!node?.children?.size()) {

@@ -9,7 +9,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven' // to use maven repository
 apply plugin: 'idea' // to generate project+module files for Intellij Idea
 
-version = '1.1.0'
+version = '1.1.1'
 sourceCompatibility = '1.6'
 def groupId = "org.bitbucket.novakmi"
 def installDir = file("${project.projectDir}/install")
@@ -32,7 +32,7 @@ dependencies {
         compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '0.9.0'
         // dependencies for tests
         testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.9'
-        testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
+        testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
         testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.3'
         //testCompile 'org.uncommons:reportng:1.1.1'
         testCompile group: 'janino', name: 'janino', version: '2.4.3'
