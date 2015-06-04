@@ -17,10 +17,6 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         // list of keywords with special quote handling
         private quoteKeywords = []
 
-        def splitString(String string, String splitString="\n") {
-                return string?.split(splitString)
-        }
-
         /**
          * Create new YangBuilder
          * @param indent number of spaces for indentation (default is 2)
@@ -99,7 +95,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                 opaque.println('/*')
                                         }
                                         // process comment line by line
-                                        def lines = splitString(node?.value)
+                                        def lines = node?.value.readLines()
                                         lines.each {l ->
                                                 indentIfNeeded(node, opaque)
                                                 if (isInline) {
@@ -145,7 +141,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         opaque.println(extraLine)
                                 }
                                 if (node?.attributes?.cmt) {
-                                        def lines = splitString(node.attributes.cmt)
+                                        def lines = node.attributes.cmt.readLines()
                                         lines.each {l ->
                                                 def out = l.trim()
                                                 if (out != "") {
@@ -176,7 +172,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         }
                                 }
                                 if (node.value instanceof String || node.value instanceof GString) {
-                                        def lines = splitString(node?.value)
+                                        def lines = node?.value.readLines()
                                         if (lines.size() == 1) {
                                                 opaque.print(" ${quoteString}${lines[0]}${quoteString}")
                                         } else {
