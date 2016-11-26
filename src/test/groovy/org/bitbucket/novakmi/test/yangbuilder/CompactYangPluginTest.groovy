@@ -338,7 +338,6 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [new CompactYangPlugin()]) // new instance
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME, pnl_namespace: "http://novakmi.bitbucket.org/test", prefix_nl: YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        'import'('ietf-inet-types', prefix: 'inet', nl: 1)
                         grouping("Port", nl: true) {
                                 leaf('port', config: false, type: "int32")
                         }
@@ -357,6 +356,9 @@ class CompactYangPluginTest {
                         deviation("/numbers") {
                                 deviate("replace", config: false)
                         }
+                        deviation("/numbers/val") {
+                                deviate("replace", config: false)
+                        }
                 }
 
                 Assert.assertEquals(builder.getText(),
@@ -364,10 +366,6 @@ class CompactYangPluginTest {
 
     namespace "http://novakmi.bitbucket.org/test";
     prefix test;
-
-    import ietf-inet-types {
-        prefix inet;
-    }
 
     grouping Port {
         leaf port {
@@ -405,6 +403,11 @@ class CompactYangPluginTest {
     }
 
     deviation /numbers {
+        deviate replace {
+            config false;
+        }
+    }
+    deviation /numbers/val {
         deviate replace {
             config false;
         }
