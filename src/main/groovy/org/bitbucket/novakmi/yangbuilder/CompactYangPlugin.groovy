@@ -162,7 +162,7 @@ class CompactYangPlugin extends CompactPluginBase {
         public void declareCommonAliasesAndQuotes() {
                 if (getMyBuilder()) {
                         this.declareMinColAliases([
-                                "leaf-list", "if-feature", "min-elements", "max-elements",
+                                "leaf-list", "if-feature", "min-elements", "max-elements", "belongs-to",
                                 "error-app-tag", "error-message", "fraction-digits",
                                 "ordered-by", "require-instance", "revision-date", "yang-version", "yin-element"
                         ])
