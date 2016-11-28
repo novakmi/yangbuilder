@@ -10,15 +10,15 @@
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
-//This script template represents example of usage without any plugin
+//This script template represents example of usage without any plugin with closure reuse
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
 
 //name of file to generate
-moduleName = "acme-module"   // do not use 'def' for script global variable
+moduleName = "acme-module-closure"   // do not use 'def' for script global variable
 
 
-def makeModuleHeader(builder) {
-    builder.header(_ygn:true) { //any node with attribute '_ygn' is  ignored
+def makeModuleHeader = {
+    header _ygn:true, { //any node with attribute '_ygn' is  ignored
         namespace "http://acme.example.com/module"; //semicolon at the end can present (yang style)
         prefix "acme" //or semicolon can be missing (more groovy like style)
         yngbuild ''  //yngbuild '' means new line without indentation
@@ -44,10 +44,9 @@ def makeModuleHeader(builder) {
     }
 }
 
-def makeModule(builder) {
-    builder.module moduleName, {
-
-        makeModuleHeader(builder)
+def makeModule = {
+    module moduleName, {
+        delegate << makeModuleHeader
 
         leaf "host-name", {
             type "string"
@@ -71,8 +70,8 @@ def makeModule(builder) {
 builder.yangroot {
     geninfo file: "acmeYang.groovy", time: true,
         cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
-    // one can continue with  module(moduleName) ... or build continue building yang in separate function
-    makeModule(builder)
+    // one can continue with  module(moduleName) ... or build continue building yang in separate closure
+    delegate << makeModule
 }
 
 builder.writeToFile("${builder.getYangName()}.yang")

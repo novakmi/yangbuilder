@@ -8,7 +8,7 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
 //This script template represents example of usage with the CompactYangPlugin
@@ -17,7 +17,7 @@ def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin)  //re
 plugin.declareCommonAliasesAndQuotes()   // and configure compact plugin
 
 //name of file to generate
-moduleName = "acme-module"   // do not use 'def' for script global variable
+moduleName = "acme-module-compact"   // do not use 'def' for script global variable
 
 /* if 'yangroot' is used as root node, its value is not echoed;
    use 'yangroot' e.g. if you need to add comments before 'module' or 'submodule'
