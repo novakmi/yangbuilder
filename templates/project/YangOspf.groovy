@@ -6,16 +6,19 @@ class YangOspf {
 
         static def yangName = "ospf-module" // groovy makes automatically getYangName(), setYangName()
 
-        static def buildYang(builder) {
-                def protocol = 'ospf'
-                builder.module(getName()) {
+        def static ospf = { protocol ->
+                module getYangName(), {
                         geninfo file: "${this.name}.groovy"
-                        YangCommon.buildHeader(builder, protocol)
-
-                        yngbuild("/* ${protocol} neighbor */", indent: true)
-                        container("${protocol}-neighbor") {
-                                YangCommon.buildAddressPort(builder, protocol) // as if content of function is written here, yangbuilder reuse (not possible in yang)
+                        delegate << YangCommon.buildHeader.curry(protocol)
+                        yngbuild "/* ${protocol} neighbor */", indent: true
+                        container "${protocol}-neighbor", {
+                                // as if content of closure/function is written here, yangbuilder reuse (not possible in yang)
+                                delegate << YangCommon.buildAddressPort.curry(protocol)
                         }
                 }
+        }
+
+        static def buildYang(builder) {
+                builder << ospf.curry("ospf")
         }
 }

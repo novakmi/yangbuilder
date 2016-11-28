@@ -7,20 +7,20 @@ class YangBgp {
         static def yangName = "bgp-module" // groovy makes automatically getYangName(), setYangName()
 
         static def buildYang(builder) {
-                builder.module(getName()) {
+                builder.module getYangName(),{
                         geninfo file: "${this.name}.groovy"
-                        YangCommon.buildHeader(builder, 'bgp')
+                        delegate << YangCommon.buildHeader.curry("bgp")
 
-                        include YangBgpSubmodule.getName()
+                        include YangBgpSubmodule.getYangName()
                         yngbuild('')
 
                         yngbuild("/* bgp neighbor */", indent: true)
                         container("bgp-neighbor") {
-                                YangCommon.buildAddressPort(builder, 'bgp') // as if content of function is written here, yangbuilder reuse (not possible in yang)
+                                delegate << YangCommon.buildAddressPort.curry("bgp") // as if content of closure is written here, yangbuilder reuse (not possible in yang)
                         }
                         yngbuild('')
-                        container('next-hop') {
-                                uses 'BgpNextHop'
+                        container "next-hop", {
+                                uses "BgpNextHop"
                         }
                 }
         }

@@ -6,24 +6,27 @@ class YangBgpSubmodule {
 
         static def yangName = "bgp-submodule" // groovy makes automatically getYangName(), setYangName()
 
+        static def makeGrouping(builder) {
+                builder.yngbuild "/* bgp neighbor */", indent: true
+                builder.grouping "BgpNextHop", {
+                        leaf "next-hop-address", { //output depends on parameters, not possible in yang
+                                type 'inet:ip-address'
+                        }
+                }
+        }
+
         static def buildYang(builder) {
                 builder.yangroot { //yangroot is used only because comment is above 'submodule'
                         geninfo file: "${this.name}.groovy"
-                        yngbuild("/* Example of submodule */")
-                        submodule(getName()) {
-                                'belongs-to'(YangBgp.getName()) {
+                        yngbuild "/* Example of submodule */"
+                        submodule getYangName(), {
+                                'belongs-to' YangBgpSubmodule.getYangName(), {
                                         prefix "bgp"
                                 }
-                                yngbuild('')
-
-                                YangCommon.buildHeader(builder)
-
-                                yngbuild("/* bgp neighbor */", indent: true)
-                                grouping("BgpNextHop") {
-                                        leaf("next-hop-address") { //output depends on parameters, not possible in yang
-                                                type('inet:ip-address')
-                                        }
-                                }
+                                yngbuild ''
+                                delegate << YangCommon.buildHeader
+                                makeGrouping(delegate)
+                                // as if content of closure is written here, yangbuilder reuse (not possible in yang); `delegate` is same object as `builder`
                         }
                 }
         }
