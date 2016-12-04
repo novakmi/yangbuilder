@@ -70,7 +70,7 @@ def makeModule = {
 builder.yangroot {
     geninfo file: "acmeYang.groovy", time: true,
         cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
-    // one can continue with  module(moduleName) ... or build continue building yang in separate closure
+    // one can continue with  module(moduleName) ... or build continue building yang from separate closure
     delegate << makeModule
 }
 

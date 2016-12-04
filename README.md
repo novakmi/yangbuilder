@@ -1,25 +1,49 @@
 #Yangbuilder
 
-The `yangbuilder` is Groovy builder for the Yang Modeling Language.
+The `yangbuilder` is Groovy builder for the Yang Modeling Language (https://en.wikipedia.org/wiki/YANG)
 
-The Groovy `yang` model syntax, written in the `yangbuilder`, can be very similar to the original `yang` syntax.
+## Benefits and usage scenarios
 
-On the other hand, it can use power of a programming language (Groovy) - loops, conditions, functions with parameters, closures.
+* output is the `yang` file (no compatibility issues)
+* syntax similar to the `yang` syntax (`compact yang` extenmded syntax with `CompactYangPlugin`)
+* better reuse than in `yang` (power of programming language)
+    * parametrized groupings (e.g. `grouping ipv4 {`  and `grouping ipv6 {` can be written as `grouping ${ipver} {`)
+    * reusable functions/closures
+    * build directly from content of groovy closures with `delegate << closure` (requires `nodebuilder-1.0.0` and newer) 
+    * use variables for common values
+    * optionally extend syntax (e.g. add `leaf_string`)
+* generate `yang` conditionally 
+    * generate different release or customer specific `yang` versions according to the build options or environment variables
+    * use conditions also where it is not possible to use `if-feature` (`import`, `include`, ...)
+    * use negative conditions (not possible with `if-feature`)
+* split common parts into several functions/closures/files 
+* extend with plugins
+* use power of favorite IDE supporting `groovy` 
+    * auto completion
+    * syntax highlighting
+    * formatting
+    * syntax checking       
+
+## Description
+
+The Groovy `yang` model syntax, written in the `yangbuilder`,  is similar to the original `yang` syntax.
+
+On the other hand, we can use power of a programming language (Groovy) - loops, conditions, functions with parameters, closures.
 With `groovy` closures, one can optionally extend the functionality in a way as if new 
-features/keywords are added to the `yang` language (e.g. define `leaf_uint23` which represents `leaf` with `uint32` type).
+features/keywords are added to the `yang` language (e.g. define `leaf_string` which represents `leaf` with `string` type).
 The Groovy support in development environments (`Eclipse`, `Intellij Idea`) makes data model editing faster (syntax
 highlighting, formatting, navigation). 
  
 With use of `groovy` `Grapes`, the yang can be generated directly from the text script without need to download and install any
 `yangbuilder` dependency or create project (no need for `ant`, `maven`, `gradle`, IDE support, etc.).
 
-The `yangbuilder` is very useful for creation of the data model specific variants, which share common data model base, but are
+The `yangbuilder` is useful for creation of the data model specific variants, which share common data model base, but are
 different in the final deployment (e.g. customer variants, device variants, different data model versions). 
-With this use case, only one source code for the data model is kept and desired variant is generated. 
-This increases source code reuse, reduces possible copy/paste errors, avoids merging between the variants.
+With this use case, only one source code for the data model is kept and desired variant is generated during build time. 
+This increases source code reuse, reduces possible of copy/paste errors, avoids merging between the variants.
   
 In addition, there is a `CompactYangPlugin` plugin, which bring even more features. 
-One of them is so called `compact yang` syntax:
+One of them is so called `compact yang` syntax, which creates simple sub-elements from attributes (can be freely mixed with `yang` like syntax):
   
 Example (from the Yang tutorial):
  
@@ -47,13 +71,37 @@ Test source code is in the `main/tests` directory. (Test source code is good exa
 Documentation files and source  is in the `documentation` directory. (Documentation is still in progress.)
 
 Use [gradle][gradle_id] to build, test and package project.
-Use [groovy][groovy_id] version 2.0.0 and later.
+Use [groovy][groovy_id] version 2.1.9 and later (`groovy` < 2.1.9 can be used with special builds of `nodebuilder`, e.g. 
+`nodebuilder-1.0.0.1`)
 
 See `changelog.md`.
 
 Quick examples:
 
 See `templates\scripts\`
+
+### Usage with `groovy` Grapes in script
+
+```groovy
+//@GrabResolver(name = 'jcenterrepo', root = 'https://jcenter.bintray.com', m2Compatible = true) //needed only with older ver. of groovy
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
+```
+
+### Usage with `gradle` build file
+
+```groovy
+dependencies {
+        compile localGroovy()
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.0.0'
+        compile group: 'org.bitbucket.novakmi', name: 'yangbuilder', version: '1.2.0'
+}
+```
+
+### Usage with `groovy` and command line
+
+* download desired (last) version of `nodebuilder` and `yangbuilder`  jar files from  http://jcenter.bintray.com/org/bitbucket/novakmi/
+* run with `groovy` command with classpath pointing to the downloaded  jar files (e.g. `groovy -cp ./nodebuilder.jar:./yangbuilder.jar yang_script.groovy`) 
 
 
 Michal Novak (<it.novakmi@gmail.com>)
