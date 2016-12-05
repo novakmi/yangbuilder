@@ -4,11 +4,12 @@
 package org.bitbucket.novakmi.test.yangbuilder
 
 import groovy.util.logging.Slf4j
-import org.testng.annotations.Test
-import org.testng.Assert
 import org.bitbucket.novakmi.yangbuilder.YangBuilder
+import org.testng.Assert
+import org.testng.annotations.Test
 
-@Slf4j //Initialize logging
+@Slf4j
+//Initialize logging
 class YangBuilderTest {
 
 // test based on example from Instant YANG tutorial, section modules
@@ -149,8 +150,10 @@ class YangBuilderTest {
                 log.trace("==> quoteTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         organization 'novakmi organization'
@@ -235,8 +238,10 @@ class YangBuilderTest {
 
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         list('ports') {
@@ -262,8 +267,10 @@ class YangBuilderTest {
 
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         organization 'novakmi'
@@ -283,8 +290,10 @@ class YangBuilderTest {
 
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         organization 'novakmi'
@@ -304,8 +313,10 @@ class YangBuilderTest {
 
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         organization 'novakmi'
@@ -337,8 +348,10 @@ description"''', noAutoQuotes: true) // multiline and indent
                 log.trace("==> commentTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
                         cmt('This is comment', indent: false, inline: false)
@@ -462,9 +475,11 @@ multiline comment.
                 log.trace("==> geninfoTest")
                 def builder = new YangBuilder(4) // new instance/use indent 4
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        geninfo(file: "test.groovy", time:false)
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        geninfo(file: "test.groovy", time: false)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
 
                         leaf('port') {
                                 type 'uint16'
@@ -485,9 +500,11 @@ multiline comment.
 ''')
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        geninfo(file: "test.groovy", time:false, cmt: "Example implementation.")
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        geninfo(file: "test.groovy", time: false, cmt: "Example implementation.")
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
 
                         leaf('port') {
                                 type 'uint16'
@@ -510,7 +527,7 @@ multiline comment.
 
                 builder.reset()
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        geninfo(file: "test.groovy", time:false,
+                        geninfo(file: "test.groovy", time: false,
                                 cmt: '''
                                         Example implementation.
 
@@ -518,8 +535,10 @@ multiline comment.
                                         Each line will be trimmed and printed.
                                            The lines will be aligned
                                         and indented.''')
-                        namespace "http://novakmi.bitbucket.org/test"; // semicolon at the end can be preset (yang style)
-                        prefix YangBuilderTestCommon._TEST_MODULE_NAME // or semicolon can be missing (more groovy like style)
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
 
                         leaf('port') {
                                 type 'uint16'
@@ -572,7 +591,7 @@ multiline comment.
                                 }
                         }
                         leaf("after_ygn") { // check indentation is not influenced by _ygn node
-                            type("uint32")
+                                type("uint32")
                         }
                 }
                 Assert.assertEquals(builder.getText(), '''module test {
@@ -595,5 +614,76 @@ multiline comment.
 }
 ''')
                 log.trace("<== ygnTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void closureTest() {
+                log.trace("==> closureTest")  // since nodebuilder-1.0.0
+
+                //all closures are instantiated before builder (using `delegate`)
+                def header = {
+                        namespace "http://novakmi.bitbucket.org/test"
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        'import'("ietf-inet-types") {
+                                prefix "inet"
+                        }
+                }
+
+                def leaf_text = { txt ->
+                        leaf(txt) {
+                                type "string"
+                        }
+                }
+
+                def my_text = {
+                        container("my_text") {
+                                delegate << leaf_text.curry("text") //pass param with curry
+                                my_leaf(_ygn: true)
+                        }
+                }
+
+                def in_yang = { val ->
+                        container(val, presence: true) { //child nodes not ignored
+                                presence(true)
+                        }
+                }
+
+                def module = {
+                        module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                                delegate << header
+                                delegate << my_text
+                                container("not_in_yang", _ygn: true)
+                                container("not_in_yang2", _ygn: true) {
+                                        delegate << in_yang.curry("in_yang")
+                                }
+                                leaf("after_ygn") { // check indentation is not influenced by _ygn node
+                                        type("uint32")
+                                }
+                        }
+                }
+
+                def builder = new YangBuilder(4)
+                builder << module // send closure to builder
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+    import ietf-inet-types {
+        prefix inet;
+    }
+    container my_text {
+        leaf text {
+            type string;
+        }
+    }
+    container in_yang {
+        presence true;
+    }
+    leaf after_ygn {
+        type uint32;
+    }
+}
+''')
+                log.trace("<== closureTest")
         }
 }

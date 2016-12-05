@@ -5,12 +5,13 @@ package org.bitbucket.novakmi.test.yangbuilder
 
 import groovy.util.logging.Slf4j
 import org.bitbucket.novakmi.nodebuilder.BuilderException
+import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
+import org.bitbucket.novakmi.yangbuilder.YangBuilder
 import org.testng.Assert
 import org.testng.annotations.Test
-import org.bitbucket.novakmi.yangbuilder.YangBuilder
-import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 
-@Slf4j //Initialize logging
+@Slf4j
+//Initialize logging
 class CompactYangPluginTest {
 
         @Test(groups = ["basic"])
@@ -348,7 +349,7 @@ class CompactYangPluginTest {
                                 leaf('porta', type: 'uint16')
                                 leaf('portb', type: 'uint16', description: 'port value')
                         }
-                        'leaf-list'('codes', config: false, type: 'uint32',  nl: false)
+                        'leaf-list'('codes', config: false, type: 'uint32', nl: false)
                         list("numbers", config: true, key: "val", nl: true) {
                                 leaf("val", type: "int32")
                         }
@@ -939,9 +940,9 @@ class CompactYangPluginTest {
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
                         namespace "http://novakmi.bitbucket.org/test";
                         prefix(YangBuilderTestCommon._TEST_MODULE_NAME)
-                        leaf('my-leaf', type: [val:"enumeration", elems: [
-                                ["enum",[val: "a", value: 1, description: "Description a"]],
-                                ["enum",[val: "b", value: 2, description: "Description b"]],
+                        leaf('my-leaf', type: [val: "enumeration", elems: [
+                                ["enum", [val: "a", value: 1, description: "Description a"]],
+                                ["enum", [val: "b", value: 2, description: "Description b"]],
                         ]])
                 }
 
@@ -1146,7 +1147,7 @@ class CompactYangPluginTest {
                         'import'("ietf-inet-types") {
                                 prefix "inet";
                         }
-                        leaf("text", type: [val:"enumeration", enums: ["a", "b", "c"], description: "My enumeration"])
+                        leaf("text", type: [val: "enumeration", enums: ["a", "b", "c"], description: "My enumeration"])
                 }
 
                 Assert.assertEquals(builder.getText(), '''module test {
@@ -1233,7 +1234,7 @@ class CompactYangPluginTest {
                 def builder = new YangBuilder(4, [plugin]) // new instance/use indent 4
 
                 builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
-                        namespace "http://novakmi.bitbucket.org/test",nlLevel: true
+                        namespace "http://novakmi.bitbucket.org/test", nlLevel: true
                         prefix YangBuilderTestCommon._TEST_MODULE_NAME
                         'import'("ietf-inet-types", prefix: "inet")
                         list("ports", key: "name") {
@@ -1321,6 +1322,94 @@ class CompactYangPluginTest {
 }
 ''')
                 log.trace("<== pnlAndNlLevelTest")
+        }
+
+
+        @Test(groups = ["basic"])
+        public void closureTest() {
+                log.trace("==> closureTest")  // since nodebuilder-1.0.0
+
+                def header = { pfx ->
+                        namespace "http://novakmi.bitbucket.org/test", nlLevel: true
+                        prefix pfx
+                        'import'("ietf-inet-types", prefix: "inet")
+                }
+
+                def port = {
+                        leaf("port1", type: "int32", pnlLevel: false)
+                }
+
+                def ports2 = {
+                        list("ports2", key: "name") {
+                                leaf("name", type: "string", nlLevel: false, pnlLevel: true) {
+                                        description "myDescr"
+                                }
+                                delegate << port
+                        }
+                }
+
+                def ports = { leafDescr ->
+                        list("ports", key: "name") {
+                                leaf("name", type: "string", nlLevel: false, pnlLevel: true) {
+                                        description leafDescr
+                                }
+                                delegate << ports2
+                                delegate << port
+
+                        }
+                }
+
+                def module = {
+                        module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                                delegate << header.curry(YangBuilderTestCommon._TEST_MODULE_NAME)
+                                delegate << ports.curry("myDescr")
+                                leaf("text", type: "string", _ygn_my_attr: "attr", nlLevel: false)
+                        }
+                }
+
+                CompactYangPlugin plugin = new CompactYangPlugin()
+                def builder = new YangBuilder(4, [plugin]) // new instance/use indent 4
+                builder << module
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+
+    prefix test;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    list ports {
+        key name;
+
+        leaf name {
+            type string;
+            description myDescr;
+        }
+
+        list ports2 {
+            key name;
+
+            leaf name {
+                type string;
+                description myDescr;
+            }
+            leaf port1 {
+                type int32;
+            }
+        }
+        leaf port1 {
+            type int32;
+        }
+    }
+
+    leaf text {
+        type string;
+    }
+}
+''')
+                log.trace("<== closureTest")
         }
 
 }

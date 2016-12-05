@@ -2,6 +2,9 @@
 
 The `yangbuilder` is Groovy builder for the Yang Modeling Language (https://en.wikipedia.org/wiki/YANG)
 
+(c) Michal Novak (<it.novakmi@gmail.com>)
+See LICENSE file
+
 ## Benefits and usage scenarios
 
 * output is the `yang` file (no compatibility issues)
@@ -12,9 +15,12 @@ The `yangbuilder` is Groovy builder for the Yang Modeling Language (https://en.w
     * build directly from content of groovy closures with `delegate << closure` (requires `nodebuilder-1.0.0` and newer) 
     * use variables for common values
     * optionally extend syntax (e.g. add `leaf_string`)
+    * `groovy` reuse (closures, functions, etc.) can be alternative option to the `yang` reuse (`grouping`, `augment`, `refine`);
+      e.g in cases when `yang` reuse cannot be used (for instance parsing `yang` with `pyang` plugin that does not implement full support 
+      for  `yang` reuse -  handling of `grouping`, `augment`, etc.) 
 * generate `yang` conditionally 
     * generate different release or customer specific `yang` versions according to the build options or environment variables
-    * use conditions also where it is not possible to use `if-feature` (`import`, `include`, ...)
+    * use conditions where it is not possible to use `if-feature` (`import`, `include`, ...)
     * use negative conditions (not possible with `if-feature`)
 * split common parts into several functions/closures/files 
 * extend with plugins
@@ -80,6 +86,10 @@ Quick examples:
 
 See `templates\scripts\`
 
+## Build environment
+
+`yangbuilder` and `nodebuilder` are accessible through JCenter maven repository
+
 ### Usage with `groovy` Grapes in script
 
 ```groovy
@@ -87,6 +97,13 @@ See `templates\scripts\`
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 ```
+First run of the `groovy` scripts downloads dependencies into `~/.groovy/grapes` directory (Internet connection required),
+next run of the script uses already downloaded dependencies (Internet connection not required).
+
+`~/.groovy/grapes` can be moved to other development machine (Internet connection not required even for first run) of the script.
+
+See  http://docs.groovy-lang.org/latest/html/documentation/grape.html
+
 
 ### Usage with `gradle` build file
 
@@ -98,13 +115,10 @@ dependencies {
 }
 ```
 
-### Usage with `groovy` and command line
+### Usage with `groovy` and command line (without dependency on external repository)
 
-* download desired (last) version of `nodebuilder` and `yangbuilder`  jar files from  http://jcenter.bintray.com/org/bitbucket/novakmi/
-* run with `groovy` command with classpath pointing to the downloaded  jar files (e.g. `groovy -cp ./nodebuilder.jar:./yangbuilder.jar yang_script.groovy`) 
-
-
-Michal Novak (<it.novakmi@gmail.com>)
+* download desired (latest) version of the `nodebuilder` and `yangbuilder` jar files from  http://jcenter.bintray.com/org/bitbucket/novakmi/
+* run with `groovy` command with classpath pointing to the downloaded `jar` files (e.g. `groovy -cp ./nodebuilder.jar:./yangbuilder.jar yang_script.groovy`) 
 
 [gradle_id]: http://www.gradle.org/  "Gradle"
-[groovy_id]: http://groovy.codehaus.org/  "Groovy"
+[groovy_id]: http://groovy-lang.org/ "Groovy"

@@ -3,8 +3,8 @@ yangbuilder
 :Author:    Michal Novák
 :Email:     it.novakmi@gmail.com
 :URL:       https://bitbucket.org/novakmi/yangbuilder
-:Date:      2015-04-10
-:Revision:  1.1.0
+:Date:      2016-12-12
+:Revision:  1.2.0
 
 This  document describes how to use Groovy builder for the Yang data modeling language.
 The document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc].
@@ -16,6 +16,7 @@ The document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc].
 | Version     | Notes          | Date        | Author
 | 0.0.1       | Initial version| 2012-04-14  | {author}
 | 1.0.0       | Updated        | 2013-03-08  | {author}
+| 1.1.0       | Updated        | 2015-04-10  | {author}
 | {revision}  | Updated        | {date}      | {author}
 |======
 
@@ -24,7 +25,7 @@ The document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc].
 [bibliography]
 * [[[yang]]] http://www.netconfcentral.org/yang_docs[YANG Data Modeling Language]
 * [[[RFC6020]]] RFC for http://www.ietf.org/rfc/rfc6020.txt[YANG - A Data Modeling Language for the Network Configuration Protocol (NETCONF)]
-* [[[groovy]]] http://groovy.codehaus.org/[Groovy - a dynamic language for JAVA platform]
+* [[[groovy]]] http://groovy-lang.org/[Groovy - a dynamic language for JAVA platform]
 * [[[nodebuilder]]] https://bitbucket.org/novakmi/nodebuilder[Library for creation of groovy builders with plugin support]
 * [[[yangbuilder]]] https://bitbucket.org/novakmi/yangbuilder[Groovy builder for YANG] - described in this document
 * [[[pyang]]] http://code.google.com/p/pyang/ - Python <<yang>> parser, converter
@@ -58,6 +59,7 @@ The syntax of the data model written in the <<yang>> resembles syntax used in th
 === <<yang>> example
 
 .Yang example from the Yang tutorial (shortened)
+[source, groovy]
 ----
 container timeout {                                             <1>
     leaf access-timeout {                                       <2>
@@ -77,6 +79,7 @@ container timeout {                                             <1>
 === groovy <<yangbuilder>> example
 
 .Yang example from the Yang tutorial (shortened) written in the <<groovy>> yangbuilder
+[source, groovy]
 ----
 container "timeout", {                                             <1>
     leaf "access-timeout", {                                       <2>
@@ -144,11 +147,15 @@ The <<yangbuilder>> is based on this common library.
 
 === Dependencies
 
-* <<groovy>> 2.0.0 and newer has to be installed on the system (preferably with +GROOVY_HOME+ set and +$GROOVY_HOME/bin+ in the the system +PATH+)
-* +nodebuilder+ jar file
-* +yangbuilder+ jar file
+* <<groovy>> 1.8.6 and newer has to be installed on the system (preferably with +GROOVY_HOME+ set and +$GROOVY_HOME/bin+ in the the system +PATH+)
+* `nodebuilder` jar file
+* `yangbuilder` jar file
 
-Note: <<nodebuilder>> and <<yangbuilder>> jar files do not need to be downloaded if <<groovy>> `@Grab` can be used (and the Internet connection is available)
+NOTE: <<nodebuilder>> and <<yangbuilder>> jar files do not need to be downloaded if <<groovy>> `@Grab` can be used (and the Internet connection is available)
+
+NOTE: It is recommended to use <<groovy>> of version 2.1.9 and newer, for older version of <<groovy>> special version of the `nodebuilder` must be used
+      (usually `x.x.x.1` - e.g. `1.0.0.1`)
+
 
 === Installation
 
@@ -178,7 +185,7 @@ This example are <<groovy>> source scripts that generates <<yang>> file adopted 
 
 See `templates\scripts\acme`
 
-[source,java]
+[source,groovy]
 .acmeYang.groovy - example of the <<yangbuilder>> script without `CompactYangPlugin`
 ----
 #!/usr/bin/env groovy        //<1>
@@ -255,7 +262,7 @@ builder.writeToFile("${builder.getYangName()}.yang") //<10>
 
 The result looks like
 
-[source,java]
+[source,groovy]
 .Generated `acme-module.yang` file
 ----
 /*
@@ -299,7 +306,7 @@ module acme-module {
 
 Variant with the `CompactYangPlugin`
 
-[source,java]
+[source,groovy]
 .acmeYangCompact.groovy - example of the <<yangbuilder>> script with `CompactYangPlugin`
 ----
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
@@ -378,35 +385,35 @@ In the <<yangbuilder>>, each element can have following attributes:
 
 * `indent` enable/disable indentation for the element (indentation is enabled by default)
 
-[source,java]
+[source,groovy]
 ---------
-description(
+description
     '''test quotes
 in multiline
-description''', multiline: true, indent: true)
+description''', multiline: true, indent: true
 ---------
 * `quotes` force to surround element value with quotes (with provided quotes character), even though quotes are not needed;
   see also <<quotes,special quotes handling>>.
 
-[source,java]
+[source,groovy]
 ---------
 organization 'novakmi'
-contact('it.novakmi@gmail.com', quotes: '"')
+contact 'it.novakmi@gmail.com', quotes: '"'
 ---------
 
 * `noAutoQuotes` do not add automatic quotes for element with <<quotes,special quotes handling>>
 
 [source,java]
 ---------
-description('test quotes', noAutoQuotes: true)
+description 'test quotes', noAutoQuotes: true
 ---------
 WARNING: Element statements without quotes may lead to an invalid yang.
 
 * +cmt+ add inline comment to the element, the comment is on the same line, see also <<cmt,cmt keyword>>
 
-[source,java]
+[source,groovy]
 ---------
-container('socket', cmt: "Inline comment for socket container")
+container 'socket', cmt: "Inline comment for socket container"
 ---------
 
 See `YangBuilderTest.groovy`, tests `quoteTest` and `commentTest` for other examples and corresponding <<yang>> result.
@@ -423,9 +430,9 @@ value is indented according to the current nesting level, otherwise no indentati
 
 Example:
 
-`builder.yngbuild("/* not indented comment */")`
+`builder.yngbuild "/* not indented comment */"`
 
-`builder.yngbuild("/* indented comment */", indent:true)`
+`builder.yngbuild "/* indented comment */", indent:true`
 
 NOTE: It is preferred to use `<<cmt,cmt keyword>>` keyword for comments, rather than `yngbuild` keyword
 
@@ -460,15 +467,15 @@ Example:
 
 As default, one-line indented comment is produced:
 
-`cmt("This is inline indented comment")` (default)
+`cmt "This is inline indented comment"` (default)
 
 Other options are:
 
-`cmt("This is inline, not indented comment", indent: false)`
+`cmt "This is inline, not indented comment", indent: false`
 
-`cmt("This is non-inline indented comment", inline: false)`
+`cmt "This is non-inline indented comment", inline: false`
 
-`cmt("This is non-inline comment", not indent: false, inline: false)`
+`cmt "This is non-inline comment", not indent: false, inline: false`
 
 Inline comments have `//` as comment mark, non-inline comments use `/\*` and `*/` on separate lines.
 Indented comments are indented according to the current indent (level of nesting).
@@ -502,7 +509,7 @@ In most cases, it allows to write sub-elements as attributes.
 
 Example:
 
-[source,java]
+[source,groovy]
 ---------
 leaf "node", type: string
 ---------
@@ -567,9 +574,10 @@ The <<yangbuilder>> inherits interface methods from the <<nodebuilder>>.
 
 [source,java]
 ---------
-builder.declareAlias('import_', 'import') // declare 'import' keyword alias 'import_'
-builder.'import'('my-module1') //groovy keyword has to be surrounded with quotes
-builder.import_('my-module2') //or alias can be used
+builder.declareAlias('import_', 'import') // declare 'import_' as alias  for 'import'
+...
+'import'('my-module1') //groovy keyword has to be surrounded with quotes
+import_ 'my-module2' //or alias can be used
 ---------
 
 ===== Attributes from the `BuilderNode`
@@ -599,14 +607,14 @@ builder.import_('my-module2') //or alias can be used
 * `getPrefixName`
 * `addQuoteKeywords`
 
-[source,java]
+[source,groovy]
 ---------
 builder.getYangName()
 ---------
 
 * `getPrefixName` returns the name of `prefix` of the first `module` or `submodule` (`belongs-to` prefix)
 
-[source,java]
+[source,groovy]
 ---------
 builder.getPrefixName()
 ---------
@@ -616,7 +624,7 @@ See `YangBuilderTest.groovy` file (`src/test` directory), tests `yangNameTest`, 
 
 * `addQuoteKeywords` specify additional keywords for <<quotes,special quotes handling>>
 
-[source,java]
+[source,groovy]
 ---------
 builder.addQuoteKeywords('my-annotation')
 ---------
