@@ -53,24 +53,27 @@ One of them is so called `compact yang` syntax, which creates simple sub-element
   
 Example (from the Yang tutorial):
  
-    container timeout {                                             
-       leaf access-timeout {                                       
-           description "Maximum time without server response";
-           type uint32;
-       }
-       leaf retry-timer {
-           description "Period to retry operation";                
-           type uint32;
-       }
-    }
+```groovy 
+container timeout {                                             
+   leaf access-timeout {                                       
+       description "Maximum time without server response";
+       type uint32;
+   }
+   leaf retry-timer {
+       description "Period to retry operation";                
+       type uint32;
+   }
+}
+```
 
 can be written as:
 
-    container "timeout", {
-        leaf "access-timeout", type: uint32, description: "Maximum time without server response"
-        leaf "retry-timer", type: uint32, description: "Period to retry operation"
-    }
-
+```groovy
+container "timeout", {
+    leaf "access-timeout", type: uint32, description: "Maximum time without server response"
+    leaf "retry-timer", type: uint32, description: "Period to retry operation"
+}
+```
 
 Implementation source code is in the `main/src` directory.
 Test source code is in the `main/tests` directory. (Test source code is good examples of the `yangbuilder` usage.)
