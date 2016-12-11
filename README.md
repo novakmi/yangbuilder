@@ -110,6 +110,10 @@ next run of the script uses already downloaded dependencies (Internet connection
 
 See  http://docs.groovy-lang.org/latest/html/documentation/grape.html
 
+NOTE: With `groovy` version below `2.3.0` following dependency may also be needed:
+```groovy
+@Grab(group = 'org.codehaus.groovy', module = 'groovy-backports-compat23', version = '2.4.7')
+```
 
 
 ### Usage with `gradle` build file
