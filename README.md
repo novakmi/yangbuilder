@@ -99,13 +99,17 @@ See `templates\scripts\`
 //@GrabResolver(name = 'jcenterrepo', root = 'https://jcenter.bintray.com', m2Compatible = true) //needed only with older ver. of groovy
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
+...
 ```
+Run `groovy` script as regular script (`Linux`) of with `groovy` command (`Linux`, `Windows`).
+
 First run of the `groovy` scripts downloads dependencies into `~/.groovy/grapes` directory (Internet connection required),
 next run of the script uses already downloaded dependencies (Internet connection not required).
 
 `~/.groovy/grapes` can be moved to other development machine (Internet connection not required even for first run) of the script.
 
 See  http://docs.groovy-lang.org/latest/html/documentation/grape.html
+
 
 
 ### Usage with `gradle` build file
@@ -116,12 +120,13 @@ dependencies {
         compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.0.0'
         compile group: 'org.bitbucket.novakmi', name: 'yangbuilder', version: '1.2.0'
 }
+...
 ```
 
 ### Usage with `groovy` and command line (without dependency on external repository)
 
-* download desired (latest) version of the `nodebuilder` and `yangbuilder` jar files from  http://jcenter.bintray.com/org/bitbucket/novakmi/
-* run with `groovy` command with classpath pointing to the downloaded `jar` files (e.g. `groovy -cp ./nodebuilder.jar:./yangbuilder.jar yang_script.groovy`) 
+Download desired (latest) version of the `nodebuilder` and `yangbuilder` jar files from  http://jcenter.bintray.com/org/bitbucket/novakmi/.  
+Run with `groovy` command with classpath pointing to the downloaded `jar` files (e.g. `groovy -cp ./nodebuilder.jar:./yangbuilder.jar yang_script.groovy`). 
 
 [gradle_id]: http://www.gradle.org/  "Gradle"
 [groovy_id]: http://groovy-lang.org/ "Groovy"

@@ -28,13 +28,13 @@ The document is written in http://www.methods.co.nz/asciidoc/[AsciiDoc].
 * [[[groovy]]] http://groovy-lang.org/[Groovy - a dynamic language for JAVA platform]
 * [[[nodebuilder]]] https://bitbucket.org/novakmi/nodebuilder[Library for creation of groovy builders with plugin support]
 * [[[yangbuilder]]] https://bitbucket.org/novakmi/yangbuilder[Groovy builder for YANG] - described in this document
-* [[[pyang]]] http://code.google.com/p/pyang/ - Python <<yang>> parser, converter
+* [[[pyang]]] https://github.com/mbj4668/pyang - Python <<yang>> parser, converter
 
 == Terminology
 
 * *Yang:* a Data Modeling Language for the Network Configuration Protocol (NETCONF), see <<RFC6020>>
 * *Groovy builder:*  http://en.wikipedia.org/wiki/Design_Patterns[builder design pattern] implemented in the <<groovy>>, 
-  with support for DSL (Domain Specific Language), see http://groovy.codehaus.org/Builders[groovy builders]
+  with support for DSL (Domain Specific Language), see http://groovy-lang.org/dsls.html#_builders[groovy builders]
 
 == License
 
@@ -49,10 +49,9 @@ include::../LICENSE[]
 NOTE: _This document is still work in progress. Please take a look at the examples in the `templates\scripts` directory 
        and at the tests in the `tests\groovy` directory to see usage of all <<yangbuilder>> features._
 
-The <<yang>> modeling language is used to describe data model. It can be compared to the *XSD*, however, the syntax is different. 
-The <<groovy>> builder can be used to create parent-child oriented data documents (e.g. *XSD*, *XML* and <<yang>>). 
-
-See http://groovy.codehaus.org/Creating+XML+using+Groovy%27s+MarkupBuilder[Creating XML] chapter how to use <<groovy>> builder for *XML*.
+The <<yang>> modeling language is used to describe data model. It can be compared to the *XML Schema* (*XSD*), however, the syntax is different.
+The <<groovy>> builder can be used to create parent-child oriented data documents (e.g. *XSD*, *XML*). See, for example,
+http://groovy-lang.org/processing-xml.html#_creating_xml[creating XML] chapter how to use <<groovy>> builder for *XML*.
 
 The syntax of the data model written in the <<yang>> resembles syntax used in the <<groovy>> builder. 
 
@@ -159,8 +158,8 @@ NOTE: It is recommended to use <<groovy>> of version 2.1.9 and newer, for older 
 
 === Installation
 
-In most cases, there is no need for special installation of the <<yangbuilder>>, if you have installed <<groovy>> of version 2.0.0 or newer and you have an Internet connection. 
-The <<groovy>> script generating <<yang>> file can download all required dependencies with the use of <<groovy>> http://groovy.codehaus.org/Grape[Grape] feature. 
+In most cases, there is no need for special installation of the <<yangbuilder>>, if you have installed <<groovy>> of version 2.1.9 (1.8.6) or newer and you have an Internet connection.
+The <<groovy>> script generating <<yang>> file can download all required dependencies with the use of <<groovy>>http://docs.groovy-lang.org/latest/html/documentation/grape.html[Grape] feature.
 See +templates/scripts+ directory for example scripts. Usually, first run of the script takes some time (downloading dependencies). During next run, no dependencies are 
 downloaded and an Internet connection is not needed anymore.
 
@@ -184,6 +183,8 @@ See `templates/project` directory for sample project that generates several (rel
 This example are <<groovy>> source scripts that generates <<yang>> file adopted from the Yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials.
 
 See `templates\scripts\acme`
+
+=====  simple variant
 
 [source,groovy]
 .acmeYang.groovy - example of the <<yangbuilder>> script without `CompactYangPlugin`
@@ -304,11 +305,94 @@ module acme-module {
 }
 ----
 
-Variant with the `CompactYangPlugin`
+===== variant with `groovy` closures
+
+[source,groovy]
+.acmeYangClrs.groovy - example of the <<yangbuilder>> script with `groovy` closures
+----
+#!/usr/bin/env groovy
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
+
+//name of file to generate
+moduleName = "acme-module-closure"   // do not use 'def' for script global variable
+
+// define closures (not depending on builder object)
+def makeModuleHeader = {
+    header _ygn:true, { //any node with attribute '_ygn' is  ignored
+        namespace "http://acme.example.com/module"; //semicolon at the end can present (yang style)
+        prefix "acme" //or semicolon can be missing (more groovy like style)
+        yngbuild ''  //yngbuild '' means new line without indentation
+
+        'import' "yang-types", {
+            //Groovy/Java keywords has to be quoted (or alias e.g. "import_" can be declared)
+            prefix "yang"
+        }
+        include "acme-system"
+        yngbuild ''
+
+        organization 'ACME Inc.'
+        contact 'joe@acme.example.com'
+        // multiple line description
+        description '''The module for entities
+                       implementing the ACME products.'''
+
+        yngbuild ''
+        revision "2007-06-09", {
+            description "Initial revision."
+        }
+        yngbuild ''
+    }
+}
+
+def makeModule = { name ->
+    module name, {
+        delegate << makeModuleHeader
+
+        leaf "host-name", {
+            type "string"
+            mandatory true
+            config true
+            description "Hostname for this system"
+        }
+
+        "leaf-list" "domain-search", {
+            type "string"
+            "ordered-by" "user"
+            description "List of domain names to search"
+        }
+    }
+}
+
+/* if 'yangroot' is used as root node, its value is not echoed;
+   use 'yangroot' e.g. if you need to add comments before 'module' or 'submodule'
+   Otherwise use directly builder.module or builder.submodule
+*/
+def root = {
+    yangroot {
+        geninfo file: "acmeYang.groovy", time: true,
+                cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
+        // one can continue with continue building yang from separate closure
+        delegate << makeModule.curry(moduleName) //use curry to pass params to the closure <1> <2>
+    }
+}
+
+//This script template represents example of usage without any plugin with closure reuse
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
+builder << root // build closure <3>
+builder.writeToFile("${builder.getYangName()}.yang")
+----
+<1> closures can have parameters, they are passed with `curry` function
+<2> one can use other closures inside closure with `delegate << ...` (`delegate` is alias for `builder` object)
+<3> closure does not need to know about `builder` object (`builder` can be created after closure or in different scope/file)
+
+
+===== variant with the `CompactYangPlugin`
 
 [source,groovy]
 .acmeYangCompact.groovy - example of the <<yangbuilder>> script with `CompactYangPlugin`
 ----
+#!/usr/bin/env groovy
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
