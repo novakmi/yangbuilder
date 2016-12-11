@@ -10,13 +10,10 @@
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
 
-//This script template represents example of usage without any plugin with closure reuse
-def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
-
 //name of file to generate
 moduleName = "acme-module-closure"   // do not use 'def' for script global variable
 
-
+// define closures (not depending on builder object)
 def makeModuleHeader = {
     header _ygn:true, { //any node with attribute '_ygn' is  ignored
         namespace "http://acme.example.com/module"; //semicolon at the end can present (yang style)
@@ -44,8 +41,8 @@ def makeModuleHeader = {
     }
 }
 
-def makeModule = {
-    module moduleName, {
+def makeModule = { name ->
+    module name, {
         delegate << makeModuleHeader
 
         leaf "host-name", {
@@ -67,11 +64,17 @@ def makeModule = {
    use 'yangroot' e.g. if you need to add comments before 'module' or 'submodule'
    Otherwise use directly builder.module or builder.submodule
 */
-builder.yangroot {
-    geninfo file: "acmeYang.groovy", time: true,
-        cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
-    // one can continue with  module(moduleName) ... or build continue building yang from separate closure
-    delegate << makeModule
+def root = {
+    yangroot {
+        geninfo file: "acmeYang.groovy", time: true,
+                cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
+        // one can continue with continue building yang from separate closure
+        delegate << makeModule.curry(moduleName) //use curry to pass params to the closure
+    }
 }
 
+//This script template represents example of usage without any plugin with closure reuse
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //create new builder, default indent 2
+builder << root // build closure
 builder.writeToFile("${builder.getYangName()}.yang")
+
