@@ -5,10 +5,6 @@
 class YangCommon {
 
         static def buildHeader = { prefixName = null ->
-                yngbuild("/* This yang file was generated with groovy YangBuilder on ${new Date().toString()}", indent: true)
-                yngbuild('   see http://bitbucket.org/novakmi/yangbuilder */', indent: true)
-                yngbuild('') // new line
-
                 if (prefixName) { // do not generate prefix for and namespace for submodules
                         namespace "http://bitbucket.org/novakmi/yangbuilder"
                         prefix prefixName

@@ -34,9 +34,9 @@ def yangs = [
 
 for (y in yangs) { // one can also use yangs.each {y ->
         builder.reset() // empty builder
-        y.buildYang(builder)
-        print("Processing ${y.getYangName()} ...")
-        builder.writeToFile("${y.getYangName()}.yang")
+        builder << y.yang
+        print("Processing ${y.yangName} ...")
+        builder.writeToFile("${y.yangName}.yang")
         //new File("${y.getName()}.yang").write(builder.getText()) //write to file
         println("done")
 }

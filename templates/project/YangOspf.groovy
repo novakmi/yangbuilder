@@ -7,7 +7,7 @@ class YangOspf {
         static def yangName = "ospf-module" // groovy makes automatically getYangName(), setYangName()
 
         def static ospf = { protocol ->
-                module getYangName(), {
+                module yangName, {
                         geninfo file: "${this.name}.groovy"
                         delegate << YangCommon.buildHeader.curry(protocol)
                         yngbuild "/* ${protocol} neighbor */", indent: true
@@ -18,7 +18,5 @@ class YangOspf {
                 }
         }
 
-        static def buildYang(builder) {
-                builder << ospf.curry("ospf")
-        }
+        def static yang = ospf.curry("ospf")
 }

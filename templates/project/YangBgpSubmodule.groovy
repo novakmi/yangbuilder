@@ -15,18 +15,17 @@ class YangBgpSubmodule {
                 }
         }
 
-        static def buildYang(builder) {
-                builder.yangroot { //yangroot is used only because comment is above 'submodule'
+        def static yang = {
+                yangroot { //yangroot is used only because comment is above 'submodule'
                         geninfo file: "${this.name}.groovy"
                         yngbuild "/* Example of submodule */"
-                        submodule getYangName(), {
-                                'belongs-to' YangBgpSubmodule.getYangName(), {
+                        submodule yangName, {
+                                'belongs-to' YangBgp.yangName, {
                                         prefix "bgp"
                                 }
                                 yngbuild ''
                                 delegate << YangCommon.buildHeader
-                                makeGrouping(delegate)
-                                // as if content of closure is written here, yangbuilder reuse (not possible in yang); `delegate` is same object as `builder`
+                                makeGrouping(delegate) //delegate is builder (example of reuse through function)
                         }
                 }
         }

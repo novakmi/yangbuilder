@@ -6,8 +6,8 @@ class YangBgp {
 
         static def yangName = "bgp-module" // groovy makes automatically getYangName(), setYangName()
 
-        static def buildYang(builder) {
-                builder.module getYangName(),{
+        def static yang = {
+                module yangName, {
                         geninfo file: "${this.name}.groovy"
                         delegate << YangCommon.buildHeader.curry("bgp")
 
