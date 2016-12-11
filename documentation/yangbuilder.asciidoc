@@ -190,8 +190,8 @@ See `templates\scripts\acme`
 .acmeYang.groovy - example of the <<yangbuilder>> script without `CompactYangPlugin`
 ----
 #!/usr/bin/env groovy        //<1>
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0') //<2>
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0') //<2>
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder() //<3>
 moduleName = "acme-module"  //name of file to generate
@@ -312,7 +312,7 @@ module acme-module {
 ----
 #!/usr/bin/env groovy
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 //name of file to generate
 moduleName = "acme-module-closure"   // do not use 'def' for script global variable
@@ -393,8 +393,8 @@ builder.writeToFile("${builder.getYangName()}.yang")
 .acmeYangCompact.groovy - example of the <<yangbuilder>> script with `CompactYangPlugin`
 ----
 #!/usr/bin/env groovy
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '0.9.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 def plugin = new CompactYangPlugin() // <1>
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin)  // register

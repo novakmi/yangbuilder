@@ -8,7 +8,7 @@
 //Update nodebuilder, yangbuilder version numbers as needed
 //adoc-begin - documentation purpose comment
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 // This script template represents example of usage without any plugin
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(4) // create new builder, indent 4 (default is 2)

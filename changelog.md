@@ -1,5 +1,13 @@
 #Yangbuilder change log
 
+* 1.2.0 2016-12-12
+    * updated documentation (mainly reuse with closures)
+    * updated examples (closures)
+    * updated dependencies (`nodebuilder-1.0.0`)
+    * updated copyright
+    * added `belongs-to` to aliases
+    * updated tests to reflect new functionality
+
 * 1.1.0 2015-04-10    
     * updated documentation
     * updated dependencies
