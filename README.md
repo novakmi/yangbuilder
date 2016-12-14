@@ -8,7 +8,7 @@ See LICENSE file
 ## Benefits and usage scenarios
 
 * output is the `yang` file (no compatibility issues)
-* syntax similar to the `yang` syntax (`compact yang` extenmded syntax with `CompactYangPlugin`)
+* syntax similar to the `yang` syntax (`compact yang` extended syntax with `CompactYangPlugin`)
 * better reuse than in `yang` (power of programming language)
     * parametrized groupings (e.g. `grouping ipv4 {`  and `grouping ipv6 {` can be written as `grouping ${ipver} {`)
     * reusable functions/closures
