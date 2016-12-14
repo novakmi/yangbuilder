@@ -52,6 +52,8 @@ In addition, there is a `CompactYangPlugin` plugin, which bring even more featur
 One of them is so called `compact yang` syntax, which creates simple sub-elements from attributes (can be freely mixed with `yang` like syntax):
   
 Example (from the Yang tutorial):
+
+`yang` syntax: 
  
 ```groovy 
 container timeout {                                             
@@ -66,12 +68,27 @@ container timeout {
 }
 ```
 
-can be written as:
+`yangbuilder` syntax (semicolons at the end are optional):
+
+```groovy 
+container timeout, {                                             
+   leaf "access-timeout", {                                       
+       description "Maximum time without server response"
+       type "uint32"
+   }
+   leaf retry-timer, {
+       description "Period to retry operation"                
+       type "uint32"
+   }
+}
+```
+
+`yangbuilder` (compact yang) syntax:
 
 ```groovy
 container "timeout", {
-    leaf "access-timeout", type: uint32, description: "Maximum time without server response"
-    leaf "retry-timer", type: uint32, description: "Period to retry operation"
+    leaf "access-timeout", type: "uint32", description: "Maximum time without server response"
+    leaf "retry-timer", type: "uint32", description: "Period to retry operation"
 }
 ```
 
