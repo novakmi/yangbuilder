@@ -1,6 +1,9 @@
 #Yangbuilder
 
-The `yangbuilder` is Groovy builder for the Yang Modeling Language (https://en.wikipedia.org/wiki/YANG)
+The `yangbuilder` is Groovy builder for the Yang Modeling Language (https://en.wikipedia.org/wiki/YANG).
+It can be used to generate `yang` data models, using programming language (`groovy`) and still keep data model 
+syntax similar to the `yang` syntax. 
+
 
 (c) Michal Novak (<it.novakmi@gmail.com>)
 See LICENSE file
@@ -18,7 +21,7 @@ See LICENSE file
     * `groovy` reuse (closures, functions, etc.) can be alternative option to the `yang` reuse (`grouping`, `augment`, `refine`);
       e.g in cases when `yang` reuse cannot be used (for instance parsing `yang` with `pyang` plugin that does not implement full support 
       for  `yang` reuse -  handling of `grouping`, `augment`, etc.) 
-* generate `yang` conditionally 
+* generate `yang` data models conditionally 
     * generate different release or customer specific `yang` versions according to the build options or environment variables
     * use conditions where it is not possible to use `if-feature` (`import`, `include`, ...)
     * use negative conditions (not possible with `if-feature`)
