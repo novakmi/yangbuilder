@@ -107,7 +107,7 @@ See `changelog.md`.
 
 Quick examples:
 
-See `templates\scripts\`
+See `examples\scripts\`
 
 ## Build environment
 
