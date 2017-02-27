@@ -90,14 +90,21 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 } else {
                                         assert (node.name == 'cmt')
                                         def isInline = node.attributes.inline == null || node.attributes.inline
+                                        def lines = node?.value.readLines()
                                         if (!isInline) {
                                                 indentIfNeeded(node, opaque)
-                                                opaque.println('/*')
+                                                opaque.print('/*')
+                                                if (lines.size() > 1) {
+                                                        opaque.println('')
+                                                }
                                         }
                                         // process comment line by line
-                                        def lines = node?.value.readLines()
                                         lines.each {l ->
-                                                indentIfNeeded(node, opaque)
+                                                if ((lines.size() > 1) || isInline) {
+                                                        indentIfNeeded(node, opaque)
+                                                } else {
+                                                        opaque.print(' ')
+                                                }
                                                 if (isInline) {
                                                         opaque.print('// ')
                                                 } else {
@@ -105,10 +112,17 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                                l = l.trim()
                                                         }
                                                 }
-                                                opaque.println(l)
+                                                opaque.print(l)
+                                                if (lines.size() > 1) {
+                                                        opaque.println('')
+                                                }
                                         }
                                         if (!isInline) {
-                                                indentIfNeeded(node, opaque)
+                                                if (lines.size() > 1) {
+                                                        indentIfNeeded(node, opaque)
+                                                }  else {
+                                                        opaque.print(' ')
+                                                }
                                                 opaque.println('*/')
                                         }
                                 }
