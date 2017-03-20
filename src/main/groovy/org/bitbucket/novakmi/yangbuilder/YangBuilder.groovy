@@ -65,25 +65,15 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 return retVal
         }
 
-        private static def stringToLines(val) {
-                def retVal = []
-                if (val) {
-                        def lines = val.readLines()
-                        def first = true
-                        for (def l:lines) {
-                                if (first) {
-                                    if (l != '') {
-                                            retVal += l
-                                    }
-                                } else {
-                                        retVal += l
-                                }
-                                first = false
+        private def static dropFirstElemIfEq(elems, equal='') {
+                if (elems.size()) {
+                        if (elems[0] == equal) {
+                                elems = elems.drop(1)
                         }
                 }
-                return retVal
+                return elems
         }
-
+        
         @Override
         protected void processNode(BuilderNode node, Object opaque) throws BuilderException {
                 def quoteString = node.attributes.quotes ?: ''
@@ -109,8 +99,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 } else {
                                         assert (node.name == 'cmt')
                                         def isInline = node.attributes.inline == null || node.attributes.inline
-                                        def numLines = node?.value.readLines().size()
-                                        def lines = stringToLines(node?.value)
+                                        def lines = node?.value.readLines()
+                                        def numLines = lines.size()
+                                        lines = dropFirstElemIfEq(lines)
                                         if (!isInline) {
                                                 indentIfNeeded(node, opaque)
                                                 opaque.print('/*')
@@ -206,12 +197,14 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         if (lines.size() == 1) {
                                                 opaque.print(" ${quoteString}${lines[0]}${quoteString}")
                                         } else {
+                                                lines = dropFirstElemIfEq(lines)
                                                 lines = TextPluginTreeNodeBuilder.trimAndQuoteLines(lines, quoteString)
                                                 lines.each { l->
                                                         opaque.println("")
                                                         indentIfNeeded(node, opaque)
                                                         if (isIndent(node)) {
-                                                                opaque.print("${opaque.indent}") //TODO indent private
+                                                                opaque.print("${opaque.indent}")
+                                                                //TODO indent private
                                                         }
                                                         opaque.print(l)
                                                 }
