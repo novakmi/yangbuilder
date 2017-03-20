@@ -70,7 +70,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         description '''
          This YANG module augments the 'ietf-routing' module with basic\n''' +
-            "configuration and state data for IPv${afi} unicast routing." + '''
+         "configuration and state data for IPv${afi} unicast routing." + '''
 
          Copyright (c) 2016 IETF Trust and the persons identified as
          authors of the code.  All rights reserved.
