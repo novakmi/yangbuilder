@@ -65,6 +65,25 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 return retVal
         }
 
+        private static def stringToLines(val) {
+                def retVal = []
+                if (val) {
+                        def lines = val.readLines()
+                        def first = true
+                        for (def l:lines) {
+                                if (first) {
+                                    if (l != '') {
+                                            retVal += l
+                                    }
+                                } else {
+                                        retVal += l
+                                }
+                                first = false
+                        }
+                }
+                return retVal
+        }
+
         @Override
         protected void processNode(BuilderNode node, Object opaque) throws BuilderException {
                 def quoteString = node.attributes.quotes ?: ''
@@ -90,17 +109,18 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 } else {
                                         assert (node.name == 'cmt')
                                         def isInline = node.attributes.inline == null || node.attributes.inline
-                                        def lines = node?.value.readLines()
+                                        def numLines = node?.value.readLines().size()
+                                        def lines = stringToLines(node?.value)
                                         if (!isInline) {
                                                 indentIfNeeded(node, opaque)
                                                 opaque.print('/*')
-                                                if (lines.size() > 1) {
+                                                if (numLines > 1) {
                                                         opaque.println('')
                                                 }
                                         }
                                         // process comment line by line
                                         lines.each {l ->
-                                                if ((lines.size() > 1) || isInline) {
+                                                if ((numLines > 1) || isInline) {
                                                         indentIfNeeded(node, opaque)
                                                 } else {
                                                         opaque.print(' ')
@@ -113,12 +133,12 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                         }
                                                 }
                                                 opaque.print(l)
-                                                if (lines.size() > 1) {
+                                                if (numLines > 1 || isInline) {
                                                         opaque.println('')
                                                 }
                                         }
                                         if (!isInline) {
-                                                if (lines.size() > 1) {
+                                                if (numLines > 1) {
                                                         indentIfNeeded(node, opaque)
                                                 }  else {
                                                         opaque.print(' ')

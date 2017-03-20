@@ -354,11 +354,11 @@ description"''', noAutoQuotes: true) // multiline and indent
                         // or semicolon can be missing (more groovy like style)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        cmt('This is comment', indent: false, inline: false)
+                        cmt('\nThis is comment', indent: false, inline: false)
                         cmt('This is inline comment', indent: false)
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
-                        cmt('This is indented comment', inline: false)
+                        cmt('\nThis is indented comment', inline: false)
                         cmt('This is inline indented comment')
                         yngbuild('') //yngbuild echoes value, yngbuild('') means new line
 
@@ -380,7 +380,7 @@ multiline comment''')
                         description 'test quotes'
 
                         container('socket', cmt: "Inline comment for socket container") {
-                                cmt('This is indented comment in container', inline: false)
+                                cmt('\nThis is indented comment in container', inline: false)
                                 yngbuild('') //yngbuild echoes value, yngbuild('') means new line
                                 cmt('This is inline indented comment in container')
                                 yngbuild('') //yngbuild echoes value, yngbuild('') means new line
