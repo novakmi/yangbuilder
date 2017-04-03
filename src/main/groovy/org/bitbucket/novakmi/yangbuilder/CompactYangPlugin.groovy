@@ -15,10 +15,10 @@ class CompactYangPlugin extends CompactPluginBase {
 
         private HashSet autoNlLevels = new HashSet();
         private HashSet autoPnlLevels = new HashSet();
-
+        private static  reservedAttributes = ["pnl", "nl", "nlLevel", "pnlLevel"] + YangBuilder.reservedAttributes
 
         private boolean skipAttr(final String name) {
-                def retVal = (name in ["pnl", "nl", "nlLevel", "pnlLevel", "indent", "cmt", "noAutoQuotes", "quotes"])
+                def retVal = name in reservedAttributes
                 retVal |=  (name.startsWith("${YangBuilder._YGN}_")) //if attribute name starts with '_ygn_', skip this attribute from processing
                 return retVal
         }

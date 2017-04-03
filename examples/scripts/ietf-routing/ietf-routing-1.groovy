@@ -11,6 +11,7 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 def plugin = new CompactYangPlugin()
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin)
 plugin.declareCommonAliasesAndQuotes()
+builder.config([autoNl: true])
 
 scriptName = "ietf-routing"
 gVer = 1
@@ -70,7 +71,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         description '''
          This YANG module augments the 'ietf-routing' module with basic\n''' +
-         "configuration and state data for IPv${afi} unicast routing." + '''
+            "configuration and state data for IPv${afi} unicast routing." + '''
 
          Copyright (c) 2016 IETF Trust and the persons identified as
          authors of the code.  All rights reserved.
@@ -116,10 +117,10 @@ def ietf_ipvx_unicast_routing = { afi ->
             }
         }
 
-        augment("/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/"
-            + "rt:next-hop/rt:next-hop-options/rt:simple-next-hop") {
-            when("derived-from-or-self(../../../rt:address-family, "
-                + "'v${afi}ur:ipv${afi}-unicast')") {
+        augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/" +
+            "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", {
+            when "derived-from-or-self(../../../rt:address-family, " +
+                "'v${afi}ur:ipv${afi}-unicast')", {
                 description "This augment is valid only for IPv${afi} unicast."
             }
             description "Augment 'simple-next-hop' case in IPv${afi} unicast routes."
@@ -129,6 +130,22 @@ def ietf_ipvx_unicast_routing = { afi ->
             }
         }
 
+        augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/" +
+            "rt:next-hop/rt:next-hop-options/rt:next-hop-list/" +
+            "rt:next-hop-list/rt:next-hop", {
+            when "derived-from-or-self(../../../../../rt:address-family, " +
+                "'v${afi}ur:ipv${afi}-unicast')", {
+                description "This augment is valid only for IPv${afi} unicast."
+            }
+
+            description "This leaf augments the 'next-hop-list' case of IPv${afi} unicast\n" +
+                "routes."
+
+            leaf "address", {
+                type "inet:ipv${afi}-address"
+                description "IPv${afi} address of the next-hop."
+            }
+        }
     }
 }
 

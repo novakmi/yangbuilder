@@ -13,6 +13,17 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public static final String YANG_ROOT = 'yangroot'
         public static final String YANG_CMD = 'yngcmd'
         public static final reservedCommands = ["cmt", "geninfo", "yngbuild", YANG_ROOT ,YANG_CMD]
+        public static final reservedAttributes = ["autoNl", "noAutoQuotes", "indent", "quotes", "cmt", "inline"]
+
+        public config = [:]
+
+        public def config(configMap) {
+                config += configMap
+        }
+
+        private isAutoNl(node) {
+                return config?.autoNl || node?.attributes?.autoNl
+        }
 
         // list of keywords with special quote handling
         private quoteKeywords = []
@@ -181,7 +192,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         break;
                                 }
                                 opaque.printIndent()
-                                opaque.print("$node.name")
+                                opaque.print(node.name)
                                 //qoute handling attributes
                                 //*************************
                                 //quotes - force quotes
@@ -194,19 +205,33 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 }
                                 if (node.value instanceof String || node.value instanceof GString) {
                                         def lines = node?.value.readLines()
+                                        def autoNl = false
                                         if (lines.size() == 1) {
-                                                opaque.print(" ${quoteString}${lines[0]}${quoteString}")
+                                                if (isAutoNl(node) &&
+                                                    node.name in ["description", "reference", // newline after these nodes
+                                                                  "organization", "contact"]) {
+                                                        opaque.println("")
+                                                        opaque.incrementIndent()
+                                                        indentIfNeeded(node, opaque)
+                                                        autoNl = true
+                                                }
+                                                opaque.print("${autoNl?"":" "}${quoteString}${lines[0]}${quoteString}")
+                                                if (autoNl) {
+                                                        opaque.decrementIndent()
+                                                }
                                         } else {
                                                 lines = dropFirstElemIfEq(lines)
                                                 lines = TextPluginTreeNodeBuilder.trimAndQuoteLines(lines, quoteString)
                                                 lines.each { l->
                                                         opaque.println("")
-                                                        indentIfNeeded(node, opaque)
-                                                        if (isIndent(node)) {
-                                                                opaque.print("${opaque.indent}")
-                                                                //TODO indent private
+                                                        if (!l.trim().equals("")) {
+                                                                indentIfNeeded(node, opaque)
+                                                                if (isIndent(node)) {
+                                                                        opaque.print("${opaque.indent}")
+                                                                        //TODO indent private
+                                                                }
+                                                                opaque.print(l)
                                                         }
-                                                        opaque.print(l)
                                                 }
                                         }
                                 }  else {
