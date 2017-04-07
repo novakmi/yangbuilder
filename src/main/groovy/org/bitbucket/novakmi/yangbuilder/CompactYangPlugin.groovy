@@ -159,7 +159,7 @@ class CompactYangPlugin extends CompactPluginBase {
         /**
          * Declare common aliases for the Yang language conflicting with groovy syntax and keywords.
          */
-        public void declareCommonAliasesAndQuotes() {
+        public void declareCommonAliasesAndQuotes() throws BuilderException {
                 if (getMyBuilder()) {
                         this.declareMinColAliases([
                                 "leaf-list", "if-feature", "min-elements", "max-elements", "belongs-to",
@@ -170,6 +170,8 @@ class CompactYangPlugin extends CompactPluginBase {
                         getMyBuilder().declareAlias("import_", "import")
                         getMyBuilder().declareAlias("enum_", "enum")
                         getMyBuilder().declareAlias("case_", "case")
+                } else {
+                        throw new BuilderException("Plugin not attached to the builder!")
                 }
         }
 }
