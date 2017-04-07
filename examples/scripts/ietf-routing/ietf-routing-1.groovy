@@ -9,9 +9,8 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 def plugin = new CompactYangPlugin()
-def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin)
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin, [autoNl: true])
 plugin.declareCommonAliasesAndQuotes()
-builder.config([autoNl: true])
 
 scriptName = "ietf-routing"
 gVer = 1
@@ -166,8 +165,3 @@ def ietf_ipv6_router_advertisements = {
     builder << it
     builder.writeToFile("${builder.getYangName()}.yang")
 }
-
-
-
-
-

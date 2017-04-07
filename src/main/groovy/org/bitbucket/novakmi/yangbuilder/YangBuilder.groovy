@@ -14,17 +14,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public static final String YANG_CMD = 'yngcmd'
         public static final reservedCommands = ["cmt", "geninfo", "yngbuild", YANG_ROOT ,YANG_CMD]
         public static final reservedAttributes = ["autoNl", "noAutoQuotes", "indent", "quotes", "cmt", "inline"]
-
-        public config = [:]
-
-        public def config(configMap) {
-                config += configMap
-        }
-
-        private isAutoNl(node) {
-                return config?.autoNl || node?.attributes?.autoNl
-        }
-
+        
         // list of keywords with special quote handling
         private quoteKeywords = []
 
@@ -33,8 +23,8 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          * @param indent number of spaces for indentation (default is 2)
          * @param plugins list of plugins to be added (no plugins by default)
          */
-        public YangBuilder(indent = 2, plugins = null) {
-                super(indent, plugins)
+        public YangBuilder(indent = 2, plugins = null, configMap = null) {
+                super(indent, plugins, configMap)
                 quoteKeywords += [
                         'reference',
                         'contact',
@@ -207,15 +197,17 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         def lines = node?.value.readLines()
                                         def autoNl = false
                                         if (lines.size() == 1) {
-                                                if (isAutoNl(node) &&
+                                                if (isKeyInConfigOrNodeAttr(node, "autoNl") &&
                                                     node.name in ["description", "reference", // newline after these nodes
                                                                   "organization", "contact"]) {
                                                         opaque.println("")
                                                         opaque.incrementIndent()
                                                         indentIfNeeded(node, opaque)
                                                         autoNl = true
+                                                } else {
+                                                        opaque.print(" ")
                                                 }
-                                                opaque.print("${autoNl?"":" "}${quoteString}${lines[0]}${quoteString}")
+                                                opaque.print("${quoteString}${lines[0]}${quoteString}")
                                                 if (autoNl) {
                                                         opaque.decrementIndent()
                                                 }
