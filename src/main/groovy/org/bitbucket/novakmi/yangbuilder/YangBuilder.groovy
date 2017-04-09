@@ -13,8 +13,9 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public static final String YANG_ROOT = 'yangroot'
         public static final String YANG_CMD = 'yngcmd'
         public static final reservedCommands = ["cmt", "geninfo", "yngbuild", YANG_ROOT ,YANG_CMD]
-        public static final reservedAttributes = ["autoNl", "noAutoQuotes", "indent", "quotes", "cmt", "inline"]
-        
+        public static final reservedAttributes = ["autoNl", "noAutoQuotes", "indent", "quotes", "cmt", "inline",
+                                                  "splitOnPlus"]
+
         // list of keywords with special quote handling
         private quoteKeywords = []
 
@@ -74,7 +75,23 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                 }
                 return elems
         }
-        
+
+        private splitLineOnPlus(line) {
+            def linesTmp = line.split('\\+')
+            def lines = []
+            int cur = 0
+
+            for (int i = 0; i < linesTmp.size(); i++) {
+                if (i != 0 && lines[cur - 1].endsWith('\\')) {
+                    lines[cur - 1] = lines[cur - 1][0..-2] + linesTmp[i]
+                    continue
+                }
+                lines += linesTmp[i]
+                cur++
+            }
+            return lines
+        }
+
         @Override
         protected void processNode(BuilderNode node, Object opaque) throws BuilderException {
                 def quoteString = node.attributes.quotes ?: ''
@@ -207,7 +224,26 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                 } else {
                                                         opaque.print(" ")
                                                 }
-                                                opaque.print("${quoteString}${lines[0]}${quoteString}")
+                                                def splitOnPlus = isKeyInConfigOrNodeAttr(node, "splitOnPlus")
+                                                if (splitOnPlus) {
+                                                        lines = splitLineOnPlus(lines[0])
+                                                        if(quoteString == '') {
+                                                            quoteString = getMyQuotes(node.value)
+                                                        }
+                                                    if(quoteString == '') {
+                                                        quoteString = this.qouteStrings[0]
+                                                    }
+                                                }
+                                                splitOnPlus = lines.size() > 1
+                                                for (int i = 0; i < lines.size(); i++) {
+                                                    opaque.print("${quoteString}${lines[i]}${quoteString}")
+                                                    if (i != lines.size() - 1 && splitOnPlus) {
+                                                        opaque.println("")
+                                                        indentIfNeeded(node, opaque)
+                                                        def spaces = node?.name?.size() -1
+                                                        opaque.print("${" "?.multiply(spaces)}+ ")
+                                                    }
+                                                }                                             
                                                 if (autoNl) {
                                                         opaque.decrementIndent()
                                                 }

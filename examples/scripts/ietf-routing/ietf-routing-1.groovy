@@ -105,8 +105,8 @@ def ietf_ipvx_unicast_routing = { afi ->
         cmt "State data", inline: false
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route", {
-            when("derived-from-or-self(../../rt:address-family, "
-                + "'v${afi}ur:ipv$afi-unicast')") {
+            when "derived-from-or-self(../../rt:address-family, +" +
+                "'v${afi}ur:ipv$afi-unicast')", splitOnPlus: true, {
                 description "This augment is valid only for IPv${afi} unicast."
             }
             description "This leaf augments an IPv${afi} unicast route."
@@ -116,10 +116,10 @@ def ietf_ipvx_unicast_routing = { afi ->
             }
         }
 
-        augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/" +
-            "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", {
-            when "derived-from-or-self(../../../rt:address-family, " +
-                "'v${afi}ur:ipv${afi}-unicast')", {
+        augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
+            "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", splitOnPlus: true, {
+            when "derived-from-or-self(../../../rt:address-family, +" +
+                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true, {
                 description "This augment is valid only for IPv${afi} unicast."
             }
             description "Augment 'simple-next-hop' case in IPv${afi} unicast routes."
@@ -129,11 +129,11 @@ def ietf_ipvx_unicast_routing = { afi ->
             }
         }
 
-        augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/" +
-            "rt:next-hop/rt:next-hop-options/rt:next-hop-list/" +
-            "rt:next-hop-list/rt:next-hop", {
-            when "derived-from-or-self(../../../../../rt:address-family, " +
-                "'v${afi}ur:ipv${afi}-unicast')", {
+        augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
+            "rt:next-hop/rt:next-hop-options/rt:next-hop-list/+" +
+            "rt:next-hop-list/rt:next-hop", splitOnPlus: true,{
+            when "derived-from-or-self(../../../../../rt:address-family, +" +
+                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,{
                 description "This augment is valid only for IPv${afi} unicast."
             }
 
