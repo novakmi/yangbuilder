@@ -120,8 +120,7 @@ module ietf-ipv4-unicast-routing {
     }
   }
 
-  augment
-    "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/rt:input" {
+  augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/rt:input" {
     when "derived-from-or-self(../rt:address-family, "
        + "'v4ur:ipv4-unicast')" {
       description
