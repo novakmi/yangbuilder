@@ -43,10 +43,196 @@ def org_contact = { name ->
                          <mailto:acee@cisco.com>'''
 }
 
+def commmonIetfDesc = '''
+
+         Copyright (c) 2016 IETF Trust and the persons identified as
+         authors of the code.  All rights reserved.
+    
+         Redistribution and use in source and binary forms, with or
+         without modification, is permitted pursuant to, and subject to
+         the license terms contained in, the Simplified BSD License set
+         forth in Section 4.c of the IETF Trust's Legal Provisions
+         Relating to IETF Documents
+         (http://trustee.ietf.org/license-info).
+    
+         The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
+         NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and
+         'OPTIONAL' in the module text are to be interpreted as described
+         in RFC 2119.
+    
+         This version of this YANG module is part of RFC 8022;
+         see the RFC itself for full legal notices.'''
+
+def revision = {
+    revision "2016-11-04", {
+        description "Initial revision."
+        reference "RFC 8022: A YANG Data Model for Routing Management"
+    }
+}
+
 def ietf_routing_yang = {
     def name = scriptName
     module "$name-$gVer", {
         delegate << ietf_routing_header.curry(name)
+        namespace "urn:ietf:params:xml:ns:yang:ietf-routing"
+        prefix "rt"
+
+        import_ "ietf-yang-types", prefix: "yang"
+        import_ "ietf-interfaces", prefix: "if"
+
+        delegate << org_contact
+
+        description '''This YANG module defines essential components for the management
+                    of a routing subsystem.''' + commmonIetfDesc
+
+        delegate << revision
+
+        cmt "Features", inline: false
+
+        def featureIndicates = "This feature indicates that the server supports "
+        def serverNotAdv = "Servers that do not advertise this feature "
+
+        feature "multiple-ribs", {
+            description featureIndicates + '''user-defined
+               RIBs.
+
+               ''' + serverNotAdv + '''SHOULD provide
+               exactly one system-controlled RIB per supported address family
+               and make it also the default RIB.  This RIB then appears as an
+               entry of the list /routing-state/ribs/rib.'''
+        }
+
+        feature "router-id", {
+            description featureIndicates + '''configuration
+              of an explicit 32-bit router ID that is used by some routing
+              protocols.
+
+              ''' + serverNotAdv + '''set a router ID
+              algorithmically, usually to one of the configured IPv4
+              addresses.  However, this algorithm is implementation
+              specific.'''
+        }
+
+        def identity = { idName, baseName, descr ->
+            identity idName, {
+                if (baseName) {
+                    base baseName
+                }
+                description descr
+            }
+        }
+
+        cmt "Identities", inline: false
+
+        identity "address-family", null,
+            '''Base identity from which identities describing address
+               families are derived.'''
+
+        [4, 6].each { afi ->
+            identity "ipv${afi}", "address-family",
+                "This identity represents IPv${afi} address family."
+        }
+
+        identity "control-plane-protocol", null,
+            '''Base identity from which control-plane protocol identities are
+               derived.'''
+
+        identity "routing-protocol", "control-plane-protocol",
+            '''Identity from which Layer 3 routing protocol identities are
+               derived.'''
+
+        identity "direct", "routing-protocol",
+            '''Routing pseudo-protocol that provides routes to directly
+               connected networks.'''
+
+        identity "static", "routing-protocol", "Static routing pseudo-protocol."
+
+        cmt "Type Definitions", inline: false
+
+        typedef "route-preference", type: "uint32",
+            description: "This type is used for route preferences."
+
+        cmt "Groupings", inline: false
+
+        grouping "address-family", {
+            description  '''This grouping provides a leaf identifying an address
+                            family.'''
+            leaf "address-family", {
+                type "identityref", base: "address-family"
+                mandatory true
+                description "Address family."
+            }
+        }
+
+        grouping "router-id",description: "This grouping provides router ID.", {
+            leaf "router-id",  type: "yang:dotted-quad", {
+                description  '''A 32-bit number in the form of a dotted quad that is used by
+                                some routing protocols identifying a router.'''
+                reference '''RFC 2328: OSPF Version 2.'''
+            }
+        }
+
+        grouping "special-next-hop", {
+            description '''This grouping provides a leaf with an enumeration of special
+                           next hops.'''
+            leaf "special-next-hop", {
+                type "enumeration", {
+                    enum_ "blackhole", description: "Silently discard the packet."
+                    enum_ "unreachable",
+                        description: '''Discard the packet and notify the sender with an error
+                                       message indicating that the destination host is
+                                       unreachable.'''
+                    enum_ "prohibit",
+                        description: '''Discard the packet and notify the sender with an error
+                                       message indicating that the communication is
+                                       administratively prohibited.'''
+                    enum_ "receive", description: "The packet will be received by the local system."
+                }
+                description "Options for special next hops."
+            }
+        }
+
+        grouping "next-hop-content",
+            description: "Generic parameters of next hops in static routes.", {
+            choice "next-hop-options", mandatory: true,
+                description: '''Options for next hops in static routes.
+
+                                 It is expected that further cases will be added through
+                                 augments from other modules.''', {
+                case_ "simple-next-hop",
+                    description: '''This case represents a simple next hop consisting of the
+                                     next-hop address and/or outgoing interface.
+
+                                     Modules for address families MUST augment this case with a
+                                     leaf containing a next-hop address of that address
+                                     family.''', {
+                    leaf "outgoing-interface", type: "if:interface-ref",
+                        description: "Name of the outgoing interface."
+                }
+                case_ "special-next-hop", uses: "special-next-hop"
+                case_ "next-hop-list", {
+                    container "next-hop-list", description: "Container for multiple next-hops.", {
+                        list "next-hop", key: "index",
+                            description:
+                                '''An entry of a next-hop list.
+
+                            Modules for address families MUST augment this list
+                            with a leaf containing a next-hop address of that
+                            address family.''', {
+                            leaf "index", type: "string", description:
+                                '''A user-specified identifier utilized to uniquely
+                                reference the next-hop entry in the next-hop list.
+                                The value of this index has no semantic meaning
+                                other than for referencing the entry.'''
+
+                            leaf "outgoing-interface", type: "if:interface-ref",
+                                description: "Name of the outgoing interface."
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -70,34 +256,14 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         description '''
          This YANG module augments the 'ietf-routing' module with basic\n''' +
-            "configuration and state data for IPv${afi} unicast routing." + '''
+            "configuration and state data for IPv${afi} unicast routing." +
+            commmonIetfDesc
 
-         Copyright (c) 2016 IETF Trust and the persons identified as
-         authors of the code.  All rights reserved.
-    
-         Redistribution and use in source and binary forms, with or
-         without modification, is permitted pursuant to, and subject to
-         the license terms contained in, the Simplified BSD License set
-         forth in Section 4.c of the IETF Trust's Legal Provisions
-         Relating to IETF Documents
-         (http://trustee.ietf.org/license-info).
-    
-         The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
-         NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and
-         'OPTIONAL' in the module text are to be interpreted as described
-         in RFC 2119.
-    
-         This version of this YANG module is part of RFC 8022;
-         see the RFC itself for full legal notices.'''
-
-        revision "2016-11-04", {
-            description "Initial revision."
-            reference "RFC 8022: A YANG Data Model for Routing Management"
-        }
+        delegate << revision
 
         cmt "Identities", inline: false
 
-        identity "ipv$afi-unicast", {
+        identity "ipv${afi}-unicast", {
             base "rt:ipv${afi}"
             description "This identity represents the IPv${afi} unicast address family."
         }
