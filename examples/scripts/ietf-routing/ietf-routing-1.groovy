@@ -155,7 +155,7 @@ def ietf_routing_yang = {
         cmt "Groupings", inline: false
 
         grouping "address-family", {
-            description  '''This grouping provides a leaf identifying an address
+            description '''This grouping provides a leaf identifying an address
                             family.'''
             leaf "address-family", {
                 type "identityref", base: "address-family"
@@ -164,9 +164,9 @@ def ietf_routing_yang = {
             }
         }
 
-        grouping "router-id",description: "This grouping provides router ID.", {
-            leaf "router-id",  type: "yang:dotted-quad", {
-                description  '''A 32-bit number in the form of a dotted quad that is used by
+        grouping "router-id", description: "This grouping provides router ID.", {
+            leaf "router-id", type: "yang:dotted-quad", {
+                description '''A 32-bit number in the form of a dotted quad that is used by
                                 some routing protocols identifying a router.'''
                 reference '''RFC 2328: OSPF Version 2.'''
             }
@@ -192,47 +192,82 @@ def ietf_routing_yang = {
             }
         }
 
-        grouping "next-hop-content",
-            description: "Generic parameters of next hops in static routes.", {
-            choice "next-hop-options", mandatory: true,
-                description: '''Options for next hops in static routes.
-
-                                 It is expected that further cases will be added through
-                                 augments from other modules.''', {
-                case_ "simple-next-hop",
-                    description: '''This case represents a simple next hop consisting of the
+        def simple_nexthop_case = { isState = false ->
+            case_ "simple-next-hop",
+                description: '''This case represents a simple next hop consisting of the
                                      next-hop address and/or outgoing interface.
 
                                      Modules for address families MUST augment this case with a
                                      leaf containing a next-hop address of that address
                                      family.''', {
-                    leaf "outgoing-interface", type: "if:interface-ref",
-                        description: "Name of the outgoing interface."
-                }
-                case_ "special-next-hop", uses: "special-next-hop"
-                case_ "next-hop-list", {
-                    container "next-hop-list", description: "Container for multiple next-hops.", {
-                        list "next-hop", key: "index",
-                            description:
-                                '''An entry of a next-hop list.
+                leaf "outgoing-interface", type: "if:interface-${isState ? "state-" : ""}ref",
+                    description: "Name of the outgoing interface."
+            }
+        }
+
+        def nexthop_list_case = { isState = false ->
+            case_ "next-hop-list", {
+                container "next-hop-list", description: "Container for multiple next-hops.", {
+                    list "next-hop", {
+                        if (!isState) {
+                            key "index"
+                        }
+                        description '''An entry of a next-hop list.
 
                             Modules for address families MUST augment this list
                             with a leaf containing a next-hop address of that
-                            address family.''', {
+                            address family.'''
+                        if (!isState) {
                             leaf "index", type: "string", description:
                                 '''A user-specified identifier utilized to uniquely
                                 reference the next-hop entry in the next-hop list.
                                 The value of this index has no semantic meaning
                                 other than for referencing the entry.'''
-
-                            leaf "outgoing-interface", type: "if:interface-ref",
-                                description: "Name of the outgoing interface."
                         }
+                        leaf "outgoing-interface", type: "if:interface-${isState ? "state-" : ""}ref",
+                            description: "Name of the outgoing interface."
                     }
                 }
             }
         }
 
+        def next_hop_grouping = { isState = false ->
+            def inText = isState ? "state data" : "static routes"
+            grouping "next-hop-${isState ? "state-" : ""}content",
+                description:
+                    "Generic parameters of next hops in ${inText}.", {
+                choice "next-hop-options", mandatory: true,
+                    description: "Options for next hops in ${inText}." + '''
+
+                                 It is expected that further cases will be added through
+                                 augments from other modules''' +
+                        "${isState ? ", e.g., for recursive\nnext hops" : ""}.", {
+                    simple_nexthop_case(isState)
+                    case_ "special-next-hop", uses: "special-next-hop"
+                    nexthop_list_case(isState)
+                }
+            }
+        }
+        next_hop_grouping()
+        next_hop_grouping(true)
+
+        grouping "route-metadata", description: "Common route metadata.", {
+            leaf "source-protocol", {
+                type "identityref", base: "routing-protocol"
+                mandatory true
+                description '''Type of the routing protocol from which the route
+                               originated.'''
+            }
+            leaf "active", type: "empty",
+                description: '''Presence of this leaf indicates that the route is preferred
+                                among all routes in the same RIB that have the same
+                                destination prefix.'''
+
+            leaf "last-updated", type: "yang:date-and-time",
+                description: '''Time stamp of the last modification of the route.  If the
+                                route was never modified, it is the time when the route was
+                                inserted into the RIB.'''
+        }
     }
 }
 
@@ -297,9 +332,9 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
             "rt:next-hop/rt:next-hop-options/rt:next-hop-list/+" +
-            "rt:next-hop-list/rt:next-hop", splitOnPlus: true,{
+            "rt:next-hop-list/rt:next-hop", splitOnPlus: true, {
             when "derived-from-or-self(../../../../../rt:address-family, +" +
-                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,{
+                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true, {
                 description "This augment is valid only for IPv${afi} unicast."
             }
 
@@ -314,11 +349,11 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/rt:input", {
             when "derived-from-or-self(../rt:address-family, +" +
-                 "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true, {
+                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true, {
                 description "This augment is valid only for IPv${afi} unicast RIBs."
             }
             description "This augment adds the input parameter of the 'active-route'\n" +
-               "action."
+                "action."
             leaf "destination-address", {
                 type "inet:ipv${afi}-address"
                 description "IPv${afi} destination address."
@@ -326,20 +361,20 @@ def ietf_ipvx_unicast_routing = { afi ->
         }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/+" +
-                "rt:output/rt:route",  splitOnPlus: true, {
+            "rt:output/rt:route", splitOnPlus: true, {
             when "derived-from-or-self(../../rt:address-family, +" +
-                  "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true, {
-                description  "This augment is valid only for IPv${afi} unicast."
+                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true, {
+                description "This augment is valid only for IPv${afi} unicast."
             }
             description "This augment adds the destination prefix to the reply of the\n" +
-                        "'active-route' action."
+                "'active-route' action."
             leaf "destination-prefix", {
                 type "inet:ipv${afi}-prefix"
-                description  "IPv${afi} destination prefix."
+                description "IPv${afi} destination prefix."
             }
         }
 
-        def nextHopAugmentBody = {simple = true ->
+        def nextHopAugmentBody = { simple = true ->
             addLevel = ""
             nexthopElem = "simple-next-hop"
             if (!simple) {
@@ -359,23 +394,23 @@ def ietf_ipvx_unicast_routing = { afi ->
         }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/+" +
-               "rt:output/rt:route/rt:next-hop/rt:next-hop-options/+" +
-               "rt:simple-next-hop", splitOnPlus: true, {
+            "rt:output/rt:route/rt:next-hop/rt:next-hop-options/+" +
+            "rt:simple-next-hop", splitOnPlus: true, {
             nextHopAugmentBody()
         }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/+" +
-                "rt:output/rt:route/rt:next-hop/rt:next-hop-options/+" +
-                "rt:next-hop-list/rt:next-hop-list/rt:next-hop", splitOnPlus: true, {
+            "rt:output/rt:route/rt:next-hop/rt:next-hop-options/+" +
+            "rt:next-hop-list/rt:next-hop-list/rt:next-hop", splitOnPlus: true, {
             nextHopAugmentBody(false)
         }
 
         cmt "Configuration data", inline: false
 
         augment "/rt:routing/rt:control-plane-protocols/+" +
-                "rt:control-plane-protocol/rt:static-routes", splitOnPlus: true, {
+            "rt:control-plane-protocol/rt:static-routes", splitOnPlus: true, {
             description "This augment defines the configuration of the 'static'\n" +
-                         "pseudo-protocol with data specific to IPv${afi} unicast."
+                "pseudo-protocol with data specific to IPv${afi} unicast."
             container "ipv${afi}", {
                 description '''Configuration of a 'static' pseudo-protocol instance
                                consists of a list of routes.'''
@@ -383,24 +418,24 @@ def ietf_ipvx_unicast_routing = { afi ->
                     description: "A list of static routes.", {
                     leaf "destination-prefix", mandatory: true, {
                         type "inet:ipv${afi}-prefix"
-                        description  "IPv${afi} destination prefix."
+                        description "IPv${afi} destination prefix."
                     }
                     leaf "description", type: "string",
-                        description:  "Textual description of the route."
-                    container "next-hop", description:  "Configuration of next-hop.", {
+                        description: "Textual description of the route."
+                    container "next-hop", description: "Configuration of next-hop.", {
                         uses "rt:next-hop-content", {
                             augment "next-hop-options/simple-next-hop", {
                                 description "Augment 'simple-next-hop' case in IPv${afi} static\n" +
-                                             "routes."
+                                    "routes."
                                 leaf "next-hop-address", {
                                     type "inet:ipv${afi}-address"
                                     description "IPv${afi} address of the next hop."
                                 }
                             }
                             augment "next-hop-options/next-hop-list/next-hop-list/+" +
-                                     "next-hop", splitOnPlus: true, {
-                                description "Augment 'next-hop-list' case in IPv${afi} static\n"+
-                                            "routes."
+                                "next-hop", splitOnPlus: true, {
+                                description "Augment 'next-hop-list' case in IPv${afi} static\n" +
+                                    "routes."
                                 leaf "next-hop-address", {
                                     type "inet:ipv${afi}-address"
                                     description "IPv${afi} address of the next hop."
