@@ -268,6 +268,172 @@ def ietf_routing_yang = {
                                 route was never modified, it is the time when the route was
                                 inserted into the RIB.'''
         }
+
+        cmt "State data", inline: false
+
+        container "routing-state", config: false, description: "State data of the routing subsystem.", {
+            uses "router-id", description: '''Global router ID.
+
+                                              It may be either configured or assigned algorithmically by
+                                              the implementation.'''
+            container "interfaces", description: "Network-layer interfaces used for routing.", {
+                leaf_list "interface", type: "if:interface-state-ref",
+                    description: '''Each entry is a reference to the name of a configured
+                                    network-layer interface.'''
+            }
+
+            container "control-plane-protocols", description: "Container for the list of routing protocol instances.", {
+                list "control-plane-protocol", key: "type name",
+                    description: '''State data of a control-plane protocol instance.
+
+                                    An implementation MUST provide exactly one
+                                    system-controlled instance of the 'direct'
+                                    pseudo-protocol.  Instances of other control-plane
+                                    protocols MAY be created by configuration.''', {
+                    leaf "type", {
+                        type "identityref", base: "control-plane-protocol"
+                        description "Type of the control-plane protocol."
+                    }
+                    leaf "name", type: "string",
+                        description: '''The name of the control-plane protocol instance.
+
+                                        For system-controlled instances this name is persistent,
+                                        i.e., it SHOULD NOT change across reboots.'''
+                }
+
+            }
+
+            container "ribs", description: "Container for RIBs.", {
+                list "rib", key: "name", min_elements: "1", {
+                    description '''Each entry represents a RIB identified by the 'name' key.
+                                    All routes in a RIB MUST belong to the same address
+                                    family.
+
+                                        An implementation SHOULD provide one system-controlled
+                                    default RIB for each supported address family.'''
+                    leaf "name", type: "string", description: "The name of the RIB."
+                    uses "address-family"
+                    leaf "default-rib", if_feature: "multiple-ribs", type: "boolean", default_: true,
+                        description: '''This flag has the value of 'true' if and only if the RIB
+                                        is the default RIB for the given address family.
+
+                                            By default, control-plane protocols place their routes
+                                        in the default RIBs.'''
+
+                    container "routes", description: "Current content of the RIB.", {
+                        list "route", {
+                            description ''' A RIB route entry.  This data node MUST be augmented
+                                    with information specific for routes of each address
+                                    family.'''
+                            leaf "route-preference", type: "route-preference", {
+                                description '''This route attribute, also known as administrative
+                                        distance, allows for selecting the preferred route
+                                        among routes with the same destination prefix.  A
+                                        smaller value means a more preferred route.'''
+                            }
+                            container "next-hop", description: "Route's next-hop attribute.",
+                                uses: "next-hop-state-content"
+                            uses "route-metadata"
+                        }
+                    }
+
+                    action "active-route", {
+                        description '''Return the active RIB route that is used for the
+                                       destination address.
+
+                                        Address-family-specific modules MUST augment input
+                                        parameters with a leaf named 'destination-address'.'''
+                        output {
+                            container "route", {
+                                description '''The active RIB route for the specified destination.
+
+                                                If no route exists in the RIB for the destination
+                                                address, no output is returned.
+
+                                                Address-family-specific modules MUST augment this
+                                                container with appropriate route contents.'''
+                                container "next-hop", description: "Route's next-hop attribute.",
+                                    uses: "next-hop-state-content"
+                                uses "route-metadata"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        cmt " Configuration Data", inline: false
+
+        container "routing", description: "Configuration parameters for the routing subsystem.", {
+            uses "router-id", if_feature: "router-id", {
+                description '''Configuration of the global router ID.  Routing protocols
+                                that use router ID can use this parameter or override it
+                                with another value.'''
+            }
+
+            container "control-plane-protocols",
+                description: "Configuration of control-plane protocol instances.", {
+                list "control-plane-protocol", key: "type name", {
+                    description '''Each entry contains configuration of a control-plane
+                                protocol instance.'''
+                    leaf "type", {
+                        type "identityref", base: "control-plane-protocol"
+                        description '''Type of the control-plane protocol - an identity derived
+                                    from the 'control-plane-protocol' base identity.'''
+                    }
+                    leaf "name", type: "string", {
+                        description '''An arbitrary name of the control-plane protocol
+                                    instance.'''
+                    }
+                    leaf "description", type: "string", {
+                        description '''Textual description of the control-plane protocol
+                                   instance.'''
+                    }
+                    container "static-routes", {
+                        when "derived-from-or-self(../type, 'rt:static')", {
+                            description '''This container is only valid for the 'static' routing
+                                        protocol.'''
+                        }
+                        description '''Configuration of the 'static' pseudo-protocol.
+
+                                   Address-family-specific modules augment this node with
+                                   their lists of routes.'''
+                    }
+                }
+            }
+
+            container "ribs", description: "Configuration of RIBs.", {
+                list "rib", key: "name", {
+                    description '''Each entry contains configuration for a RIB identified by
+                               the 'name' key.
+
+                               Entries having the same key as a system-controlled entry
+                               of the list /routing-state/ribs/rib are used for
+                               configuring parameters of that entry.  Other entries
+                               define additional user-controlled RIBs.'''
+                    leaf "name", type: "string", {
+                        description '''The name of the RIB.
+
+                                    For system-controlled entries, the value of this leaf
+                                    must be the same as the name of the corresponding entry
+                                    in state data.
+                
+                                        For user-controlled entries, an arbitrary name can be
+                                    used.'''
+                    }
+                    uses "address-family", {
+                        description '''Address family of the RIB.
+
+                                   It is mandatory for user-controlled RIBs.  For
+                                   system-controlled RIBs it can be omitted; otherwise, it
+                                   must match the address family of the corresponding state
+                                   entry.'''
+                        refine "address-family", mandatory: false
+                    }
+                    leaf "description", type: "string", description: "Textual description of the RIB."
+                }
+            }
+        }
     }
 }
 
