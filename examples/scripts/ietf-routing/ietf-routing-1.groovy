@@ -619,6 +619,291 @@ def ietf_ipv6_router_advertisements = {
     def name = "ietf-ipv6-router-advertisements"
     submodule "$name-$gVer", {
         delegate << ietf_routing_header.curry(name)
+        belongs_to "ietf-ipv6-unicast-routing", prefix: "v6ur";
+        import_ "ietf-inet-types", prefix: "inet"
+        import_ "ietf-interfaces", prefix: "if"
+        import_ "ietf-ip", prefix: "ip"
+
+        delegate << org_contact
+
+        description '''This YANG module augments the 'ietf-ip' module with
+                    configuration and state data of IPv6 router advertisements.''' +
+            commmonIetfDesc
+
+        reference "RFC 4861: Neighbor Discovery for IP version 6 (IPv6)."
+        delegate << revision
+
+        cmt "State data", inline: false
+
+        augment "/if:interfaces-state/if:interface/ip:ipv6", {
+            description '''Augment interface state data with parameters of IPv6 router
+                           advertisements.'''
+
+            container "ipv6-router-advertisements",
+                description: "Parameters of IPv6 Router Advertisements.", {
+                leaf "send-advertisements", type: "boolean", {
+                    description '''A flag indicating whether or not the router sends periodic
+                                   Router Advertisements and responds to Router
+                                   Solicitations.'''
+                }
+                leaf "max-rtr-adv-interval", {
+                    type "uint16", range: "4..1800"
+                    units "seconds"
+                    description '''The maximum time allowed between sending unsolicited
+                                   multicast Router Advertisements from the interface.'''
+                }
+                leaf "min-rtr-adv-interval", {
+                    type "uint16", range: "3..1350"
+                    units "seconds"
+                    description '''The minimum time allowed between sending unsolicited
+                                    multicast Router Advertisements from the interface.'''
+                }
+                leaf "managed-flag", type: "boolean", {
+                    description '''The value that is placed in the 'Managed address
+                                    configuration' flag field in the Router Advertisement.'''
+                }
+                leaf "other-config-flag", type: "boolean", {
+                    description '''The value that is placed in the 'Other configuration' flag
+                                   field in the Router Advertisement.'''
+                }
+                leaf "link-mtu", type: "uint32", {
+                    description '''The value that is placed in MTU options sent by the
+                                   router.  A value of zero indicates that no MTU options are
+                                    sent.'''
+                }
+                leaf "reachable-time", {
+                    type "uint32", range: "0..3600000";
+                    units "milliseconds"
+                    description '''The value that is placed in the Reachable Time field in
+                                    the Router Advertisement messages sent by the router.  A
+                                    value of zero means unspecified (by this router).'''
+                }
+                leaf "retrans-timer", type: "uint32", units: "milliseconds", {
+                    description '''The value that is placed in the Retrans Timer field in the
+                                    Router Advertisement messages sent by the router.  A value
+                                    of zero means unspecified (by this router).'''
+                }
+                leaf "cur-hop-limit", type: "uint8", {
+                    description '''The value that is placed in the Cur Hop Limit field in the
+                                    Router Advertisement messages sent by the router.  A value
+                                    of zero means unspecified (by this router).'''
+                }
+                leaf "default-lifetime", {
+                    type "uint16", range: "0..9000"
+                    units "seconds"
+                    description '''The value that is placed in the Router Lifetime field of
+                                   Router Advertisements sent from the interface, in seconds.
+                                   A value of zero indicates that the router is not to be
+                                   used as a default router.'''
+                }
+                container "prefix-list", {
+                    description '''A list of prefixes that are placed in Prefix Information
+                                   options in Router Advertisement messages sent from the
+                                   interface.
+
+                                    By default, these are all prefixes that the router
+                                    advertises via routing protocols as being on-link for the
+                                    interface from which the advertisement is sent.'''
+                    list "prefix", key: "prefix-spec", description: "Advertised prefix entry and its parameters.", {
+                        leaf "prefix-spec", type: "inet:ipv6-prefix", description: "IPv6 address prefix."
+                        leaf "valid-lifetime", type: "uint32", units: "seconds", {
+                            description '''The value that is placed in the Valid Lifetime in the
+                                        Prefix Information option.  The designated value of
+                                        all 1's (0xffffffff) represents infinity.
+                
+                                        An implementation SHOULD keep this value constant in
+                                        consecutive advertisements except when it is
+                                        explicitly changed in configuration.'''
+                        }
+                        leaf "on-link-flag", type: "boolean", {
+                            description '''The value that is placed in the on-link flag ('L-bit')
+                                       field in the Prefix Information option.'''
+                        }
+                        leaf "preferred-lifetime", type: "uint32", units: "seconds", {
+                            description '''The value that is placed in the Preferred Lifetime in
+                                        the Prefix Information option, in seconds.  The
+                                        designated value of all 1's (0xffffffff) represents
+                                        infinity.
+                
+                                            An implementation SHOULD keep this value constant in
+                                        consecutive advertisements except when it is
+                                        explicitly changed in configuration.'''
+                        }
+                        leaf "autonomous-flag", type: "boolean", {
+                            description '''The value that is placed in the Autonomous Flag field
+                                       in the Prefix Information option.'''
+                        }
+                    }
+                }
+            }
+        }
+
+        cmt " Configuration data", inline: false
+
+        augment "/if:interfaces/if:interface/ip:ipv6", {
+
+            def refRfc4861 = { elem ->
+                reference '''RFC 4861: Neighbor Discovery for IP version 6 (IPv6) -
+                                ''' + elem + "."
+            }
+
+            description '''Augment interface configuration with parameters of IPv6 router
+                           advertisements.'''
+            container "ipv6-router-advertisements", description: "Configuration of IPv6 Router Advertisements.", {
+                leaf "send-advertisements", type: "boolean", default: false, {
+                    description '''A flag indicating whether or not the router sends periodic
+                                   Router Advertisements and responds to Router
+                                   Solicitations.'''
+                    refRfc4861 "AdvSendAdvertisements"
+                }
+                leaf "max-rtr-adv-interval", {
+                    type "uint16", range: "4..1800"
+                    units "seconds"
+                    default_ "600"
+                    description '''The maximum time allowed between sending unsolicited
+                                    multicast Router Advertisements from the interface.'''
+                    refRfc4861 "MaxRtrAdvInterval"
+                }
+                leaf "min-rtr-adv-interval", {
+                    type "uint16", range: "3..1350"
+                    units "seconds"
+                    must ". <= 0.75 * ../max-rtr-adv-interval", {
+                        description '''The value MUST NOT be greater than 75% of
+                                        'max-rtr-adv-interval'.'''
+                    }
+                    description '''The minimum time allowed between sending unsolicited
+                                   multicast Router Advertisements from the interface.
+                
+                                   The default value to be used operationally if this leaf is
+                                   not configured is determined as follows:
+                
+                                   - if max-rtr-adv-interval >= 9 seconds, the default
+                                     value is 0.33 * max-rtr-adv-interval;
+                
+                                   - otherwise, it is 0.75 * max-rtr-adv-interval.'''
+                    refRfc4861 "MinRtrAdvInterval"
+                }
+                leaf "managed-flag", type: "boolean", default: false, {
+                    description '''The value to be placed in the 'Managed address
+                                    configuration' flag field in the Router Advertisement.'''
+                    refRfc4861 "AdvManagedFlag"
+                }
+                leaf "other-config-flag", type: "boolean", default: false, {
+                    description '''The value to be placed in the 'Other configuration' flag
+                                    field in the Router Advertisement.'''
+                    refRfc4861 "AdvOtherConfigFlag"
+                }
+                leaf "link-mtu", type: "uint32", default: 0, {
+                    description '''The value to be placed in MTU options sent by the router.
+                                    A value of zero indicates that no MTU options are sent.'''
+                    refRfc4861 "AdvLinkMTU"
+                }
+                leaf "reachable-time", {
+                    type "uint32", range: "0..3600000"
+                    units "milliseconds"
+                    default_ 0
+                    description '''The value to be placed in the Reachable Time field in the
+                                   Router Advertisement messages sent by the router.  A value
+                                   of zero means unspecified (by this router).'''
+                    refRfc4861 "AdvReachableTime"
+                }
+                leaf "retrans-timer", type: "uint32", units: "milliseconds", default: 0, {
+                    description '''The value to be placed in the Retrans Timer field in the
+                                    Router Advertisement messages sent by the router.  A value
+                                    of zero means unspecified (by this router).'''
+                    refRfc4861 "AdvRetransTimer"
+                }
+                leaf "cur-hop-limit", type: "uint8", {
+                    description '''The value to be placed in the Cur Hop Limit field in the
+                                    Router Advertisement messages sent by the router.  A value
+                                    of zero means unspecified (by this router).
+                
+                                    If this parameter is not configured, the device SHOULD use
+                                    the value specified in IANA Assigned Numbers that was in
+                                    effect at the time of implementation.'''
+                    reference '''RFC 4861: Neighbor Discovery for IP version 6 (IPv6) -
+                                 AdvCurHopLimit.
+            
+                                 IANA: IP Parameters,
+                                 http://www.iana.org/assignments/ip-parameters'''
+                }
+                leaf "default-lifetime", {
+                    type "uint16", range: "0..9000"
+                    units "seconds"
+                    description '''The value to be placed in the Router Lifetime field of
+                                    Router Advertisements sent from the interface, in seconds.
+                                    It MUST be either zero or between max-rtr-adv-interval and
+                                    9000 seconds.  A value of zero indicates that the router
+                                    is not to be used as a default router.  These limits may
+                                    be overridden by specific documents that describe how IPv6
+                                    operates over different link layers.
+                
+                                    If this parameter is not configured, the device SHOULD use
+                                    a value of 3 * max-rtr-adv-interval.'''
+                    refRfc4861 "AdvDefaultLifeTime"
+                }
+                container "prefix-list", {
+                    description '''Configuration of prefixes to be placed in Prefix
+                                    Information options in Router Advertisement messages sent
+                                    from the interface.
+                
+                                    Prefixes that are advertised by default but do not have
+                                    their entries in the child 'prefix' list are advertised
+                                    with the default values of all parameters.
+                
+                                    The link-local prefix SHOULD NOT be included in the list
+                                    of advertised prefixes.'''
+                    refRfc4861 "AdvPrefixList"
+                    list "prefix", key: "prefix-spec", description: "Configuration of an advertised prefix entry.", {
+                        leaf "prefix-spec", type: "inet:ipv6-prefix", description: "IPv6 address prefix."
+                        choice "control-adv-prefixes", default: "advertise", {
+                            description '''Either the prefix is explicitly removed from the
+                                           set of advertised prefixes, or the parameters with
+                                           which it is advertised are specified (default case).'''
+                            leaf "no-advertise", type: "empty", {
+                                description '''The prefix will not be advertised.
+
+                                                This can be used for removing the prefix from the
+                                                default set of advertised prefixes.'''
+                            }
+                            case_ "advertise", {
+                                leaf "valid-lifetime", type: "uint32", units: "seconds", default: 2592000, {
+                                    description '''The value to be placed in the Valid Lifetime in
+                                                    the Prefix Information option.  The designated
+                                                    value of all 1's (0xffffffff) represents
+                                                    infinity.'''
+                                    refRfc4861 "AdvValidLifetime"
+                                }
+                                leaf "on-link-flag", type: "boolean", default: true, {
+                                    description '''The value to be placed in the on-link flag
+                                                    ('L-bit') field in the Prefix Information
+                                                    option.'''
+                                    refRfc4861 "AdvOnLinkFlag"
+                                }
+                                leaf "preferred-lifetime", type: "uint32", units: "seconds", {
+                                    must ". <= ../valid-lifetime", {
+                                        description '''This value MUST NOT be greater than
+                                                        valid-lifetime.'''
+                                    }
+                                    default_ 604800
+                                    description '''The value to be placed in the Preferred Lifetime
+                                                    in the Prefix Information option.  The designated
+                                                    value of all 1's (0xffffffff) represents
+                                                    infinity.'''
+                                    refRfc4861 "AdvPreferredLifetime"
+                                }
+                                leaf "autonomous-flag", type: "boolean", default: true, {
+                                    description '''The value to be placed in the Autonomous Flag
+                                                   field in the Prefix Information option.'''
+                                    refRfc4861 "AdvAutonomousFlag"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
 
