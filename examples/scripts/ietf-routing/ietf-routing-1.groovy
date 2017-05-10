@@ -9,8 +9,10 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 def plugin = new CompactYangPlugin()
-def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin, [autoNl: true])
+def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin, [doNl: true, doQuote: true])
 plugin.declareCommonAliasesAndQuotes()
+builder.quoteKeywords += ["mandatory", "config", "min-elements", "default", "if-feature", "refine", "augment",
+                          "range", "units", "yang-version"]
 
 scriptName = "ietf-routing"
 gVer = 1
@@ -489,7 +491,7 @@ def ietf_ipvx_unicast_routing = { afi ->
         
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route", {
             when "derived-from-or-self(../../rt:address-family, +" +
-                "'v${afi}ur:ipv$afi-unicast')", splitOnPlus: true,
+                "'v${afi}ur:ipv$afi-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
 
             description "This leaf augments an IPv${afi} unicast route."
@@ -497,9 +499,9 @@ def ietf_ipvx_unicast_routing = { afi ->
        }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
-            "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", splitOnPlus: true, {
+            "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", doSplitOnPlus: true, {
             when "derived-from-or-self(../../../rt:address-family, +" +
-                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,
+                "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
             description "Augment 'simple-next-hop' case in IPv${afi} unicast routes."
             leaf_address "next-hop-address", "address of the next hop"
@@ -507,9 +509,9 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
             "rt:next-hop/rt:next-hop-options/rt:next-hop-list/+" +
-            "rt:next-hop-list/rt:next-hop", splitOnPlus: true, {
+            "rt:next-hop-list/rt:next-hop", doSplitOnPlus: true, {
             when "derived-from-or-self(../../../../../rt:address-family, +" +
-                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,
+                "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
             description "This leaf augments the 'next-hop-list' case of IPv${afi} unicast\n" +
                          "routes."
@@ -518,7 +520,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/rt:input", {
             when "derived-from-or-self(../rt:address-family, +" +
-                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,
+                "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast RIBs."
             description "This augment adds the input parameter of the 'active-route'\n" +
                          "action."
@@ -526,9 +528,9 @@ def ietf_ipvx_unicast_routing = { afi ->
         }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/+" +
-            "rt:output/rt:route", splitOnPlus: true, {
+            "rt:output/rt:route", doSplitOnPlus: true, {
             when "derived-from-or-self(../../rt:address-family, +" +
-                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,
+                "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
 
             description "This augment adds the destination prefix to the reply of the\n" +
@@ -544,7 +546,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                 nexthopElem = "next-hop-list"
             }
             when "derived-from-or-self(../../..${addLevel}/rt:address-family, +" +
-                "'v${afi}ur:ipv${afi}-unicast')", splitOnPlus: true,
+                "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
             description "Augment '${nexthopElem}' case in the reply to the\n" +
                         "'active-route' action."
@@ -553,20 +555,20 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/+" +
             "rt:output/rt:route/rt:next-hop/rt:next-hop-options/+" +
-            "rt:simple-next-hop", splitOnPlus: true, {
+            "rt:simple-next-hop", doSplitOnPlus: true, {
             nextHopAugmentBody()
         }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:active-route/+" +
             "rt:output/rt:route/rt:next-hop/rt:next-hop-options/+" +
-            "rt:next-hop-list/rt:next-hop-list/rt:next-hop", splitOnPlus: true, {
+            "rt:next-hop-list/rt:next-hop-list/rt:next-hop", doSplitOnPlus: true, {
             nextHopAugmentBody(false)
         }
 
         cmt "Configuration data", inline: false
 
         augment "/rt:routing/rt:control-plane-protocols/+" +
-            "rt:control-plane-protocol/rt:static-routes", splitOnPlus: true, {
+            "rt:control-plane-protocol/rt:static-routes", doSplitOnPlus: true, {
             description "This augment defines the configuration of the 'static'\n" +
                 "pseudo-protocol with data specific to IPv${afi} unicast."
             container "ipv${afi}", {
@@ -574,7 +576,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                                consists of a list of routes.'''
                 list "route", key: "destination-prefix",
                     description: "A list of static routes.", {
-                    leaf "destination-prefix", mandatory: true, type: "inet:ipv${afi}-prefix",
+                    leaf "destination-prefix", type: "inet:ipv${afi}-prefix", mandatory: true,
                         description: "IPv${afi} destination prefix."
                     leaf "description", type: "string",
                         description: "Textual description of the route."
@@ -586,7 +588,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                                 leaf_address "next-hop-address", "address of the next hop"
                             }
                             augment "next-hop-options/next-hop-list/next-hop-list/+" +
-                                "next-hop", splitOnPlus: true, {
+                                "next-hop", doSplitOnPlus: true, {
                                 description "Augment 'next-hop-list' case in IPv${afi} static\n" +
                                     "routes."
                                 leaf_address "next-hop-address", "address of the next hop"

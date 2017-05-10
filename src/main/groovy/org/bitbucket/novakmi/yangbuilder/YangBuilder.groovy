@@ -13,11 +13,14 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public static final String YANG_ROOT = 'yangroot'
         public static final String YANG_CMD = 'yngcmd'
         public static final reservedCommands = ["cmt", "geninfo", "yngbuild", YANG_ROOT ,YANG_CMD]
-        public static final reservedAttributes = ["autoNl", "noAutoQuotes", "indent", "quotes", "cmt", "inline",
-                                                  "splitOnPlus"]
+        public static final reservedAttributes = ["doNl", "doQuote", "noAutoQuotes", "indent", "quotes", "cmt", "inline",
+                                                  "doSplitOnPlus"]
 
         // list of keywords with special quote handling
-        private quoteKeywords = []
+        public quoteKeywords = []
+
+        // list of keywords that support doNL attribute or config
+        public autoNlKeywords = []
 
         /**
          * Create new YangBuilder
@@ -39,6 +42,13 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                         'must',
                         'error-message',
                         'when'
+                ]
+                
+                autoNlKeywords += [
+                    "description",
+                    "reference",
+                    "organization",
+                    "contact"
                 ]
         }
 
@@ -209,14 +219,17 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                         if (!node.attributes.noAutoQuotes) {
                                                 quoteString = getMyQuotes(node.value)
                                         }
-                                }
+                                        if (isKeyInConfigOrNodeAttr(node, "doQuote")
+                                            && (quoteString == '')) {
+                                                quoteString = '"'
+                                        }
+                                }                         
                                 if (node.value instanceof String || node.value instanceof GString) {
                                         def lines = node?.value.readLines()
                                         def autoNl = false
                                         if (lines.size() == 1) {
-                                                if (isKeyInConfigOrNodeAttr(node, "autoNl") &&
-                                                    node.name in ["description", "reference", // newline after these nodes
-                                                                  "organization", "contact"]) {
+                                                if (isKeyInConfigOrNodeAttr(node, "doNl") &&
+                                                    node.name in autoNlKeywords) {// newline after these nodes                                                         
                                                         opaque.println("")
                                                         opaque.incrementIndent()
                                                         indentIfNeeded(node, opaque)
@@ -224,7 +237,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                 } else {
                                                         opaque.print(" ")
                                                 }
-                                                def splitOnPlus = isKeyInConfigOrNodeAttr(node, "splitOnPlus")
+                                                def splitOnPlus = isKeyInConfigOrNodeAttr(node, "doSplitOnPlus")
                                                 if (splitOnPlus) {
                                                         lines = splitLineOnPlus(lines[0])
                                                         if(quoteString == '') {
