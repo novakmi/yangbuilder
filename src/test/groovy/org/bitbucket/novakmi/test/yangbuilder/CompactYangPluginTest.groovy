@@ -1094,6 +1094,19 @@ class CompactYangPluginTest {
         }
 
         @Test(groups = ["basic"])
+        public void commonAliasesTestNotRegistered() {
+                log.trace("==> commonAliasesTestNotRegistered")
+                CompactYangPlugin plugin = new CompactYangPlugin()
+                try {
+                        plugin.declareCommonAliasesAndQuotes()
+                        Assert.fail()
+                } catch (BuilderException expected) {
+                        // do nothing
+                }
+                log.trace("<== commonAliasesTestNotRegistered")
+        }
+
+        @Test(groups = ["basic"])
         public void minColAliasesTest() {
                 log.trace("==> minColAliasesTest")
                 CompactYangPlugin plugin = new CompactYangPlugin()

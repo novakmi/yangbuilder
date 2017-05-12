@@ -16,10 +16,10 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
         public static final reservedAttributes = ["doNl", "doQuote", "noAutoQuotes", "indent", "quotes", "cmt", "inline",
                                                   "doSplitOnPlus"]
 
-        // list of keywords with special quote handling
+        // list of keywords with special quote handling, not changed by 'reset'
         public quoteKeywords = []
 
-        // list of keywords that support doNL attribute or config
+        // list of keywords that support doNL attribute or config, not changed by `reset`
         public autoNlKeywords = []
 
         /**
@@ -93,7 +93,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
 
             for (int i = 0; i < linesTmp.size(); i++) {
                 if (i != 0 && lines[cur - 1].endsWith('\\')) {
-                    lines[cur - 1] = lines[cur - 1][0..-2] + linesTmp[i]
+                    lines[cur - 1] = lines[cur - 1][0..-2] + "+" + linesTmp[i]
                     continue
                 }
                 lines += linesTmp[i]

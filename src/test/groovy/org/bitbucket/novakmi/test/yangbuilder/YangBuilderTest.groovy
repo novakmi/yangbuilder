@@ -340,6 +340,44 @@ description"''', noAutoQuotes: true) // multiline and indent
 ''')
                 YangBuilderTestCommon.assertYangFile(builder, YangBuilderTestCommon._TEST_MODULE_NAME)
 
+                builder.reset()
+                builder.module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                        namespace "http://novakmi.bitbucket.org/test";
+                        // semicolon at the end can be preset (yang style)
+                        prefix YangBuilderTestCommon._TEST_MODULE_NAME
+                        // or semicolon can be missing (more groovy like style)
+                        yngbuild('') //yngbuild echoes value, yngbuild('') means new line
+
+                        organization 'novakmi'
+                        contact('it.novakmi@gmail.com', quotes: '"')
+                        description('test') // no quotes
+                        leaf("name") {
+                                type("string")
+                                description "test", doQuote:true //force quotes
+                        }
+                        leaf("name2") {
+                                type("string")
+                                description "test", quotes:"\"" //force quotes - another way
+                        }
+                }
+                Assert.assertEquals(builder.getText(), '''module test {
+    namespace "http://novakmi.bitbucket.org/test";
+    prefix test;
+
+    organization novakmi;
+    contact "it.novakmi@gmail.com";
+    description test;
+    leaf name {
+        type string;
+        description "test";
+    }
+    leaf name2 {
+        type string;
+        description "test";
+    }
+}
+''')
+
                 log.trace("<== quoteTest")
         }
 
@@ -689,4 +727,130 @@ multiline comment.
 ''')
                 log.trace("<== closureTest")
         }
+
+        @Test(groups = ["basic"])
+        public void splitOnPlusTest() {
+                log.trace("==> splitOnPlusTest")
+
+                def module = {
+                        module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                                augment "/rt:routing-state/rt:routes/rt:route/+" +
+                                    "rt:next-hop", doSplitOnPlus: true, {
+                                        container("ContA")
+                                }
+                                // slash before plus "\\+" means no split, just plus
+                                augment "/rt:routing-state/rt:routes/rt:route/\\+" +
+                                    "rt:next-hop", doSplitOnPlus: true, {
+                                        container("ContB") 
+                                }
+                        }
+                }
+
+                def builder = new YangBuilder(4)
+                builder << module // send closure to builder
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    augment "/rt:routing-state/rt:routes/rt:route/"
+          + "rt:next-hop" {
+        container ContA;
+    }
+    augment "/rt:routing-state/rt:routes/rt:route/+rt:next-hop" {
+        container ContB;
+    }
+}
+''')
+                log.trace("<== splitOnPlusTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void doQuoteTest() {
+                log.trace("==> doQuoteTest")
+
+                def module = {
+                        module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                                container("contA") {
+                                        description "one"
+                                }
+                                leaf("val") {
+                                        mandatory true
+                                        type("uint32")
+                                }
+                        }
+                }
+
+                def builder = new YangBuilder(4)
+                builder << module // send closure to builder
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    container contA {
+        description one;
+    }
+    leaf val {
+        mandatory true;
+        type uint32;
+    }
+}
+''')
+                 builder.resetText()
+                 builder.addConfig([doQuote:true])
+                 Assert.assertEquals(builder.getText(), '''module test {
+    container contA {
+        description "one";
+    }
+    leaf val {
+        mandatory true;
+        type uint32;
+    }
+}
+''')
+
+                builder.resetText()
+                builder.quoteKeywords += ["mandatory"]
+                Assert.assertEquals(builder.getText(), '''module test {
+    container contA {
+        description "one";
+    }
+    leaf val {
+        mandatory "true";
+        type uint32;
+    }
+}
+''')
+
+                log.trace("<== doQuoteTest")
+        }
+
+        @Test(groups = ["basic"])
+        public void autoNlTest() {
+                log.trace("==> autoNlTest")
+
+                def module = {
+                        module(YangBuilderTestCommon._TEST_MODULE_NAME) {
+                                container("contA") {
+                                        description "one"
+                                }
+                        }
+                }
+
+                def builder = new YangBuilder(4)
+                builder << module // send closure to builder
+
+                Assert.assertEquals(builder.getText(), '''module test {
+    container contA {
+        description one;
+    }
+}
+''')
+                builder.resetText()
+                builder.addConfig([doNl:true])
+                Assert.assertEquals(builder.getText(), '''module test {
+    container contA {
+        description
+            one;
+    }
+}
+''')
+                log.trace("<== autoNlTest")
+        }
+
 }
