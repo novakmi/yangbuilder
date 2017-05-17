@@ -15,11 +15,10 @@ builder.quoteKeywords += ["mandatory", "config", "min-elements", "default", "if-
                           "range", "units", "yang-version"]
 
 scriptName = "ietf-routing"
-gVer = 1
 moduleName = scriptName
 
 def ietf_routing_header = { name ->
-    geninfo file: "$scriptName-${gVer}.groovy", time: true,
+    geninfo file: "${scriptName}.groovy", time: true,
         cmt: '''Example implementation of the RFC 8022 in the yangbuilder
                in the syntax most similar to the Yang.
                See https://tools.ietf.org/html/rfc8022'''
@@ -74,7 +73,7 @@ def revision = {
 
 def ietf_routing_yang = {
     def name = scriptName
-    module "$name-$gVer", {
+    module name, {
         delegate << ietf_routing_header.curry(name)
         namespace "urn:ietf:params:xml:ns:yang:ietf-routing"
         prefix "rt"
@@ -223,7 +222,7 @@ def ietf_routing_yang = {
                                         address family.'''
                         if (!isState) {
                             leaf "index", type: "string", {
-                                description  '''A user-specified identifier utilized to uniquely
+                                description '''A user-specified identifier utilized to uniquely
                                                 reference the next-hop entry in the next-hop list.
                                                 The value of this index has no semantic meaning
                                                  other than for referencing the entry.'''
@@ -449,7 +448,7 @@ def ietf_routing_yang = {
 
 def ietf_ipvx_unicast_routing = { afi ->
     def name = "ietf-ipv${afi}-unicast-routing"
-    module "$name-$gVer", {
+    module name, {
         delegate << ietf_routing_header.curry(name)
         namespace "urn:ietf:params:xml:ns:yang:ietf-ipv$afi-unicast-routing"
         prefix "v${afi}ur"
@@ -474,7 +473,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         cmt "Identities", inline: false
 
-        identity "ipv${afi}-unicast",  base: "rt:ipv${afi}",
+        identity "ipv${afi}-unicast", base: "rt:ipv${afi}",
             description: "This identity represents the IPv${afi} unicast address family."
 
         cmt "State data", inline: false
@@ -484,11 +483,11 @@ def ietf_ipvx_unicast_routing = { afi ->
                 description: "IPv${afi} ${descr}."
         }
 
-        leaf_address = {nam, descr ->
+        leaf_address = { nam, descr ->
             leaf nam, type: "inet:ipv${afi}-address",
                 description: "IPv${afi} ${descr}."
         }
-        
+
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route", {
             when "derived-from-or-self(../../rt:address-family, +" +
                 "'v${afi}ur:ipv$afi-unicast')", doSplitOnPlus: true,
@@ -496,7 +495,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
             description "This leaf augments an IPv${afi} unicast route."
             leaf_prefix "destination-prefix", "destination prefix"
-       }
+        }
 
         augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
             "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", doSplitOnPlus: true, {
@@ -514,7 +513,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                 "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
             description "This leaf augments the 'next-hop-list' case of IPv${afi} unicast\n" +
-                         "routes."
+                "routes."
             leaf_address "address", "address of the next-hop"
         }
 
@@ -523,7 +522,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                 "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast RIBs."
             description "This augment adds the input parameter of the 'active-route'\n" +
-                         "action."
+                "action."
             leaf_address "destination-address", "destination address"
         }
 
@@ -534,7 +533,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                 description: "This augment is valid only for IPv${afi} unicast."
 
             description "This augment adds the destination prefix to the reply of the\n" +
-                        "'active-route' action."
+                "'active-route' action."
             leaf_prefix "destination-prefix", "destination prefix"
         }
 
@@ -549,7 +548,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                 "'v${afi}ur:ipv${afi}-unicast')", doSplitOnPlus: true,
                 description: "This augment is valid only for IPv${afi} unicast."
             description "Augment '${nexthopElem}' case in the reply to the\n" +
-                        "'active-route' action."
+                "'active-route' action."
             leaf_address "next-hop-address", "address of the next hop"
         }
 
@@ -584,7 +583,7 @@ def ietf_ipvx_unicast_routing = { afi ->
                         uses "rt:next-hop-content", {
                             augment "next-hop-options/simple-next-hop", {
                                 description "Augment 'simple-next-hop' case in IPv${afi} static\n" +
-                                             "routes."
+                                    "routes."
                                 leaf_address "next-hop-address", "address of the next hop"
                             }
                             augment "next-hop-options/next-hop-list/next-hop-list/+" +
@@ -603,7 +602,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
 def ietf_ipv6_router_advertisements = {
     def name = "ietf-ipv6-router-advertisements"
-    submodule "$name-$gVer", {
+    submodule name, {
         delegate << ietf_routing_header.curry(name)
         belongs_to "ietf-ipv6-unicast-routing", prefix: "v6ur";
         import_ "ietf-inet-types", prefix: "inet"

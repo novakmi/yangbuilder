@@ -3,8 +3,10 @@
 //This is free software licensed under MIT License, see LICENSE file
 //(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
-//If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
-//Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
+//If you have Internet connection, use groovy Grab to get dependencies
+//(may take some time for the first time to download jars)
+//Run as ordinary groovy script with command 'groovy <scriptName>.groovy'
+//(or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
@@ -43,6 +45,7 @@ def makeModuleHeader = {
 
 def makeModule = { name ->
     module name, {
+
         delegate << makeModuleHeader
 
         leaf "host-name", {
@@ -67,7 +70,8 @@ def makeModule = { name ->
 def root = {
     yangroot {
         geninfo file: "acmeYang.groovy", time: true,
-                cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
+            cmt: '''Example implementation from yang tutorial
+                http://www.yang-central.org/twiki/bin/view/Main/YangTutorials'''
         // one can continue with continue building yang from separate closure
         delegate << makeModule.curry(moduleName) //use curry to pass params to the closure
     }

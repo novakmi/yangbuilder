@@ -4,8 +4,10 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //This is free software licensed under MIT License, see LICENSE file
 //(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
-//If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
-//Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
+//If you have Internet connection, use groovy Grab to get dependencies
+//(may take some time for the first time to download jars)
+//Run as ordinary groovy script with command 'groovy <scriptName>.groovy'
+//(or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
@@ -25,7 +27,9 @@ moduleName = "acme-module-compact"   // do not use 'def' for script global varia
 */
 builder.yangroot {
     geninfo file: "acmeYang.groovy", time: true,
-        cmt: "Example implementation from yang tutorial http://www.yang-central.org/twiki/bin/view/Main/YangTutorials"
+        cmt: '''Example implementation from yang tutorial
+                http://www.yang-central.org/twiki/bin/view/Main/YangTutorials'''
+
     builder.module moduleName, {
         namespace "http://acme.example.com/module", nlLevel: true
         // nlLevel: true - insert \n after each element on this indent level

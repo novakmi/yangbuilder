@@ -51,12 +51,11 @@ different in the final deployment (e.g. customer variants, device variants, diff
 With this use case, only one source code for the data model is kept and desired variant is generated during build time. 
 This increases source code reuse, reduces possible of copy/paste errors, avoids merging between the variants.
   
-In addition, there is a `CompactYangPlugin` plugin, which bring even more features. 
-One of them is so called `compact yang` syntax, which creates simple sub-elements from attributes (can be freely mixed with `yang` like syntax):
+In addition, there is a `CompactYangPlugin` plugin, which bring even more features.
+One of them is so called `compact yang` syntax, which creates simple sub-elements 
+from attributes (can be freely mixed with `yang` like syntax):
   
-Example (from the Yang tutorial):
-
-`yang` syntax: 
+**Example of the `yang>` data model**
  
 ```groovy 
 container timeout {                                             
@@ -71,7 +70,7 @@ container timeout {
 }
 ```
 
-`yangbuilder` syntax (semicolons at the end are optional):
+**Example of the groovy `yangbuilder`> data model**
 
 ```groovy 
 container timeout, {                                             
@@ -86,7 +85,7 @@ container timeout, {
 }
 ```
 
-`yangbuilder` (compact yang) syntax:
+**Example of the groovy `yangbuilder` data model with compact syntax**
 
 ```groovy
 container "timeout", {
@@ -100,8 +99,7 @@ Test source code is in the `main/tests` directory. (Test source code is good exa
 Documentation files and source  is in the `documentation` directory. (Documentation is still in progress.)
 
 Use [gradle][gradle_id] to build, test and package project.
-Use [groovy][groovy_id] version 2.1.9 and later (`groovy` < 2.1.9 can be used with special builds of `nodebuilder`, e.g. 
-`nodebuilder-1.0.0.1`)
+Use [groovy][groovy_id] version 2.4.0 and later
 
 See `changelog.md`.
 
@@ -116,9 +114,9 @@ See `examples\scripts\`
 ### Usage with `groovy` Grapes in script
 
 ```groovy
-//@GrabResolver(name = 'jcenterrepo', root = 'https://jcenter.bintray.com', m2Compatible = true) //needed only with older ver. of groovy
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
+#!/usr/bin/env groovy
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 ...
 ```
 Run `groovy` script as regular script (`Linux`) of with `groovy` command (`Linux`, `Windows`).
