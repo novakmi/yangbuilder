@@ -20,7 +20,7 @@ moduleName = "acme-module-plain"   // do not use 'def' for script global variabl
 */
 builder.yangroot {
     geninfo file: "acmeYang.groovy", time: true,
-        cmt: '''Example implementation from yang tutorial
+        cmt: '''\nExample implementation from yang tutorial
                 http://www.yang-central.org/twiki/bin/view/Main/YangTutorials'''
 
     module moduleName, {

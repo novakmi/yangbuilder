@@ -70,7 +70,7 @@ def makeModule(builder) {
 */
 builder.yangroot {
     geninfo file: "acmeYang.groovy", time: true,
-        cmt: '''Example implementation from yang tutorial
+        cmt: '''\nExample implementation from yang tutorial
                 http://www.yang-central.org/twiki/bin/view/Main/YangTutorials'''
     // one can continue with  module(moduleName) {... or build continue building yang in separate function
     makeModule(builder) // pass builder

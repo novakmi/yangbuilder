@@ -202,7 +202,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                 indentIfNeeded(node, opaque)
                                 opaque.println("*/")
                                 break;
-                        case "yngcmd": //reserved for YangBuilder commands (can be used by plugins)
+                        case YANG_CMD: //reserved for YangBuilder commands (can be used by plugins)
                                 break;
                         default:
                                 if (node.attributes[_YGN]) { // do not process ignored node

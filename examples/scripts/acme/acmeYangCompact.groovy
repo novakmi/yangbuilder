@@ -27,7 +27,7 @@ moduleName = "acme-module-compact"   // do not use 'def' for script global varia
 */
 builder.yangroot {
     geninfo file: "acmeYang.groovy", time: true,
-        cmt: '''Example implementation from yang tutorial
+        cmt: '''\nExample implementation from yang tutorial
                 http://www.yang-central.org/twiki/bin/view/Main/YangTutorials'''
 
     builder.module moduleName, {

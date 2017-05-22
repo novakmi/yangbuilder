@@ -70,7 +70,7 @@ def makeModule = { name ->
 def root = {
     yangroot {
         geninfo file: "acmeYang.groovy", time: true,
-            cmt: '''Example implementation from yang tutorial
+            cmt: '''\nExample implementation from yang tutorial
                 http://www.yang-central.org/twiki/bin/view/Main/YangTutorials'''
         // one can continue with continue building yang from separate closure
         delegate << makeModule.curry(moduleName) //use curry to pass params to the closure

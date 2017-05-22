@@ -19,7 +19,7 @@ moduleName = scriptName
 
 def ietf_routing_header = { name ->
     geninfo file: "${scriptName}.groovy", time: true,
-        cmt: '''Example implementation of the RFC 8022 in the yangbuilder
+        cmt: '''\nExample implementation of the RFC 8022 in the yangbuilder
                in the syntax most similar to the Yang.
                See https://tools.ietf.org/html/rfc8022'''
     yang_version "1.1", nlLevel: true
