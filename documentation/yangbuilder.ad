@@ -52,12 +52,15 @@ NOTE: _This document is work in progress and not all information is always up to
        Please take a look at the examples in the `examples\scripts` directory
        and at the tests in the `tests\groovy` directory to see full usage of all <<yangbuilder>> features._
 
-The <<yang>> modeling language is used to describe data model. It can be compared to the *XML Schema* (*XSD*),
-however the syntax is different. The <<groovy>> builder can be used to create parent-child oriented data documents
+The <<yang>> modeling language is used to describe data models. It can be compared to the *XML Schema* (*XSD*),
+however the syntax is different.
+
+The <<groovy>> builder can be used to create parent-child oriented data documents
 (e.g. *XSD*, *XML*). See, for example http://groovy-lang.org/processing-xml.html#_creating_xml[creating XML] chapter
 how to use <<groovy>> builder for *XML*.
 
-The syntax of the data model written in the <<yang>> resembles syntax used in the <<groovy>> builder. 
+The syntax of the data model written in the <<yang>> resembles syntax used in the <<groovy>> builder.
+This gives good reason to implement <<groovy>> builder for the <<yang>>.
 
 === Example of the <<yang>> data model
 
@@ -104,12 +107,13 @@ NOTE: The <<groovy>> syntax in the example above was written to be similar to th
       The difference are only the `,` comma after element name (needed for elements containing sub-elements)
       and apostrophes (or quotation marks).
       The comma `,` can be replaced by parentheses, e.g. `leaf("access-timeout)`
-      In <<groovy>> you can also omit all semicolons. 
+      In <<groovy>> you can also omit all semicolons. If you need to use element, that is keyword or
+      is forbidden in <<groovy>>/Java, it has to be writen as string, e.g. `"enum" "one"`, `"leaf-list" "numbers"`.
 
 === Example of the groovy <<yangbuilder>> data model with compact syntax
 
-With the <<compactPlugin,`CompactYangPlugin`>> for the <<yangbuilder>>, one can use compact syntax to reduce level of nesting
-which is required by the fact the <<Yang>> does not have element attributes.
+With the <<compactPlugin,`CompactYangPlugin`>> for the <<yangbuilder>>, one can use compact syntax to reduce
+the level of nesting, which is required by the fact the <<Yang>> does not have element attributes.
 
 .Yang example from the Yang tutorial (shortened) written in the <<groovy>> <<yangbuilder>> compact syntax
 ----
@@ -126,32 +130,30 @@ container "timeout", {
 
 NOTE: The compact syntax can be used only if <<compactPlugin,`CompactYangPlugin`>> is registered.
 
-=== Pros and Cons
+=== Pros and Cons of <<yangbuilder>>
 
 *Pros:*
 
 * output is the `yang` file (no compatibility issues)
 * syntax similar to the `yang` syntax
-* better reuse than in `yang`
-    ** use of programming language (loops, functions, variables, conditions, etc.)
-    ** parametrized groupings like constructs (e.g. `grouping ipv4 {`
+* better reuse than in the <<yang>>
+    ** use of programming language (loops, functions, closures, variables, conditions, etc.)
+    ** parametrization (e.g. `grouping ipv4 {`
        and `grouping ipv6 {` can be written as `grouping ${ipver} {`)
-    ** reusable functions/closures
-    ** reusable groovy closures built with `delegate << closure` (requires `nodebuilder-1.0.0` and newer)
-    ** use variables for common values
-    ** optionally extend syntax (add elements) with closures (e.g. add `leaf_string`)
+    ** use variables for values (no magic numbers, strings)
+    ** optionally extend syntax with closures (e.g. add `leaf_string`)
     ** `groovy` reuse (closures, functions, etc.) as alternative option to the `yang`
         reuse (`grouping`, `augment`, `refine`)
-* generate `yang` data models conditionally
-   ** easily maintain and support different versions od large (similar) data models
-   ** generate different release, product, feature or customer specific `yang` versions according
+* generate the <<yang>> data models conditionally
+   ** maintain and support different versions of (similar) data models
+   ** generate different release, product, feature or customer specific <<yang>> versions according
       to the build options or environment variables
-   ** use conditions where it is not possible to use in the <<yang>>
+   ** use `if` conditions where it is not possible to use in the <<yang>>
       (e.g `if-feature`  in `import`, `include`, ...)
    ** use negative conditions (not possible with `if-feature`)
-* split common parts into several functions/closures/files
-* reduce number of lines to maintain (with the `CompactYangPlugin`)
-* extend with plugins (e.g. code generators)
+* split common parts into several functions/closures or files
+* reduce number of lines to maintain (mainly with the `CompactYangPlugin`)
+* extend with plugins (e.g. add own aplication code generators)
 * use power of IDE supporting `groovy` (e.g.  Intellij Idea Community edition)
     * auto completion
     * syntax highlighting
@@ -179,9 +181,9 @@ NOTE: <<nodebuilder>> and <<yangbuilder>> jar files do not need to be downloaded
 
 === Installation
 
-In most cases, there is no need for special installation of the <<yangbuilder>> when there is an
+In most cases, there is no need for installation of the <<yangbuilder>> when there is an
 Internet connection. The <<groovy>> script generating the <<yang>> file can download all required
-dependencies with the use of <<groovy>>http://docs.groovy-lang.org/latest/html/documentation/grape.html[Grape]
+dependencies with the use of groovy http://docs.groovy-lang.org/latest/html/documentation/grape.html[Grape]
 feature. See +examples/scripts+ directory for example scripts.
 
 [source,groovy]
@@ -192,10 +194,10 @@ feature. See +examples/scripts+ directory for example scripts.
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 ----
 
-The script can be run with command `groovy <scriptname>.groovy`.
-On Linux it can be also run as regular script (`./<scriptname>.groovy`)
+The script can be run with command `groovy <scriptname>.groovy`. +
+On Linux, it can be also run as regular script (`./<scriptname>.groovy`).
 
-The first run of the script can take some time (downloading dependencies from Internet).
+The first run of the script can take some time (downloading dependencies from the Internet).
 During the next run, the dependencies are already downloaded and the Internet
 connection is not needed anymore.
 
@@ -203,9 +205,9 @@ The datamodel "building" can be split into several files (see example in `exampl
 directory)
 
 It is possible to run script or <<groovy>> application in regular <<groovy>> (Java]
-way by supplying `classpath` to the dependent `jar` files (no dependencies are
-downloaded). For this case the `@Grab` statements should be removed and the corresponding
-dependencies have to be placed into `CLASSPATH` directory.
+way by supplying `classpath` to the dependent `jar` files.
+For this case the `@Grab` statements should be removed and the corresponding
+dependencies have to be placed into the `CLASSPATH` directory.
 
 For example:
 
@@ -230,21 +232,22 @@ dependencies {
 
 See `examples/scripts` directory to see how to write <<yangbuilder>> scripts and generate yang files.
 See `examples/project` directory for sample project that generates several (related) yang files
-in one <<groovy>> application
+in one <<groovy>> application. The examples represents good way to learn how to use the
+<<yangbuilder>>. They can be easily run and generated <<yang>> data model file(s) compared with
+the <<yangbuilder>> data model.
 
 === acmeYang
 
 This example is represented by the several variants of the <<groovy>> source scripts that generate
 <<yang>> data model adopted from the Yang tutorial
-http://www.yang-central.org/twiki/bin/view/Main/YangTutorials.
+http://www.yang-central.org/twiki/bin/view/Main/YangTutorials. Each variant generates same <<yang>>
+data model and shows different ways how to use the <<yangbuilder>>.
 
 See directory `examples\scripts\acme`.
 
 ====  Plain variant
 
 To generate model, run the script `acmeYangPlain.groovy`.
-On Linux, run as regular script (`./acmeYangPlain.groovy`), on Windows or Mac run with <<groovy>>
-command (`groovy acmeYangPlain.groovy`).
 
 [source,groovy]
 .`acmeYangPlain.groovy` - example of the <<yangbuilder>> script
@@ -301,11 +304,11 @@ builder.yangroot {
 
 builder.writeToFile("${builder.getYangName()}.yang")                               <7>
 ----
-<1> you can generate the <<yang>> with the script
-<2> use `@Grab` to download dependent jar files
+<1> you can generate the <<yang>> by executing  the script (Linux)
+<2> use `@Grab` to download dependent jar files, if not yet downloaded
 <3> create new builder (with default indent 2)
 <4> semicolon at the end is optional
-<5> Groovy/Java keywords has to be quoted (or alias e.g. "import_" can be declared)
+<5> Groovy/Java keywords has to be quoted
 <6> Multiple line description
 <7> generate the <<yang>> and write it to the file
 
@@ -365,12 +368,13 @@ In the same directory you can find other variants:
    so it can continue building the data model.
 * `acmeYangClrs.groovy` - shows how data model in <<groovy>> script can be
    split into more closures. Overloaded left shift operator `<<` can be used.
-   Instead of passing the `builder` object, the `delegate` can be used (if the
-   `builder` is in the closure scope, then `delegate <<` can be skipped completely.
+   Instead of passing the `builder` object, the `delegate` can be used.
+   Closures can have parameters and they can be passed with `curry` feature.
+   If the `builder` is in the closure scope, then `delegate <<` can be skipped
+   completely and parameters can be passed without `curry`.
 * `acmeYangCompact.groovy` - shows the use of `CompactYangPlugin` which allows more
    compact data model representation than the original `yang`. Simple
    sub-elements (those not having children) can be written as attributes.
-
 
 === IETF examples
 
@@ -381,10 +385,11 @@ The RFC <<yang>> files make use of lot of `descriptions`, which are not suitable
 the reuse. As you can see in examples, there is still room to shorted the <<yang>>
 definition with use of the <<yangbuilder>>.
 
+The examples are found in `examples\scripts\ietf` directory.
+
 ==== `ietf-routing` data model
 
-The `ietf-routing` is found in `examples\scripts\ietf-routing` directory.
-Currently it is the latest example with output almost identical output
+Currently, this is the latest example with output almost identical output
 to the original data models (the differences are often minor fixes to the original yang
 files found by <<yangbuilder>> reuse).
 
@@ -406,10 +411,10 @@ on parameter. Each IETF file is created by one closure in the loop at the end.
     builder.writeToFile("${builder.getYangName()}.yang")    <5>
 }
 ----
-<1> list of closures
+<1> list of closures (some of them reused with curried parameter)
 <2> iterate list
 <3> reset builder content
-<4> build datamodel according to the closure
+<4> build data model according to the closure
 <5> save `*.yang` file
 
 The example illustrates usage of the <<compactPlugin,`CompactYangPlugin`>>,
@@ -417,9 +422,38 @@ most of the data model is written in (so called) compact `yang` syntax.
 
 Run with `./ietf-routing.groovy`
 
-==== `ietf-interfaces` data model
+Interesting parts of the script
 
-See sources and generated <<yang>> files in the `examples\scripts\ietf-interfaces` directory.
+[source,groovy]
+.`ietf-routing.groovy` - initialization
+----
+def plugin = new CompactYangPlugin()
+def builder =
+    new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin, [doNl: true, doQuote: true])      <1>
+plugin.declareCommonAliasesAndQuotes()                                                             <2>
+builder.quoteKeywords +=
+     ["mandatory", "config", "min-elements", "default", "if-feature", "refine", "augment",         <3>
+      "range", "units", "yang-version"]
+----
+1. Create builder with indent 2, registered `plugin` and <<configMap, `configMap`>> with
+   <<doNl, `doNl`>> and <<doQuote, `doQuote`>> elements, which help to follow `yang` style
+   often used in `ietf` data model (e.g. new line after `description`, using quotes even when not
+   required by `yang`)
+2. Declare common aliases for the Yang language conflicting with groovy syntax and keywords (e.g. `leaf-list`
+   can be used as `leaf_list`, see  `CompactYangPlugin` source file)
+3. Append to the list of <<quotes, `quote`>> keywords (use quoted value for the keywords, even though
+   not required by the `yang`).
+
+[source,groovy]
+.`ietf-routing.groovy` - use of `doSplitOnPlus`
+----
+when "derived-from-or-self(../../rt:address-family, +" +
+                "'v${afi}ur:ipv$afi-unicast')", doSplitOnPlus: true,                                <1>
+----
+1. Use of <<splitOnPlus, `doSplitOnPlus`>> attribute
+
+
+==== `ietf-interfaces` data model
 
 * `ietf-interfaces-1` - this <<yangbuilder>> script tries to be similar to the original <<yang>> file,
    it already uses the `CompactYangPlugin` to define some child elements as attributes
@@ -482,10 +516,12 @@ See `YangBuilderTest.groovy`, tests `quoteTest` and `commentTest` for other exam
 container 'socket', cmt: "Inline comment for socket container"
 ---------
 
+[[splitOnPlus]]
 * `doSplitOnPlus` - sometimes it is necessary to split string values into several lines and add plus (`+`) sign
  between them.
 
 [source,groovy]
+.line split with plus in the `yang`
 ---------
  augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/"
         + "rt:next-hop/rt:next-hop-options/rt:simple-next-hop" {
@@ -494,12 +530,13 @@ container 'socket', cmt: "Inline comment for socket container"
 For this `doSplitOnPlus` can be used.
 
 [source,groovy]
+.line split with plus modelled the `yangbuilder`
 ---------
  augment "/rt:routing-state/rt:ribs/rt:rib/rt:routes/rt:route/+" +
             "rt:next-hop/rt:next-hop-options/rt:simple-next-hop", doSplitOnPlus: true, {
 ---------
 
-The plus (`+`) sign at the end of line makes split. In case plus sign is part of string, it can be escaped with slash
+The plus (`+`) sign at the end of line makes split. In case plus sign is part of the string, it can be escaped with slash
 (`\\+`).
 
 See `YangBuilderTest.groovy`, test `splitOnPlusTest`.
@@ -636,12 +673,15 @@ Example:
 
 `description "description of the model"`
 
+[[doQuote]]
 Sometimes quotes are required, ven though they are not necessary by the `yang` syntax.
-With these special keywords one can use  `doQuote` attribute  (e.g. `description "test", doQuote:true`)
-which adds always quote to the value. The difference from  `quotes` attribute is that is processed only for
+With these special keywords one can use  `doQuote` attribute
+(e.g. `description "test", doQuote:true`) which adds always quote to the value.
+The difference from  `quotes` attribute is that is processed only for
 the quoteKeywords and the <<yangbuilder>> to choose what to use as quote attribute (usually `"`).
 The `doQuote` can be forced automatically with <<configMap, `configMap`>> feature
 
+[[doNl]]
 === <<yang>> keywords with special handling for new lines
 
 Together with `doNl` attribute, following keywords print their value in new line
@@ -656,7 +696,6 @@ Together with `doNl` attribute, following keywords print their value in new line
 ---------
 description "Text on next line", doNl: true
 ---------
-
 
 These keywords are called `autoNlKeywords` and can be extended. For example:
 
@@ -716,8 +755,8 @@ leaf "node", {
 }
 ---------
 
-See `CompactYangPlugin.groovy` for implementation and 
-`CompactYangPluginTest.groovy` for more plugin usage and examples.
+See `CompactYangPlugin.groovy` for implementation and `CompactYangPluginTest.groovy`
+for plugin usage and examples.
 
 === TailfCompactYangPlugin
 
@@ -818,7 +857,6 @@ builder.getPrefixName()
 
 See `YangBuilderTest.groovy` file (`src/test` directory), tests `yangNameTest`, `prefixNameTest` for examples of usage.
 
-
 * `addQuoteKeywords` specify additional keywords for <<quotes,special quotes handling>>
 
 [source,groovy]
@@ -826,13 +864,22 @@ See `YangBuilderTest.groovy` file (`src/test` directory), tests `yangNameTest`, 
 builder.addQuoteKeywords('my-annotation')
 ---------
 
-
 == Syntax
-
-TODO
 
 === Recommended <<yangbuilder>> syntax
 
+1. avoid semicolon at the end
+1. avoid use parentheses for values
+1. prefer to use `yang` reuse features (`grouping`, `refine`) if possible
+1. reuse often repeated (and similar) blocks
+1. split long data models into several files
+
 === Recommended compact yang syntax
 
+1. model single line elements (not containing sub-elements) as attributes
+
 === Recommended <<yang>> syntax
+
+1. do not use quotes, if not necessary
+1. place the single line elements (without sub-elements) first in the data model
+   (simplifies conversion to compact yang syntax)
