@@ -5,15 +5,28 @@
 // Tip: Use Intellij Idea community edition to work with gradle (GradleGUI plugin)
 // run 'gradle tasks' to see available tasks
 
+
+
+buildscript {
+        repositories {
+                jcenter()
+        }
+        dependencies {
+                classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+        }
+}
+
+
 apply plugin: 'groovy'
 apply plugin: 'maven' // to use maven repository
 apply plugin: 'idea' // to generate project+module files for Intellij Idea
+apply plugin: 'org.asciidoctor.convert'
 
 version = '1.3.0'
 sourceCompatibility = '1.6'
 def groupId = "org.bitbucket.novakmi"
 def installDir = file("${project.projectDir}/install")
-def documentationDir = file("${project.projectDir}/documentation")
+def documentationDir = file("${project.projectDir}/docs")
 
 idea {
         module {
@@ -100,6 +113,7 @@ task prepareInstall(type: Copy, dependsOn: [jar, sourcesJar, groovydocJar]) {
         //logger.quiet("externalJars {}", externalJars)
         from configurations['compile']?.files/*?.findAll { it.absolutePath.indexOf('unspecified') < 0 }*/
         from "${project.projectDir}/build/libs"
+        from "${project.projectDir}/build/docs"
         into installDir
 }
 
@@ -181,4 +195,12 @@ task checkLibVersions {
                         }
                 }
         }
+}
+
+asciidoctor {
+        sourceDir = documentationDir
+        sources {
+                include 'yangbuilder.ad'
+        }
+        outputDir = file("${project.projectDir}/build/docs")
 }
