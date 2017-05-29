@@ -253,7 +253,7 @@ To generate model, run the script `acmeYangPlain.groovy`.
 .`acmeYangPlain.groovy` - example of the <<yangbuilder>> script
 ----
 #!/usr/bin/env groovy                                                              <1>
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')  <2>
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')  <2>
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.1')
 
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder()                  <3>

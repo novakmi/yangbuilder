@@ -35,14 +35,14 @@ idea {
 }
 
 repositories {
-        maven { url "https://jcenter.bintray.com" } //jcenter repo
+        jcenter()      //jcenter repo
         mavenCentral() // standard maven repository
 }
 
 // Define dependencies
 dependencies {
         compile localGroovy()
-        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.0.0'
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.1.0'
         // dependencies for tests
         testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.9'
         testCompile group: 'org.testng', name: 'testng', version: '6.9.9'
@@ -107,14 +107,24 @@ test {
         //    }
 }
 
+asciidoctor {
+        sourceDir = documentationDir
+        sources {
+                include 'yangbuilder.ad'
+        }
+        outputDir = file("${project.projectDir}/build/docs")
+}
 
-task prepareInstall(type: Copy, dependsOn: [jar, sourcesJar, groovydocJar]) {
+task prepareInstall(type: Copy, dependsOn: [jar, sourcesJar, groovydocJar, asciidoctor]) {
         installDir.mkdirs()
         //logger.quiet("externalJars {}", externalJars)
-        from configurations['compile']?.files/*?.findAll { it.absolutePath.indexOf('unspecified') < 0 }*/
+        from configurations['compile']?.files {/*?.findAll { it.absolutePath.indexOf('unspecified') < 0 }*/
+             exclude "**/groovy*.jar" // do not include groovy jar
+        }
         from "${project.projectDir}/build/libs"
-        from "${project.projectDir}/build/docs"
+        from "${project.projectDir}/build/docs/html5/"
         into installDir
+        rename "yangbuilder.html", "yangbuilder-${version}.html"
 }
 
 // zip into build/distributions
@@ -195,12 +205,4 @@ task checkLibVersions {
                         }
                 }
         }
-}
-
-asciidoctor {
-        sourceDir = documentationDir
-        sources {
-                include 'yangbuilder.ad'
-        }
-        outputDir = file("${project.projectDir}/build/docs")
 }

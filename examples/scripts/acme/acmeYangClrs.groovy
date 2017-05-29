@@ -9,7 +9,7 @@
 //(or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 //name of file to generate

@@ -10,7 +10,7 @@ import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 //(or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
 
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.0.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
 
 //This script template represents example of usage with the CompactYangPlugin

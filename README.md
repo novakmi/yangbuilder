@@ -139,7 +139,7 @@ NOTE: With `groovy` version below `2.3.0` following dependency may also be neede
 ```groovy
 dependencies {
         compile localGroovy()
-        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.0.0'
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.1.0'
         compile group: 'org.bitbucket.novakmi', name: 'yangbuilder', version: '1.2.0'
 }
 ...
