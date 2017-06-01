@@ -1,5 +1,14 @@
 #Yangbuilder change log
 
+* 1.3.0 2017-06-02
+    * added RFC 8022 example (`ietf-routing`)
+    * updated dependencies (`nodebuilder-1.1.0`)
+    * updated documentation
+    * updated copyright 
+    * `quoteKeywords` and `autoNlKeywords` lists can be extended
+    * `autoNl`, `doSplitOnPlus` attributes
+    * updated tests to reflect new functionality
+    
 * 1.2.0 2016-12-12
     * updated documentation (mainly reuse with closures)
     * updated examples (closures)
