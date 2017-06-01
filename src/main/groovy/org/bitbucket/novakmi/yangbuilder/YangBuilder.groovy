@@ -26,6 +26,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
          * Create new YangBuilder
          * @param indent number of spaces for indentation (default is 2)
          * @param plugins list of plugins to be added (no plugins by default)
+         * @param configMap initial config map to use
          */
         public YangBuilder(indent = 2, plugins = null, configMap = null) {
                 super(indent, plugins, configMap)
