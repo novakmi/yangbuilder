@@ -8,7 +8,7 @@
 //update nodebuilder, yangbuilder version numbers as needed
 //@GrabResolver(name = 'novakmirepo', root = 'https://github.com/novakmi/novakmirepo/raw/master/releases', m2Compatible = true)
 @Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
-@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.2.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 
 //due to @Grab limitation in script, we have to have def ... after Grab, in our case we can just create builder
 // see http://groovy.codehaus.org/Grapes+and+grab()
