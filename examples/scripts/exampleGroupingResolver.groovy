@@ -6,7 +6,7 @@ import org.bitbucket.novakmi.yangbuilder.GroupingResolverPlugin
 //(https://bitbucket.org/novakmi/yangbuilder/src/LICENSE)
 
 //adoc-begin - documentation purpose comment
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.1')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 
 def resolver = new GroupingResolverPlugin()                                                           //<1>

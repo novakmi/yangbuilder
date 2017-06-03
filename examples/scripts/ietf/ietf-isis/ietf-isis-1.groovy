@@ -5,7 +5,7 @@
 
 import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.1')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 
 plugin = new CompactYangPlugin()
@@ -40,7 +40,7 @@ builder.module(moduleName) {
 
     contact'''WG List:	&lt;mailto:isis-wg@ietf.org&gt;
 
-        Editor:		Stephane Litkowski
+        Editor:       Stephane Litkowski
         &lt;mailto:stephane.litkowski@orange.com&gt;
 
         Derek Yeung

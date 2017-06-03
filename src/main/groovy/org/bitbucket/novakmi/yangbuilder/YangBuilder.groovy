@@ -262,7 +262,7 @@ class YangBuilder extends TextPluginTreeNodeBuilder {
                                                         opaque.decrementIndent()
                                                 }
                                         } else {
-                                                lines = dropFirstElemIfEq(lines)
+                                                //lines = dropFirstElemIfEq(lines)
                                                 lines = TextPluginTreeNodeBuilder.trimAndQuoteLines(lines, quoteString)
                                                 lines.each { l->
                                                         opaque.println("")

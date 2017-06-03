@@ -42,10 +42,10 @@ repositories {
 // Define dependencies
 dependencies {
         compile localGroovy()
-        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.1.0'
+        compile group: 'org.bitbucket.novakmi', name: 'nodebuilder', version: '1.1.1'
         // dependencies for tests
-        testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.9'
-        testCompile group: 'org.testng', name: 'testng', version: '6.9.9'
+        testCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+        testCompile group: 'org.testng', name: 'testng', version: '6.11'
         testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
         //testCompile 'org.uncommons:reportng:1.1.1'
         testCompile group: 'janino', name: 'janino', version: '2.4.3'
@@ -190,7 +190,7 @@ task checkLibVersions {
                                                         versions.removeAll { it.toLowerCase().contains('alpha') }
                                                         versions.removeAll { it.toLowerCase().contains('beta') }
                                                         versions.removeAll { it.toLowerCase().contains('rc') }
-                                                        def newest = versions.max()
+                                                        def newest = versions.last()//versions.max()
                                                         if (ver != newest) {
                                                                 println "$group:$name $ver -> $newest [$versions]"
                                                         }

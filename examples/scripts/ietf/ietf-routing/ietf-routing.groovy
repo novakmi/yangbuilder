@@ -5,8 +5,8 @@
 
 import org.bitbucket.novakmi.yangbuilder.CompactYangPlugin
 
-//@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
-//@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.1')
+@Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 
 def plugin = new CompactYangPlugin()
 def builder = new org.bitbucket.novakmi.yangbuilder.YangBuilder(2, plugin, [doNl: true, doQuote: true])
@@ -464,8 +464,7 @@ def ietf_ipvx_unicast_routing = { afi ->
 
         delegate << org_contact
 
-        description '''
-         This YANG module augments the 'ietf-routing' module with basic\n''' +
+        description '''This YANG module augments the 'ietf-routing' module with basic\n''' +
             "configuration and state data for IPv${afi} unicast routing." +
             commmonIetfDesc
 

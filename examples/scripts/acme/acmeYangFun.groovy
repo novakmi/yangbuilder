@@ -6,8 +6,7 @@
 //If you have Internet connection, use groovy Grab to get dependencies (may take some time for the first time to download jars)
 //Run as ordinary groovy script with command 'groovy <scriptName>.groovy' (or as Linux executable script './<scriptName>.groovy')
 //Update nodebuilder, yangbuilder version numbers as needed
-
-@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.0')
+@Grab(group = 'org.bitbucket.novakmi', module = 'nodebuilder', version = '1.1.1')
 @Grab(group = 'org.bitbucket.novakmi', module = 'yangbuilder', version = '1.3.0')
 
 //This script template represents example of usage without any plugin
